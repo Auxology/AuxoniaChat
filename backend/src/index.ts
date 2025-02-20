@@ -1,21 +1,48 @@
-import express, { Express, Request, Response } from 'express';
-import dotenv from 'dotenv';
+// Purpose: Entry point for the backend server.
+
+// Imports
+import express, {type Express} from 'express';
+import dotenv from 'dotenv'
+import cookieParser from 'cookie-parser'
+import cors from 'cors'
+import {testRoute} from "./routes/testRoute.js";
+import {initRedis} from "./libs/redis.js";
 
 dotenv.config();
 
-const app: Express = express();
-const port = process.env.PORT;
+// Constants
+const app:Express = express();
+const port:string = process.env.PORT!;
 
 if(!port) {
-  process.exit(1);
+    console.error('PORT not defined in .env file');
+    process.exit(1);
 }
 
-app.use(express.json());
+// Middlewares
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(cookieParser());
+app.use(cors());
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Express + TypeScript Server');
-});
+// Routes
+app.use('/api', testRoute);
 
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+// Server
+async function startServer(){
+  try {
+    await initRedis();
+    app.listen(port, () => {
+      console.log(`Server is running on http://localhost:${port}`);
+    });
+  }
+  catch(err){
+    console.error('Failed to start server', err);
+  }
+}
+
+startServer().then(() => {
+  console.log('Server started successfully');
+}).catch((err) => {
+    console.error('Failed to start server', err);
 });
