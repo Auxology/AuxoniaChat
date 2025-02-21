@@ -26,13 +26,13 @@ app.use(cookieParser());
 app.use(cors());
 
 // Routes
-app.use('/api', testRoute);
+app.use('/api', testRoute); // Test route(Do not worry about this)
 
 // Server
-async function startServer(){
+async function startServer():Promise<void>{
   try {
     await initRedis();
-    app.listen(port, () => {
+    app.listen(port, ():void => {
       console.log(`Server is running on http://localhost:${port}`);
     });
   }
@@ -41,8 +41,8 @@ async function startServer(){
   }
 }
 
-startServer().then(() => {
+startServer().then(():void => {
   console.log('Server started successfully');
-}).catch((err) => {
+}).catch((err):void => {
     console.error('Failed to start server', err);
 });

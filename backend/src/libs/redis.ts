@@ -15,7 +15,7 @@ const redis = createClient({
 });
 
 // Connect To Client(Inside index.ts)
-export const initRedis = async () => {
+export const initRedis :() => Promise<void> = async ():Promise<void> => {
     try {
         await redis.connect();
         console.log('Connected to Redis');
@@ -26,6 +26,6 @@ export const initRedis = async () => {
 }
 
 // Test Function
-export function testRedis (){
+export function testRedis ():void{
     redis.setEx('test', 10, 'Hello World');
 }
