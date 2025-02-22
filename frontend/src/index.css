@@ -5,9 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: hsl(0 0% 100%);
+  --background: #16161a;
   --foreground: hsl(222.2 84% 4.9%);
-  --card: hsl(0 0% 100%);
+  --card: #242629;
   --card-foreground: hsl(222.2 84% 4.9%);
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(222.2 84% 4.9%);
@@ -97,4 +97,34 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@font-face {
+  font-family: "Ogg TRIAL";
+  src: url('./fonts/OGG/Ogg-Bold-BF646c18fc530f4.ttf');
+}
+
+@font-face {
+  font-family: "Ogg Extra Bold";
+  src: url('./fonts/OGG/OggText-Extrabold-BF646c18fc4bcfe.ttf');
+}
+
+@font-face {
+  font-family: "Pitch Sans Medium";
+  src: url('./fonts/Pitch/PitchSans-Medium.ttf');
+}
+
+@font-face {
+  font-family: FreightTextProBlack-Regular;
+  src: url("./fonts/Freight/FreightTextProBlack-Regular.ttf");
+}
+
+@theme {
+  --font-ogg: Ogg TRIAL, serif;
+  --font-ogg-extra-bold: Ogg Extra Bold, serif;
+  --font-pitch-sans-medium: Pitch Sans Medium, sans-serif;
+  --font-freight-text-pro-black: FreightTextProBlack-Regular, serif;
+  --color-headline: #fffffe;
+  --color-paragraph: #94a1b2;
+  --color-button: #7f5af0;
 }

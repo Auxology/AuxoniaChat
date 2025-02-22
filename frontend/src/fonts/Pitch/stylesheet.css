@@ -1,0 +1,130 @@
+@font-face {
+    font-family: 'Pitch Sans';
+    src: url('PitchSans-Regular.eot');
+    src: local('Pitch Sans Regular'), local('PitchSans-Regular'),
+        url('PitchSans-Regular.eot?#iefix') format('embedded-opentype'),
+        url('PitchSans-Regular.woff2') format('woff2'),
+        url('PitchSans-Regular.woff') format('woff'),
+        url('PitchSans-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Pitch Sans';
+    src: url('PitchSans-BoldItalic.eot');
+    src: local('Pitch Sans Bold Italic'), local('PitchSans-BoldItalic'),
+        url('PitchSans-BoldItalic.eot?#iefix') format('embedded-opentype'),
+        url('PitchSans-BoldItalic.woff2') format('woff2'),
+        url('PitchSans-BoldItalic.woff') format('woff'),
+        url('PitchSans-BoldItalic.ttf') format('truetype');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Pitch Sans';
+    src: url('PitchSans-RegularItalic.eot');
+    src: local('Pitch Sans Regular Italic'), local('PitchSans-RegularItalic'),
+        url('PitchSans-RegularItalic.eot?#iefix') format('embedded-opentype'),
+        url('PitchSans-RegularItalic.woff2') format('woff2'),
+        url('PitchSans-RegularItalic.woff') format('woff'),
+        url('PitchSans-RegularItalic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Pitch Sans';
+    src: url('PitchSans-Medium.eot');
+    src: local('Pitch Sans Medium'), local('PitchSans-Medium'),
+        url('PitchSans-Medium.eot?#iefix') format('embedded-opentype'),
+        url('PitchSans-Medium.woff2') format('woff2'),
+        url('PitchSans-Medium.woff') format('woff'),
+        url('PitchSans-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Pitch Sans';
+    src: url('PitchSans-Light.eot');
+    src: local('Pitch Sans Light'), local('PitchSans-Light'),
+        url('PitchSans-Light.eot?#iefix') format('embedded-opentype'),
+        url('PitchSans-Light.woff2') format('woff2'),
+        url('PitchSans-Light.woff') format('woff'),
+        url('PitchSans-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Pitch Sans';
+    src: url('PitchSans-SemiBold.eot');
+    src: local('Pitch Sans SemiBold'), local('PitchSans-SemiBold'),
+        url('PitchSans-SemiBold.eot?#iefix') format('embedded-opentype'),
+        url('PitchSans-SemiBold.woff2') format('woff2'),
+        url('PitchSans-SemiBold.woff') format('woff'),
+        url('PitchSans-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Pitch Sans';
+    src: url('PitchSans-LightItalic.eot');
+    src: local('Pitch Sans Light Italic'), local('PitchSans-LightItalic'),
+        url('PitchSans-LightItalic.eot?#iefix') format('embedded-opentype'),
+        url('PitchSans-LightItalic.woff2') format('woff2'),
+        url('PitchSans-LightItalic.woff') format('woff'),
+        url('PitchSans-LightItalic.ttf') format('truetype');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Pitch Sans';
+    src: url('PitchSans-Bold.eot');
+    src: local('Pitch Sans Bold'), local('PitchSans-Bold'),
+        url('PitchSans-Bold.eot?#iefix') format('embedded-opentype'),
+        url('PitchSans-Bold.woff2') format('woff2'),
+        url('PitchSans-Bold.woff') format('woff'),
+        url('PitchSans-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Pitch Sans';
+    src: url('PitchSans-MediumItalic.eot');
+    src: local('Pitch Sans Medium Italic'), local('PitchSans-MediumItalic'),
+        url('PitchSans-MediumItalic.eot?#iefix') format('embedded-opentype'),
+        url('PitchSans-MediumItalic.woff2') format('woff2'),
+        url('PitchSans-MediumItalic.woff') format('woff'),
+        url('PitchSans-MediumItalic.ttf') format('truetype');
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Pitch Sans';
+    src: url('PitchSans-SemiBoldItalic.eot');
+    src: local('Pitch Sans SemiBold Italic'), local('PitchSans-SemiBoldItalic'),
+        url('PitchSans-SemiBoldItalic.eot?#iefix') format('embedded-opentype'),
+        url('PitchSans-SemiBoldItalic.woff2') format('woff2'),
+        url('PitchSans-SemiBoldItalic.woff') format('woff'),
+        url('PitchSans-SemiBoldItalic.ttf') format('truetype');
+    font-weight: 600;
+    font-style: italic;
+    font-display: swap;
+}
+
