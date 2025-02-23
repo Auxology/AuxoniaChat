@@ -13,35 +13,21 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as SecurityTermsImport } from './routes/security/terms'
+import { Route as SecurityPrivacyImport } from './routes/security/privacy'
+import { Route as SecurityCookiesImport } from './routes/security/cookies'
+import { Route as AboutGoalsImport } from './routes/about/goals'
 
 // Create Virtual Routes
 
-const SignUpLazyImport = createFileRoute('/sign-up')()
-const SecurityLazyImport = createFileRoute('/security')()
-const LoginLazyImport = createFileRoute('/login')()
 const ContactLazyImport = createFileRoute('/contact')()
-const AboutLazyImport = createFileRoute('/about')()
 const IndexLazyImport = createFileRoute('/')()
+const SignUpIndexLazyImport = createFileRoute('/sign-up/')()
+const SecurityIndexLazyImport = createFileRoute('/security/')()
+const LoginIndexLazyImport = createFileRoute('/login/')()
+const AboutIndexLazyImport = createFileRoute('/about/')()
 
 // Create/Update Routes
-
-const SignUpLazyRoute = SignUpLazyImport.update({
-  id: '/sign-up',
-  path: '/sign-up',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/sign-up.lazy').then((d) => d.Route))
-
-const SecurityLazyRoute = SecurityLazyImport.update({
-  id: '/security',
-  path: '/security',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/security.lazy').then((d) => d.Route))
-
-const LoginLazyRoute = LoginLazyImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/login.lazy').then((d) => d.Route))
 
 const ContactLazyRoute = ContactLazyImport.update({
   id: '/contact',
@@ -49,17 +35,61 @@ const ContactLazyRoute = ContactLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/contact.lazy').then((d) => d.Route))
 
-const AboutLazyRoute = AboutLazyImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
-
 const IndexLazyRoute = IndexLazyImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const SignUpIndexLazyRoute = SignUpIndexLazyImport.update({
+  id: '/sign-up/',
+  path: '/sign-up/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/sign-up/index.lazy').then((d) => d.Route))
+
+const SecurityIndexLazyRoute = SecurityIndexLazyImport.update({
+  id: '/security/',
+  path: '/security/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/security/index.lazy').then((d) => d.Route),
+)
+
+const LoginIndexLazyRoute = LoginIndexLazyImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/login/index.lazy').then((d) => d.Route))
+
+const AboutIndexLazyRoute = AboutIndexLazyImport.update({
+  id: '/about/',
+  path: '/about/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/about/index.lazy').then((d) => d.Route))
+
+const SecurityTermsRoute = SecurityTermsImport.update({
+  id: '/security/terms',
+  path: '/security/terms',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SecurityPrivacyRoute = SecurityPrivacyImport.update({
+  id: '/security/privacy',
+  path: '/security/privacy',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SecurityCookiesRoute = SecurityCookiesImport.update({
+  id: '/security/cookies',
+  path: '/security/cookies',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AboutGoalsRoute = AboutGoalsImport.update({
+  id: '/about/goals',
+  path: '/about/goals',
+  getParentRoute: () => rootRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -72,13 +102,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutLazyImport
-      parentRoute: typeof rootRoute
-    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -86,25 +109,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactLazyImport
       parentRoute: typeof rootRoute
     }
-    '/login': {
-      id: '/login'
+    '/about/goals': {
+      id: '/about/goals'
+      path: '/about/goals'
+      fullPath: '/about/goals'
+      preLoaderRoute: typeof AboutGoalsImport
+      parentRoute: typeof rootRoute
+    }
+    '/security/cookies': {
+      id: '/security/cookies'
+      path: '/security/cookies'
+      fullPath: '/security/cookies'
+      preLoaderRoute: typeof SecurityCookiesImport
+      parentRoute: typeof rootRoute
+    }
+    '/security/privacy': {
+      id: '/security/privacy'
+      path: '/security/privacy'
+      fullPath: '/security/privacy'
+      preLoaderRoute: typeof SecurityPrivacyImport
+      parentRoute: typeof rootRoute
+    }
+    '/security/terms': {
+      id: '/security/terms'
+      path: '/security/terms'
+      fullPath: '/security/terms'
+      preLoaderRoute: typeof SecurityTermsImport
+      parentRoute: typeof rootRoute
+    }
+    '/about/': {
+      id: '/about/'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/login/': {
+      id: '/login/'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof LoginLazyImport
+      preLoaderRoute: typeof LoginIndexLazyImport
       parentRoute: typeof rootRoute
     }
-    '/security': {
-      id: '/security'
+    '/security/': {
+      id: '/security/'
       path: '/security'
       fullPath: '/security'
-      preLoaderRoute: typeof SecurityLazyImport
+      preLoaderRoute: typeof SecurityIndexLazyImport
       parentRoute: typeof rootRoute
     }
-    '/sign-up': {
-      id: '/sign-up'
+    '/sign-up/': {
+      id: '/sign-up/'
       path: '/sign-up'
       fullPath: '/sign-up'
-      preLoaderRoute: typeof SignUpLazyImport
+      preLoaderRoute: typeof SignUpIndexLazyImport
       parentRoute: typeof rootRoute
     }
   }
@@ -114,64 +172,108 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
   '/contact': typeof ContactLazyRoute
-  '/login': typeof LoginLazyRoute
-  '/security': typeof SecurityLazyRoute
-  '/sign-up': typeof SignUpLazyRoute
+  '/about/goals': typeof AboutGoalsRoute
+  '/security/cookies': typeof SecurityCookiesRoute
+  '/security/privacy': typeof SecurityPrivacyRoute
+  '/security/terms': typeof SecurityTermsRoute
+  '/about': typeof AboutIndexLazyRoute
+  '/login': typeof LoginIndexLazyRoute
+  '/security': typeof SecurityIndexLazyRoute
+  '/sign-up': typeof SignUpIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
   '/contact': typeof ContactLazyRoute
-  '/login': typeof LoginLazyRoute
-  '/security': typeof SecurityLazyRoute
-  '/sign-up': typeof SignUpLazyRoute
+  '/about/goals': typeof AboutGoalsRoute
+  '/security/cookies': typeof SecurityCookiesRoute
+  '/security/privacy': typeof SecurityPrivacyRoute
+  '/security/terms': typeof SecurityTermsRoute
+  '/about': typeof AboutIndexLazyRoute
+  '/login': typeof LoginIndexLazyRoute
+  '/security': typeof SecurityIndexLazyRoute
+  '/sign-up': typeof SignUpIndexLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
-  '/about': typeof AboutLazyRoute
   '/contact': typeof ContactLazyRoute
-  '/login': typeof LoginLazyRoute
-  '/security': typeof SecurityLazyRoute
-  '/sign-up': typeof SignUpLazyRoute
+  '/about/goals': typeof AboutGoalsRoute
+  '/security/cookies': typeof SecurityCookiesRoute
+  '/security/privacy': typeof SecurityPrivacyRoute
+  '/security/terms': typeof SecurityTermsRoute
+  '/about/': typeof AboutIndexLazyRoute
+  '/login/': typeof LoginIndexLazyRoute
+  '/security/': typeof SecurityIndexLazyRoute
+  '/sign-up/': typeof SignUpIndexLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/contact' | '/login' | '/security' | '/sign-up'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/contact' | '/login' | '/security' | '/sign-up'
-  id:
-    | '__root__'
+  fullPaths:
     | '/'
-    | '/about'
     | '/contact'
+    | '/about/goals'
+    | '/security/cookies'
+    | '/security/privacy'
+    | '/security/terms'
+    | '/about'
     | '/login'
     | '/security'
     | '/sign-up'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/contact'
+    | '/about/goals'
+    | '/security/cookies'
+    | '/security/privacy'
+    | '/security/terms'
+    | '/about'
+    | '/login'
+    | '/security'
+    | '/sign-up'
+  id:
+    | '__root__'
+    | '/'
+    | '/contact'
+    | '/about/goals'
+    | '/security/cookies'
+    | '/security/privacy'
+    | '/security/terms'
+    | '/about/'
+    | '/login/'
+    | '/security/'
+    | '/sign-up/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
-  AboutLazyRoute: typeof AboutLazyRoute
   ContactLazyRoute: typeof ContactLazyRoute
-  LoginLazyRoute: typeof LoginLazyRoute
-  SecurityLazyRoute: typeof SecurityLazyRoute
-  SignUpLazyRoute: typeof SignUpLazyRoute
+  AboutGoalsRoute: typeof AboutGoalsRoute
+  SecurityCookiesRoute: typeof SecurityCookiesRoute
+  SecurityPrivacyRoute: typeof SecurityPrivacyRoute
+  SecurityTermsRoute: typeof SecurityTermsRoute
+  AboutIndexLazyRoute: typeof AboutIndexLazyRoute
+  LoginIndexLazyRoute: typeof LoginIndexLazyRoute
+  SecurityIndexLazyRoute: typeof SecurityIndexLazyRoute
+  SignUpIndexLazyRoute: typeof SignUpIndexLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
-  AboutLazyRoute: AboutLazyRoute,
   ContactLazyRoute: ContactLazyRoute,
-  LoginLazyRoute: LoginLazyRoute,
-  SecurityLazyRoute: SecurityLazyRoute,
-  SignUpLazyRoute: SignUpLazyRoute,
+  AboutGoalsRoute: AboutGoalsRoute,
+  SecurityCookiesRoute: SecurityCookiesRoute,
+  SecurityPrivacyRoute: SecurityPrivacyRoute,
+  SecurityTermsRoute: SecurityTermsRoute,
+  AboutIndexLazyRoute: AboutIndexLazyRoute,
+  LoginIndexLazyRoute: LoginIndexLazyRoute,
+  SecurityIndexLazyRoute: SecurityIndexLazyRoute,
+  SignUpIndexLazyRoute: SignUpIndexLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -185,30 +287,46 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/about",
         "/contact",
-        "/login",
-        "/security",
-        "/sign-up"
+        "/about/goals",
+        "/security/cookies",
+        "/security/privacy",
+        "/security/terms",
+        "/about/",
+        "/login/",
+        "/security/",
+        "/sign-up/"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
     },
-    "/about": {
-      "filePath": "about.lazy.tsx"
-    },
     "/contact": {
       "filePath": "contact.lazy.tsx"
     },
-    "/login": {
-      "filePath": "login.lazy.tsx"
+    "/about/goals": {
+      "filePath": "about/goals.tsx"
     },
-    "/security": {
-      "filePath": "security.lazy.tsx"
+    "/security/cookies": {
+      "filePath": "security/cookies.tsx"
     },
-    "/sign-up": {
-      "filePath": "sign-up.lazy.tsx"
+    "/security/privacy": {
+      "filePath": "security/privacy.tsx"
+    },
+    "/security/terms": {
+      "filePath": "security/terms.tsx"
+    },
+    "/about/": {
+      "filePath": "about/index.lazy.tsx"
+    },
+    "/login/": {
+      "filePath": "login/index.lazy.tsx"
+    },
+    "/security/": {
+      "filePath": "security/index.lazy.tsx"
+    },
+    "/sign-up/": {
+      "filePath": "sign-up/index.lazy.tsx"
     }
   }
 }

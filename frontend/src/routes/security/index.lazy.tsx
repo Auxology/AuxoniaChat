@@ -2,7 +2,7 @@ import { createLazyFileRoute } from '@tanstack/react-router'
 import NavBar from "@/components/NavBar.tsx";
 import {Footer} from "@/components/Footer.tsx";
 
-export const Route = createLazyFileRoute('/contact')({
+export const Route = createLazyFileRoute('/security/')({
   component: RouteComponent,
 })
 
@@ -10,11 +10,11 @@ function RouteComponent() {
   return (
       <main>
 
-        <NavBar />
+          <NavBar />
 
-        <h1>Hello</h1>
+          <h1>Hello World</h1>
 
-        <Footer />
+          <Footer />
 
       </main>
   )

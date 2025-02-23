@@ -16,9 +16,11 @@ export default function NavBar() {
                 <div className="flex items-center justify-between">
                     {/* Logo */}
                     <div>
-                        <h1 className="font-ogg scroll-m-20 text-2xl tracking-tight lg:text-3xl text-headline">
-                            Auxonia
-                        </h1>
+                        <Link to="/">
+                            <h1 className="font-ogg scroll-m-20 text-2xl tracking-tight lg:text-3xl text-headline">
+                                Auxonia
+                            </h1>
+                        </Link>
                     </div>
 
                     {/* Desktop Navigation */}

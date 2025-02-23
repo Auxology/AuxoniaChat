@@ -1,6 +1,8 @@
 import { createLazyFileRoute, Link } from '@tanstack/react-router'
 import { Button } from "@/components/ui/button.tsx";
 import { motion } from "motion/react";
+import NavBar from "@/components/NavBar";
+import {Footer} from "@/components/Footer.tsx";
 
 export const Route = createLazyFileRoute('/')({
     component: RouteComponent,
@@ -9,6 +11,8 @@ export const Route = createLazyFileRoute('/')({
 function RouteComponent() {
     return (
         <main>
+
+            <NavBar />
 
             <section className="min-h-[92.8vh] flex items-center justify-center px-4 py-8 bg-gradient-to-b from-background to-background/50">
                 {/* Main container */}
@@ -339,105 +343,114 @@ function RouteComponent() {
 
                     {/* 4 Grid Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full">
-                        {/* Card 1 - Github */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5 }}
-                            className="flex flex-col bg-background/50 rounded-2xl overflow-hidden group hover:bg-background/70
+                        {/* Card 1 - GitHub */}
+                        <a href="https://github.com/Auxology/AuxoniaChat">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5 }}
+                                className="flex flex-col bg-background/50 rounded-2xl overflow-hidden group hover:bg-background/70
                             transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1"
-                        >
-                            <div className="flex justify-center items-center p-8">
-                                <div className="w-16 h-16 sm:w-20 sm:h-20">
-                                    <img
-                                        src="/icons8-github-100.png"
-                                        alt="GitHub"
-                                        className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
-                                    />
+                            >
+                                <div className="flex justify-center items-center p-8">
+                                    <div className="w-16 h-16 sm:w-20 sm:h-20">
+                                        <img
+                                            src="/icons8-github-100.png"
+                                            alt="GitHub"
+                                            className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="p-6 flex flex-col gap-3">
-                                <h3 className="font-ogg text-headline scroll-m-20 text-2xl font-semibold tracking-tight">Github➔</h3>
-                                <p className="text-paragraph text-base font-pitch-sans-medium leading-relaxed">
-                                    Check out the source code, contribute, or explore how it works.
-                                </p>
-                            </div>
-                        </motion.div>
+                                <div className="p-6 flex flex-col gap-3">
+                                    <h3 className="font-ogg text-headline scroll-m-20 text-2xl font-semibold tracking-tight">Github➔</h3>
+                                    <p className="text-paragraph text-base font-pitch-sans-medium leading-relaxed">
+                                        Check out the source code, contribute, or explore how it works.
+                                    </p>
+                                </div>
+                            </motion.div>
+                        </a>
 
                         {/* Card 2 - Story */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                            className="flex flex-col bg-background/50 rounded-2xl overflow-hidden group hover:bg-background/70
+                        <Link to="/about">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.2 }}
+                                className="flex flex-col bg-background/50 rounded-2xl overflow-hidden group hover:bg-background/70
                             transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1"
-                        >
-                            <div className="flex justify-center items-center p-8">
-                                <div className="w-16 h-16 sm:w-20 sm:h-20">
-                                    <img
-                                        src="/Book.png"
-                                        alt="Book"
-                                        className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
-                                    />
+                            >
+                                <div className="flex justify-center items-center p-8">
+                                    <div className="w-16 h-16 sm:w-20 sm:h-20">
+                                        <img
+                                            src="/Book.png"
+                                            alt="Book"
+                                            className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="p-6 flex flex-col gap-3">
-                                <h3 className="font-ogg text-headline scroll-m-20 text-2xl font-semibold tracking-tight">How It Started➔</h3>
-                                <p className="text-paragraph text-base font-pitch-sans-medium leading-relaxed">
-                                    The story behind Auxonia Chat—why it was built and what inspired it.
-                                </p>
-                            </div>
-                        </motion.div>
+                                <div className="p-6 flex flex-col gap-3">
+                                    <h3 className="font-ogg text-headline scroll-m-20 text-2xl font-semibold tracking-tight">How It Started➔</h3>
+                                    <p className="text-paragraph text-base font-pitch-sans-medium leading-relaxed">
+                                        The story behind Auxonia Chat—why it was built and what inspired it.
+                                    </p>
+                                </div>
+                            </motion.div>
+                        </Link>
 
                         {/* Card 3 - AuxoniaAuth */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.4 }}
-                            className="flex flex-col bg-background/50 rounded-2xl overflow-hidden group hover:bg-background/70
+                        <a href="https://github.com/Auxology/AuxoniaAuth">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.4 }}
+                                className="flex flex-col bg-background/50 rounded-2xl overflow-hidden group hover:bg-background/70
                             transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1"
-                        >
-                            <div className="flex justify-center items-center p-8">
-                                <div className="w-16 h-16 sm:w-20 sm:h-20">
-                                    <img
-                                        src="/Security%20Lock.png"
-                                        alt="Security"
-                                        className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
-                                    />
+                            >
+                                <div className="flex justify-center items-center p-8">
+                                    <div className="w-16 h-16 sm:w-20 sm:h-20">
+                                        <img
+                                            src="/Security%20Lock.png"
+                                            alt="Security"
+                                            className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="p-6 flex flex-col gap-3">
-                                <h3 className="font-ogg text-headline scroll-m-20 text-2xl font-semibold tracking-tight">AuxoniAuth➔</h3>
-                                <p className="text-paragraph text-base font-pitch-sans-medium leading-relaxed">
-                                    Learn about the privacy measures, encryption, and protections in place.
-                                </p>
-                            </div>
-                        </motion.div>
+                                <div className="p-6 flex flex-col gap-3">
+                                    <h3 className="font-ogg text-headline scroll-m-20 text-2xl font-semibold tracking-tight">AuxoniAuth➔</h3>
+                                    <p className="text-paragraph text-base font-pitch-sans-medium leading-relaxed">
+                                        Learn about the privacy measures, encryption, and protections in place.
+                                    </p>
+                                </div>
+                            </motion.div>
+                        </a>
 
                         {/* Card 4 - Goals */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.6 }}
-                            className="flex flex-col bg-background/50 rounded-2xl overflow-hidden group hover:bg-background/70
+                        <Link to="/about/goals">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.6 }}
+                                className="flex flex-col bg-background/50 rounded-2xl overflow-hidden group hover:bg-background/70
                             transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1"
-                        >
-                            <div className="flex justify-center items-center p-8">
-                                <div className="w-16 h-16 sm:w-20 sm:h-20">
-                                    <img
-                                        src="/Goal.png"
-                                        alt="Goal"
-                                        className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
-                                    />
+                            >
+                                <div className="flex justify-center items-center p-8">
+                                    <div className="w-16 h-16 sm:w-20 sm:h-20">
+                                        <img
+                                            src="/Goal.png"
+                                            alt="Goal"
+                                            className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="p-6 flex flex-col gap-3">
-                                <h3 className="font-ogg text-headline scroll-m-20 text-2xl font-semibold tracking-tight">Goals➔</h3>
-                                <p className="text-paragraph text-base font-pitch-sans-medium leading-relaxed">
-                                    The mission and future roadmap for the project.
-                                </p>
-                            </div>
-                        </motion.div>
+                                <div className="p-6 flex flex-col gap-3">
+                                    <h3 className="font-ogg text-headline scroll-m-20 text-2xl font-semibold tracking-tight">Goals➔</h3>
+                                    <p className="text-paragraph text-base font-pitch-sans-medium leading-relaxed">
+                                        The mission and future roadmap for the project.
+                                    </p>
+                                </div>
+                            </motion.div>
+                        </Link>
+
                     </div>
 
 
@@ -496,6 +509,7 @@ function RouteComponent() {
                 </div>
             </section>
 
+            <Footer />
 
 
         </main>

@@ -41,13 +41,13 @@ export function Footer() {
                         <h4 className="font-ogg text-headline text-sm font-semibold mb-2">
                             Legal
                         </h4>
-                        <Link to="/privacy" className="text-paragraph hover:text-button text-sm transition-colors">
+                        <Link to="/security/privacy" className="text-paragraph hover:text-button text-sm transition-colors">
                             Privacy Policy
                         </Link>
-                        <Link to="/terms" className="text-paragraph hover:text-button text-sm transition-colors">
+                        <Link to="/security/terms" className="text-paragraph hover:text-button text-sm transition-colors">
                             Terms of Service
                         </Link>
-                        <Link to="/cookies" className="text-paragraph hover:text-button text-sm transition-colors">
+                        <Link to="/security/cookies" className="text-paragraph hover:text-button text-sm transition-colors">
                             Cookie Policy
                         </Link>
                     </div>
