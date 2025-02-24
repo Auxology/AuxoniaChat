@@ -1,10 +1,10 @@
-import { createLazyFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from "@/components/ui/button.tsx";
 import { motion } from "motion/react";
 import NavBar from "@/components/NavBar";
 import {Footer} from "@/components/Footer.tsx";
 
-export const Route = createLazyFileRoute('/')({
+export const Route = createFileRoute('/')({
     component: RouteComponent,
 })
 
@@ -233,7 +233,7 @@ function RouteComponent() {
                         group-hover:bg-background/70 group-hover:-translate-y-1"
                                 >
                                     <img
-                                        src="./../../public/Free.png"
+                                        src="/Free.png"
                                         alt="Always Available"
                                         className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
                                     />
@@ -257,7 +257,7 @@ function RouteComponent() {
                         group-hover:bg-background/70 group-hover:-translate-y-1"
                                 >
                                     <img
-                                        src="../../public/Helpful.png"
+                                        src="/Helpful.png"
                                         alt="Smart Assistant"
                                         className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
                                     />
@@ -281,7 +281,7 @@ function RouteComponent() {
                         group-hover:bg-background/70 group-hover:-translate-y-1"
                                 >
                                     <img
-                                        src="../../public/Friendly.png"
+                                        src="/Friendly.png"
                                         alt="Friendly AI"
                                         className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
                                     />
@@ -425,7 +425,7 @@ function RouteComponent() {
                         </a>
 
                         {/* Card 4 - Goals */}
-                        <Link to="/about/goals">
+                        <Link to="/about">
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}

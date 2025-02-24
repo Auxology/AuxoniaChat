@@ -13,33 +13,26 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as IndexImport } from './routes/index'
 import { Route as SecurityTermsImport } from './routes/security/terms'
 import { Route as SecurityPrivacyImport } from './routes/security/privacy'
 import { Route as SecurityCookiesImport } from './routes/security/cookies'
-import { Route as AboutGoalsImport } from './routes/about/goals'
 
 // Create Virtual Routes
 
-const ContactLazyImport = createFileRoute('/contact')()
-const IndexLazyImport = createFileRoute('/')()
 const SignUpIndexLazyImport = createFileRoute('/sign-up/')()
 const SecurityIndexLazyImport = createFileRoute('/security/')()
 const LoginIndexLazyImport = createFileRoute('/login/')()
+const ContactIndexLazyImport = createFileRoute('/contact/')()
 const AboutIndexLazyImport = createFileRoute('/about/')()
 
 // Create/Update Routes
 
-const ContactLazyRoute = ContactLazyImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/contact.lazy').then((d) => d.Route))
-
-const IndexLazyRoute = IndexLazyImport.update({
+const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+} as any)
 
 const SignUpIndexLazyRoute = SignUpIndexLazyImport.update({
   id: '/sign-up/',
@@ -60,6 +53,12 @@ const LoginIndexLazyRoute = LoginIndexLazyImport.update({
   path: '/login/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/login/index.lazy').then((d) => d.Route))
+
+const ContactIndexLazyRoute = ContactIndexLazyImport.update({
+  id: '/contact/',
+  path: '/contact/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/contact/index.lazy').then((d) => d.Route))
 
 const AboutIndexLazyRoute = AboutIndexLazyImport.update({
   id: '/about/',
@@ -85,12 +84,6 @@ const SecurityCookiesRoute = SecurityCookiesImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AboutGoalsRoute = AboutGoalsImport.update({
-  id: '/about/goals',
-  path: '/about/goals',
-  getParentRoute: () => rootRoute,
-} as any)
-
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -99,21 +92,7 @@ declare module '@tanstack/react-router' {
       id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/about/goals': {
-      id: '/about/goals'
-      path: '/about/goals'
-      fullPath: '/about/goals'
-      preLoaderRoute: typeof AboutGoalsImport
+      preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
     '/security/cookies': {
@@ -144,6 +123,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutIndexLazyImport
       parentRoute: typeof rootRoute
     }
+    '/contact/': {
+      id: '/contact/'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/login/': {
       id: '/login/'
       path: '/login'
@@ -171,26 +157,24 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
-  '/contact': typeof ContactLazyRoute
-  '/about/goals': typeof AboutGoalsRoute
+  '/': typeof IndexRoute
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
   '/about': typeof AboutIndexLazyRoute
+  '/contact': typeof ContactIndexLazyRoute
   '/login': typeof LoginIndexLazyRoute
   '/security': typeof SecurityIndexLazyRoute
   '/sign-up': typeof SignUpIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
-  '/contact': typeof ContactLazyRoute
-  '/about/goals': typeof AboutGoalsRoute
+  '/': typeof IndexRoute
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
   '/about': typeof AboutIndexLazyRoute
+  '/contact': typeof ContactIndexLazyRoute
   '/login': typeof LoginIndexLazyRoute
   '/security': typeof SecurityIndexLazyRoute
   '/sign-up': typeof SignUpIndexLazyRoute
@@ -198,13 +182,12 @@ export interface FileRoutesByTo {
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
-  '/contact': typeof ContactLazyRoute
-  '/about/goals': typeof AboutGoalsRoute
+  '/': typeof IndexRoute
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
   '/about/': typeof AboutIndexLazyRoute
+  '/contact/': typeof ContactIndexLazyRoute
   '/login/': typeof LoginIndexLazyRoute
   '/security/': typeof SecurityIndexLazyRoute
   '/sign-up/': typeof SignUpIndexLazyRoute
@@ -214,36 +197,33 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/contact'
-    | '/about/goals'
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
     | '/about'
+    | '/contact'
     | '/login'
     | '/security'
     | '/sign-up'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/contact'
-    | '/about/goals'
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
     | '/about'
+    | '/contact'
     | '/login'
     | '/security'
     | '/sign-up'
   id:
     | '__root__'
     | '/'
-    | '/contact'
-    | '/about/goals'
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
     | '/about/'
+    | '/contact/'
     | '/login/'
     | '/security/'
     | '/sign-up/'
@@ -251,26 +231,24 @@ export interface FileRouteTypes {
 }
 
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
-  ContactLazyRoute: typeof ContactLazyRoute
-  AboutGoalsRoute: typeof AboutGoalsRoute
+  IndexRoute: typeof IndexRoute
   SecurityCookiesRoute: typeof SecurityCookiesRoute
   SecurityPrivacyRoute: typeof SecurityPrivacyRoute
   SecurityTermsRoute: typeof SecurityTermsRoute
   AboutIndexLazyRoute: typeof AboutIndexLazyRoute
+  ContactIndexLazyRoute: typeof ContactIndexLazyRoute
   LoginIndexLazyRoute: typeof LoginIndexLazyRoute
   SecurityIndexLazyRoute: typeof SecurityIndexLazyRoute
   SignUpIndexLazyRoute: typeof SignUpIndexLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
-  ContactLazyRoute: ContactLazyRoute,
-  AboutGoalsRoute: AboutGoalsRoute,
+  IndexRoute: IndexRoute,
   SecurityCookiesRoute: SecurityCookiesRoute,
   SecurityPrivacyRoute: SecurityPrivacyRoute,
   SecurityTermsRoute: SecurityTermsRoute,
   AboutIndexLazyRoute: AboutIndexLazyRoute,
+  ContactIndexLazyRoute: ContactIndexLazyRoute,
   LoginIndexLazyRoute: LoginIndexLazyRoute,
   SecurityIndexLazyRoute: SecurityIndexLazyRoute,
   SignUpIndexLazyRoute: SignUpIndexLazyRoute,
@@ -287,25 +265,18 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/contact",
-        "/about/goals",
         "/security/cookies",
         "/security/privacy",
         "/security/terms",
         "/about/",
+        "/contact/",
         "/login/",
         "/security/",
         "/sign-up/"
       ]
     },
     "/": {
-      "filePath": "index.lazy.tsx"
-    },
-    "/contact": {
-      "filePath": "contact.lazy.tsx"
-    },
-    "/about/goals": {
-      "filePath": "about/goals.tsx"
+      "filePath": "index.tsx"
     },
     "/security/cookies": {
       "filePath": "security/cookies.tsx"
@@ -318,6 +289,9 @@ export const routeTree = rootRoute
     },
     "/about/": {
       "filePath": "about/index.lazy.tsx"
+    },
+    "/contact/": {
+      "filePath": "contact/index.lazy.tsx"
     },
     "/login/": {
       "filePath": "login/index.lazy.tsx"
