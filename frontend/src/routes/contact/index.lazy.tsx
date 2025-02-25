@@ -13,6 +13,7 @@ function RouteComponent() {
     <main>
       <NavBar />
       
+      {/* Main Content Section */}
       <section className="min-h-[calc(100vh-300px)] flex items-center justify-center py-16 px-4">
         <div className="container flex flex-col lg:flex-row items-center justify-between gap-16">
           {/* Left Side - Get in Touch */}
@@ -46,26 +47,26 @@ function RouteComponent() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-full lg:w-1/2 relative max-w-[600px]" // Increased max-width
+            className="w-full lg:w-1/2 relative max-w-[600px]"
           >
             {/* Glow Effect */}
             <div className="absolute -inset-[2px] bg-gradient-to-r from-button via-headline to-button rounded-2xl blur-sm" />
             
             {/* Card Content */}
-            <div className="relative bg-background rounded-2xl p-10"> {/* Increased padding */}
-              <h2 className="font-ogg text-headline text-2xl sm:text-3xl font-semibold mb-10"> {/* Increased text size and margin */}
+            <div className="relative bg-background rounded-2xl p-10">
+              <h2 className="font-ogg text-headline text-2xl sm:text-3xl font-semibold mb-10">
                 Connect With Me
               </h2>
-              <div className="flex flex-col gap-8"> {/* Increased gap between items */}
+              <div className="flex flex-col gap-8">
                 {/* Instagram */}
                 <a 
                   href="https://instagram.com/auxology" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex items-center gap-6 text-paragraph hover:text-button transition-colors group" // Increased gap
+                  className="flex items-center gap-6 text-paragraph hover:text-button transition-colors group"
                 >
-                  <Instagram className="w-7 h-7 transition-transform group-hover:scale-110" /> {/* Increased icon size */}
-                  <span className="font-pitch-sans-medium text-lg">@akaki.jomidava</span> {/* Increased text size */}
+                  <Instagram className="w-7 h-7 transition-transform group-hover:scale-110" />
+                  <span className="font-pitch-sans-medium text-lg">@akaki.jomidava</span>
                 </a>
 
                 {/* LinkedIn */}
@@ -79,7 +80,7 @@ function RouteComponent() {
                   <span className="font-pitch-sans-medium text-lg">Akaki Jomidava</span>
                 </a>
 
-                {/* Email */}
+                {/* Email */} 
                 <a 
                   href="mailto:akaki.jomidava@gmail.com"
                   className="flex items-center gap-6 text-paragraph hover:text-button transition-colors group"
