@@ -11,7 +11,7 @@ export default function NavBar() {
     };
 
     return (
-        <nav className="relative">
+        <nav className="relative z-50 bg-background">
             <div className="container mx-auto px-4 py-4">
                 <div className="flex items-center justify-between">
                     {/* Logo */}
@@ -66,7 +66,7 @@ export default function NavBar() {
 
                 {/* Mobile Navigation */}
                 {isMenuOpen && (
-                    <div className="md:hidden absolute top-16 left-0 right-0 bg-background border-b border-border/40 px-4 py-4 shadow-lg">
+                    <div className="md:hidden fixed inset-x-0 top-[73px] bg-background border-b border-border/40 px-4 py-4 shadow-lg">
                         <div className="flex flex-col space-y-4">
                             <Link to="/about">
                                 <a className="font-pitch-sans-medium text-headline/80 hover:text-headline block py-2">
