@@ -10,3 +10,12 @@ export function emailTest():Promise<CreateEmailResponse> {
         html: '<p>it works!</p>',
     });
 }
+
+export function sendEmailCode(email:string, code:string):Promise<CreateEmailResponse> {
+    return resend.emails.send({
+        from: 'Acme <onboarding@resend.dev>',
+        to: email,
+        subject: 'Auxonia Email Verification',
+        html: `<p>Your verification code is: ${code}</p>`,
+    });
+}

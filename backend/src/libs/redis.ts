@@ -5,7 +5,7 @@ import 'dotenv/config'
 import { createClient } from 'redis';
 
 // Redis Client
-const redis = createClient({
+export const redis = createClient({
     username: process.env.REDIS_USERNAME!,
     password: process.env.REDIS_PASSWORD!,
     socket: {
@@ -28,4 +28,20 @@ export const initRedis :() => Promise<void> = async ():Promise<void> => {
 // Test Function
 export function testRedis ():void{
     redis.setEx('test', 10, 'Hello World');
+}
+
+export async function storeEmailVerificationCode(email: string, code: string):Promise<void> {
+
+
+    await redis.setEx('email_verification_code:' + code, 60 * 5, email);
+}
+
+export async function lockEmailVerificationCode(email: string):Promise<void> {
+    await redis.setEx('lock_email_verification_code:' + email, 60, 'locked');
+}
+
+export async function checkIfEmailVerificationCodeLocked(email: string):Promise<boolean> {
+    const exists = await redis.exists('lock_email_verification_code:' + email);
+
+    return Boolean(exists);
 }

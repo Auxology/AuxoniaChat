@@ -2,6 +2,7 @@
 import express, {type Router, type Request, type Response } from "express";
 import {testRedis} from "../libs/redis.js";
 import {emailTest} from "../libs/resend.js";
+import {decryptEmail} from "../utils/encrypt.js";
 
 export const testRoute:Router = express.Router();
 
@@ -10,3 +11,8 @@ testRoute.post("/", (req:Request, res:Response):void => {
   emailTest().then(r => console.log(r));
   res.send("Hello World");
 });
+
+testRoute.post("/decrypt", (req:Request, res:Response):void => {
+  const decrypted = decryptEmail(req.body.encrypted, req.body.authTag);
+  res.send({decrypted});
+})

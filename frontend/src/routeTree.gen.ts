@@ -17,6 +17,7 @@ import { Route as IndexImport } from './routes/index'
 import { Route as SecurityTermsImport } from './routes/security/terms'
 import { Route as SecurityPrivacyImport } from './routes/security/privacy'
 import { Route as SecurityCookiesImport } from './routes/security/cookies'
+import { Route as Errors429Import } from './routes/errors/429'
 
 // Create Virtual Routes
 
@@ -84,6 +85,12 @@ const SecurityCookiesRoute = SecurityCookiesImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const Errors429Route = Errors429Import.update({
+  id: '/errors/429',
+  path: '/errors/429',
+  getParentRoute: () => rootRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -93,6 +100,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/errors/429': {
+      id: '/errors/429'
+      path: '/errors/429'
+      fullPath: '/errors/429'
+      preLoaderRoute: typeof Errors429Import
       parentRoute: typeof rootRoute
     }
     '/security/cookies': {
@@ -158,6 +172,7 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/errors/429': typeof Errors429Route
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
@@ -170,6 +185,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/errors/429': typeof Errors429Route
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
@@ -183,6 +199,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/errors/429': typeof Errors429Route
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
@@ -197,6 +214,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/errors/429'
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
@@ -208,6 +226,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/errors/429'
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
@@ -219,6 +238,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/errors/429'
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
@@ -232,6 +252,7 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  Errors429Route: typeof Errors429Route
   SecurityCookiesRoute: typeof SecurityCookiesRoute
   SecurityPrivacyRoute: typeof SecurityPrivacyRoute
   SecurityTermsRoute: typeof SecurityTermsRoute
@@ -244,6 +265,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  Errors429Route: Errors429Route,
   SecurityCookiesRoute: SecurityCookiesRoute,
   SecurityPrivacyRoute: SecurityPrivacyRoute,
   SecurityTermsRoute: SecurityTermsRoute,
@@ -265,6 +287,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/errors/429",
         "/security/cookies",
         "/security/privacy",
         "/security/terms",
@@ -277,6 +300,9 @@ export const routeTree = rootRoute
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/errors/429": {
+      "filePath": "errors/429.tsx"
     },
     "/security/cookies": {
       "filePath": "security/cookies.tsx"

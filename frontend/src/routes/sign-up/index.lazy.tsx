@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { motion } from "motion/react"
+import {useStartSignUp} from "@/query/useSignUp.ts";
 
 // Form validation schema
 const formSchema = z.object({
@@ -35,9 +36,10 @@ function RouteComponent() {
     },
   })
 
+  const {mutate, isLoading, isError, error} = useStartSignUp();
+
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Handle form submission here
-    console.log(values)
+    mutate(values.email);
   }
 
   return (
