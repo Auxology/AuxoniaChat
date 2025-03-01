@@ -4,16 +4,24 @@ import {emailInUse, validateEmail} from "../utils/email";
 import {clearCookieWithEmail, createCookieWithEmail} from "../utils/cookies";
 import { encryptEmail } from '../utils/encrypt';
 import {
-    checkIfEmailVerificationCodeLocked, checkTemporarySession, createTemporarySession, deleteEmailVerificationCode,
+    checkIfEmailVerificationCodeLocked,
+    checkTemporarySession,
+    createTemporarySession,
+    deleteEmailVerificationCode,
+    deleteTemporarySession,
     lockEmailVerificationCode,
-    storeEmailVerificationCode, verifyEmailVerificationCode
+    storeEmailVerificationCode,
+    verifyEmailVerificationCode
 } from "../libs/redis";
 import {generateRandomOTP} from "../utils/codes";
 import {sendEmailCode} from "../libs/resend";
-import {createTemporaryJWT} from "../libs/jwt";
+import {clearTemporaryJWT, createTemporaryJWT} from "../libs/jwt";
+import {usernameInUse, validateUsername} from "../utils/username";
+import {hashPassword, validatePassword} from "../utils/password";
+import {createUser} from "../utils/user";
 
 export const signUpStart = async (req: Request, res: Response):Promise<void> => {
-    const email: string = req.body.email;
+    const email:string = req.body.email || req.cookies.user_email;
 
     if (!email) {
         res.status(400).json({ error: 'Email is required' });
@@ -87,16 +95,21 @@ export const signUpVerify = async (req: Request, res: Response):Promise<void> =>
     const {code} = req.body;
     const email:string = req.cookies.user_email;
 
-    if(!email || !code) {
-        res.status(400).json({ error: 'Email and code are required' });
+    const isValidEmail:boolean= validateEmail(email);
+
+    if(!isValidEmail){
+        res.status(400).json({ error: 'Invalid email' });
+        return;
+    }
+
+    if(!code){
+        res.status(400).json({ error: 'Code is required' });
         return;
     }
 
     try{
         //1. Check if code is valid
         const isValid:boolean = await verifyEmailVerificationCode(email, code);
-
-        console.log(isValid);
 
         if(!isValid){
             res.status(400).json({ error: 'Invalid code' });
@@ -114,11 +127,11 @@ export const signUpVerify = async (req: Request, res: Response):Promise<void> =>
             return;
         }
 
-        //4. Clear the cookie
-        clearCookieWithEmail(res);
-
-        //5. Create JWT Session
+        //4. Create JWT Session
         createTemporaryJWT(email, sessionToken, res);
+
+        //5. Clear the cookie
+        clearCookieWithEmail(res);
 
         res.status(200).json({ message: 'Email verified' });
     }
@@ -127,4 +140,63 @@ export const signUpVerify = async (req: Request, res: Response):Promise<void> =>
         res.status(500).json({ error: 'Internal Server Error' });
     }
 
+}
+
+export const signUpFinish = async (req: Request, res: Response):Promise<void> => {
+    try {
+        const email: string = req.email;
+
+        if(!email) {
+            res.status(400).json({ error: 'Email is required' });
+            return;
+        }
+
+        const {username, password} = req.body;
+
+        //1. Validate username and password
+        const isValidUsername:boolean = await validateUsername(username);
+
+        if(!isValidUsername) {
+            res.status(400).json({error: 'Invalid username'});
+            return;
+        }
+
+        const isValidPassword:boolean = await validatePassword(password);
+
+        if(!isValidPassword) {
+            res.status(400).json({error: 'Invalid password'});
+            return;
+        }
+
+        //2. Check if username is already in use
+
+        const isUsed:boolean = await usernameInUse(username);
+
+        if(isUsed) {
+            res.status(409).json({error: 'Username already in use'});
+            return;
+        }
+
+        //3. Hash the password
+        const hashedPassword:string = await hashPassword(password);
+
+        //4. Encrypt the email
+        const {encrypted, authTag} = encryptEmail(email);
+
+        //5. Create User
+        await createUser(username, encrypted, authTag, hashedPassword);
+
+        //6. Clear the session
+        await deleteTemporarySession(email);
+        
+        //6. Clear the cookies
+        clearCookieWithEmail(res);
+        clearTemporaryJWT(res);
+
+        res.status(200).json({ message: 'Signup Finished' });
+    }
+    catch (err) {
+        console.error('Failed to finish signup', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 }

@@ -13,7 +13,7 @@ const pool = new Pool({
 });
 
 // Test the connection
-pool.query('SELECT NOW()', (err, res) => {
+pool.query('SELECT NOW()', (err, res):void => {
   if (err) {
     console.error('Database connection error:', err);
   } else {
@@ -48,7 +48,7 @@ export const transaction = async <T>(callback: (client: PoolClient) => Promise<T
 };
 
 // Close the pool (use during app shutdown)
-export const closePool = async (): Promise<void> => {
+export const closePool :() => Promise<void> = async (): Promise<void> => {
   await pool.end();
   console.log('Database pool closed');
 };

@@ -88,6 +88,10 @@ export const checkTemporarySession = async (email: string):Promise<boolean> => {
     return Boolean(tempSession);
 }
 
+export const deleteTemporarySession = async (email: string):Promise<void> => {
+    await redisClient.del(`temp_session:${email}`);
+}
+
 export async function lockEmailVerificationCode(email: string):Promise<void> {
     await redisClient.setEx('lock_email_verification_code:' + email, 60, 'locked');
 }
