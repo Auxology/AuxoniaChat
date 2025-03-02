@@ -1,9 +1,18 @@
-declare global {
-  namespace Express {
-      interface Request {
-          email: string;
-      }
+import 'express-session';
+
+declare module 'express-session' {
+  interface SessionData {
+    user: {
+      id: number;
+      username: string;
+      email: string;
+    };
+    isAuthenticated: boolean;
   }
 }
 
-export {};
+declare module 'express' {
+  interface Request {
+    email?: string;
+  }
+}

@@ -1,7 +1,6 @@
 import { createLazyFileRoute, Link } from '@tanstack/react-router'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -16,29 +15,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator"
 import { motion } from "motion/react"
 import {useStartSignUp} from "@/query/useSignUp.ts";
+import {EmailFormData, emailSchema} from "@/lib/zod.ts";
+
 
 // Form validation schema
-const formSchema = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-})
+
 
 export const Route = createLazyFileRoute('/sign-up/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<EmailFormData>({
+    resolver: zodResolver(emailSchema),
     defaultValues: {
       email: "",
     },
   })
 
-  const {mutate, isLoading, isError, error} = useStartSignUp();
+  const {mutate, isPending, isError, error} = useStartSignUp();
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: EmailFormData) {
     mutate(values.email);
   }
 
@@ -82,12 +79,25 @@ function RouteComponent() {
                   )}
                 />
                 <div className="space-y-4">
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-button hover:bg-button/80 text-headline font-pitch-sans-medium"
-                  >
-                    Continue
-                  </Button>
+
+
+
+                  {isPending ? (
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled
+                    >
+                      Creating Account...
+                    </Button>
+                  ) : (
+                      <Button
+                          type="submit"
+                          className="w-full bg-button hover:bg-button/80 text-headline font-pitch-sans-medium"
+                      >
+                        Continue
+                      </Button>
+                  )}
 
                   {/* Account Help Links */}
                   <div className="flex flex-col items-center gap-4 pt-2">
@@ -106,8 +116,16 @@ function RouteComponent() {
                     >
                       Need help with your account?
                     </a>
+
+                    {isError && (
+                        <div className="text-red-500 text-sm font-pitch-sans-medium">
+                            {error.status === 409 ? "Email already exists" : "An error occurred"}
+                        </div>
+                    )}
+
                   </div>
                 </div>
+
               </form>
             </Form>
           </CardContent>

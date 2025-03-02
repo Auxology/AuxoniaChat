@@ -144,7 +144,7 @@ export const signUpVerify = async (req: Request, res: Response):Promise<void> =>
 
 export const signUpFinish = async (req: Request, res: Response):Promise<void> => {
     try {
-        const email: string = req.email;
+        const email = req.email;
 
         if(!email) {
             res.status(400).json({ error: 'Email is required' });
@@ -197,6 +197,26 @@ export const signUpFinish = async (req: Request, res: Response):Promise<void> =>
     }
     catch (err) {
         console.error('Failed to finish signup', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+// Checker functions
+export const checkVerify = async (req: Request, res: Response):Promise<void> => {
+    try{
+        const email = req.cookies['user_email'];
+
+        console.log(email)
+
+        if(!email){
+            res.status(400).json({hasEmailPending: false});
+            return;
+        }
+
+        res.status(200).json({ hasEmailPending: true, email: email });
+    }
+    catch(err){
+        console.error('Failed to verify email', err);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }

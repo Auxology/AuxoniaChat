@@ -3,9 +3,11 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { connectRedis, disconnectRedis } from './libs/redis';
-import { closePool } from './db/pg';
+import {closePool} from './db/pg';
 import { initializeSchema } from './db/schema';
 import signUpRoute from "./routes/signUpRoute";
+import expressSession from './libs/express-session';
+import loginRoute from './routes/loginRoute';
 
 // App Config
 dotenv.config();
@@ -15,9 +17,15 @@ const app: Express = express();
 const port = process.env.PORT;
 
 // Middlewares
-app.use(cors());
+app.use(cors(
+    {
+        origin: process.env.CLIENT_URL,
+        credentials: true
+    }
+));
 app.use(cookieParser());
 app.use(express.json());
+app.use(expressSession);
 
 // Test Endpoint
 app.get('/', (req: Request, res: Response) => {
@@ -26,6 +34,7 @@ app.get('/', (req: Request, res: Response) => {
 
 // Routes
 app.use('/api', signUpRoute)
+app.use('/api', loginRoute)
 
 // Server
 const server = app.listen(port, async () => {
@@ -35,6 +44,7 @@ const server = app.listen(port, async () => {
 
   // Connect to Redis
   await connectRedis();
+
 });
 
 process.on('SIGTERM', async () => {

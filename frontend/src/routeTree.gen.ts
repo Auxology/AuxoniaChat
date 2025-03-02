@@ -14,6 +14,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as SignUpVerifyImport } from './routes/sign-up/verify'
 import { Route as SecurityTermsImport } from './routes/security/terms'
 import { Route as SecurityPrivacyImport } from './routes/security/privacy'
 import { Route as SecurityCookiesImport } from './routes/security/cookies'
@@ -66,6 +67,12 @@ const AboutIndexLazyRoute = AboutIndexLazyImport.update({
   path: '/about/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/about/index.lazy').then((d) => d.Route))
+
+const SignUpVerifyRoute = SignUpVerifyImport.update({
+  id: '/sign-up/verify',
+  path: '/sign-up/verify',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const SecurityTermsRoute = SecurityTermsImport.update({
   id: '/security/terms',
@@ -130,6 +137,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SecurityTermsImport
       parentRoute: typeof rootRoute
     }
+    '/sign-up/verify': {
+      id: '/sign-up/verify'
+      path: '/sign-up/verify'
+      fullPath: '/sign-up/verify'
+      preLoaderRoute: typeof SignUpVerifyImport
+      parentRoute: typeof rootRoute
+    }
     '/about/': {
       id: '/about/'
       path: '/about'
@@ -176,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
+  '/sign-up/verify': typeof SignUpVerifyRoute
   '/about': typeof AboutIndexLazyRoute
   '/contact': typeof ContactIndexLazyRoute
   '/login': typeof LoginIndexLazyRoute
@@ -189,6 +204,7 @@ export interface FileRoutesByTo {
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
+  '/sign-up/verify': typeof SignUpVerifyRoute
   '/about': typeof AboutIndexLazyRoute
   '/contact': typeof ContactIndexLazyRoute
   '/login': typeof LoginIndexLazyRoute
@@ -203,6 +219,7 @@ export interface FileRoutesById {
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
+  '/sign-up/verify': typeof SignUpVerifyRoute
   '/about/': typeof AboutIndexLazyRoute
   '/contact/': typeof ContactIndexLazyRoute
   '/login/': typeof LoginIndexLazyRoute
@@ -218,6 +235,7 @@ export interface FileRouteTypes {
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
+    | '/sign-up/verify'
     | '/about'
     | '/contact'
     | '/login'
@@ -230,6 +248,7 @@ export interface FileRouteTypes {
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
+    | '/sign-up/verify'
     | '/about'
     | '/contact'
     | '/login'
@@ -242,6 +261,7 @@ export interface FileRouteTypes {
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
+    | '/sign-up/verify'
     | '/about/'
     | '/contact/'
     | '/login/'
@@ -256,6 +276,7 @@ export interface RootRouteChildren {
   SecurityCookiesRoute: typeof SecurityCookiesRoute
   SecurityPrivacyRoute: typeof SecurityPrivacyRoute
   SecurityTermsRoute: typeof SecurityTermsRoute
+  SignUpVerifyRoute: typeof SignUpVerifyRoute
   AboutIndexLazyRoute: typeof AboutIndexLazyRoute
   ContactIndexLazyRoute: typeof ContactIndexLazyRoute
   LoginIndexLazyRoute: typeof LoginIndexLazyRoute
@@ -269,6 +290,7 @@ const rootRouteChildren: RootRouteChildren = {
   SecurityCookiesRoute: SecurityCookiesRoute,
   SecurityPrivacyRoute: SecurityPrivacyRoute,
   SecurityTermsRoute: SecurityTermsRoute,
+  SignUpVerifyRoute: SignUpVerifyRoute,
   AboutIndexLazyRoute: AboutIndexLazyRoute,
   ContactIndexLazyRoute: ContactIndexLazyRoute,
   LoginIndexLazyRoute: LoginIndexLazyRoute,
@@ -291,6 +313,7 @@ export const routeTree = rootRoute
         "/security/cookies",
         "/security/privacy",
         "/security/terms",
+        "/sign-up/verify",
         "/about/",
         "/contact/",
         "/login/",
@@ -312,6 +335,9 @@ export const routeTree = rootRoute
     },
     "/security/terms": {
       "filePath": "security/terms.tsx"
+    },
+    "/sign-up/verify": {
+      "filePath": "sign-up/verify.tsx"
     },
     "/about/": {
       "filePath": "about/index.lazy.tsx"

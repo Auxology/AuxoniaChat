@@ -15,7 +15,7 @@ export const useStartSignUp = () => {
     return useMutation({
         mutationFn: startSignUp,
         onSuccess: ():void => {
-            console.log('Sign up started successfully');
+            router.navigate({to: "/sign-up/verify"})
         },
         onError: (error: AxiosError) => {
             if(error.status === 429) {
