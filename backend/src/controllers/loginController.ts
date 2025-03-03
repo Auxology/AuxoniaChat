@@ -25,10 +25,15 @@ export const login = async (req: Request, res: Response):Promise<void> => {
 
         //3. Check if password is correct
         // You need to get the password hash from the database
-        const hashedPassword = await getPasswordHash(encryptedEmail, authTag);
+        const hashedPassword:string | null = await getPasswordHash(encryptedEmail, authTag);
+
+        if(!hashedPassword) {
+            res.status(401).json({ error: 'Invalid email or password' });
+            return;
+        }
 
         // Compare the hashed password with the password provided by the user
-        const correctPassword = await verifyPassword(password, hashedPassword!);
+        const correctPassword:boolean = await verifyPassword(password, hashedPassword!);
 
         if(!correctPassword) {
             res.status(401).json({ error: 'Invalid email or password' });
@@ -57,7 +62,7 @@ export const login = async (req: Request, res: Response):Promise<void> => {
 }
 
 export const logout = async (req: Request, res: Response):Promise<void> => {
-    req.session.destroy((err) => {
+    req.session.destroy((err):void => {
         if(err) {
             console.error('Failed to log out', err);
             res.status(500).json({ error: 'Internal Server Error' });

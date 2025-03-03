@@ -19,6 +19,7 @@ import {clearTemporaryJWT, createTemporaryJWT} from "../libs/jwt";
 import {usernameInUse, validateUsername} from "../utils/username";
 import {hashPassword, validatePassword} from "../utils/password";
 import {createUser} from "../utils/user";
+import {decodeJWT} from "@oslojs/jwt";
 
 export const signUpStart = async (req: Request, res: Response):Promise<void> => {
     const email:string = req.body.email || req.cookies.user_email;
@@ -95,6 +96,8 @@ export const signUpVerify = async (req: Request, res: Response):Promise<void> =>
     const {code} = req.body;
     const email:string = req.cookies.user_email;
 
+    console.log(email,code)
+
     const isValidEmail:boolean= validateEmail(email);
 
     if(!isValidEmail){
@@ -144,7 +147,7 @@ export const signUpVerify = async (req: Request, res: Response):Promise<void> =>
 
 export const signUpFinish = async (req: Request, res: Response):Promise<void> => {
     try {
-        const email = req.email;
+        const email:string = req.email as string;
 
         if(!email) {
             res.status(400).json({ error: 'Email is required' });
@@ -206,8 +209,6 @@ export const checkVerify = async (req: Request, res: Response):Promise<void> => 
     try{
         const email = req.cookies['user_email'];
 
-        console.log(email)
-
         if(!email){
             res.status(400).json({hasEmailPending: false});
             return;
@@ -217,6 +218,37 @@ export const checkVerify = async (req: Request, res: Response):Promise<void> => 
     }
     catch(err){
         console.error('Failed to verify email', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+export const checkSignUpFinish = async (req: Request, res: Response):Promise<void> => {
+    try {
+        const token = req.cookies['temp-session'];
+
+        if(!token) {
+            res.status(400).json({ error: 'Unauthorized' });
+            return;
+        }
+
+        const decoded = decodeJWT(token) as {email: string, sessionToken:string};
+
+        if(!decoded) {
+            res.status(400).json({ error: 'Unauthorized' });
+            return;
+        }
+
+        const isValid:boolean = await checkTemporarySession(decoded.email);
+
+        if(!isValid) {
+            res.status(400).json({ error: 'Unauthorized' });
+            return;
+        }
+
+        res.status(200).json({ email: decoded.email });
+    }
+    catch (err) {
+        console.error('Failed to check signup finish', err);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
