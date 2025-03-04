@@ -14,6 +14,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as ChatIndexImport } from './routes/chat/index'
 import { Route as SignUpVerifyImport } from './routes/sign-up/verify'
 import { Route as SignUpFinishImport } from './routes/sign-up/finish'
 import { Route as SecurityTermsImport } from './routes/security/terms'
@@ -68,6 +69,12 @@ const AboutIndexLazyRoute = AboutIndexLazyImport.update({
   path: '/about/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/about/index.lazy').then((d) => d.Route))
+
+const ChatIndexRoute = ChatIndexImport.update({
+  id: '/chat/',
+  path: '/chat/',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const SignUpVerifyRoute = SignUpVerifyImport.update({
   id: '/sign-up/verify',
@@ -158,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignUpVerifyImport
       parentRoute: typeof rootRoute
     }
+    '/chat/': {
+      id: '/chat/'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/about/': {
       id: '/about/'
       path: '/about'
@@ -206,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/security/terms': typeof SecurityTermsRoute
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
+  '/chat': typeof ChatIndexRoute
   '/about': typeof AboutIndexLazyRoute
   '/contact': typeof ContactIndexLazyRoute
   '/login': typeof LoginIndexLazyRoute
@@ -221,6 +236,7 @@ export interface FileRoutesByTo {
   '/security/terms': typeof SecurityTermsRoute
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
+  '/chat': typeof ChatIndexRoute
   '/about': typeof AboutIndexLazyRoute
   '/contact': typeof ContactIndexLazyRoute
   '/login': typeof LoginIndexLazyRoute
@@ -237,6 +253,7 @@ export interface FileRoutesById {
   '/security/terms': typeof SecurityTermsRoute
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
+  '/chat/': typeof ChatIndexRoute
   '/about/': typeof AboutIndexLazyRoute
   '/contact/': typeof ContactIndexLazyRoute
   '/login/': typeof LoginIndexLazyRoute
@@ -254,6 +271,7 @@ export interface FileRouteTypes {
     | '/security/terms'
     | '/sign-up/finish'
     | '/sign-up/verify'
+    | '/chat'
     | '/about'
     | '/contact'
     | '/login'
@@ -268,6 +286,7 @@ export interface FileRouteTypes {
     | '/security/terms'
     | '/sign-up/finish'
     | '/sign-up/verify'
+    | '/chat'
     | '/about'
     | '/contact'
     | '/login'
@@ -282,6 +301,7 @@ export interface FileRouteTypes {
     | '/security/terms'
     | '/sign-up/finish'
     | '/sign-up/verify'
+    | '/chat/'
     | '/about/'
     | '/contact/'
     | '/login/'
@@ -298,6 +318,7 @@ export interface RootRouteChildren {
   SecurityTermsRoute: typeof SecurityTermsRoute
   SignUpFinishRoute: typeof SignUpFinishRoute
   SignUpVerifyRoute: typeof SignUpVerifyRoute
+  ChatIndexRoute: typeof ChatIndexRoute
   AboutIndexLazyRoute: typeof AboutIndexLazyRoute
   ContactIndexLazyRoute: typeof ContactIndexLazyRoute
   LoginIndexLazyRoute: typeof LoginIndexLazyRoute
@@ -313,6 +334,7 @@ const rootRouteChildren: RootRouteChildren = {
   SecurityTermsRoute: SecurityTermsRoute,
   SignUpFinishRoute: SignUpFinishRoute,
   SignUpVerifyRoute: SignUpVerifyRoute,
+  ChatIndexRoute: ChatIndexRoute,
   AboutIndexLazyRoute: AboutIndexLazyRoute,
   ContactIndexLazyRoute: ContactIndexLazyRoute,
   LoginIndexLazyRoute: LoginIndexLazyRoute,
@@ -337,6 +359,7 @@ export const routeTree = rootRoute
         "/security/terms",
         "/sign-up/finish",
         "/sign-up/verify",
+        "/chat/",
         "/about/",
         "/contact/",
         "/login/",
@@ -364,6 +387,9 @@ export const routeTree = rootRoute
     },
     "/sign-up/verify": {
       "filePath": "sign-up/verify.tsx"
+    },
+    "/chat/": {
+      "filePath": "chat/index.tsx"
     },
     "/about/": {
       "filePath": "about/index.lazy.tsx"

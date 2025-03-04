@@ -1,7 +1,7 @@
 // Those are functions related to axios
-import axios from 'axios';
+import axios, {AxiosInstance} from 'axios';
 
-export const axiosInstance = axios.create({
+export const axiosInstance:AxiosInstance = axios.create({
     baseURL: 'http://localhost:5001/api',
     withCredentials: true,
     headers: {

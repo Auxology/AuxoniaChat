@@ -96,8 +96,6 @@ export const signUpVerify = async (req: Request, res: Response):Promise<void> =>
     const {code} = req.body;
     const email:string = req.cookies.user_email;
 
-    console.log(email,code)
-
     const isValidEmail:boolean= validateEmail(email);
 
     if(!isValidEmail){

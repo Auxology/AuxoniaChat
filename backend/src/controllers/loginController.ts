@@ -42,8 +42,6 @@ export const login = async (req: Request, res: Response):Promise<void> => {
 
         const decryptedEmail:string = decryptEmail(encryptedEmail, authTag) as string;
 
-        console.log(decryptedEmail);
-
         //4. Store user info in session
         req.session.user = {
             id: user.id,

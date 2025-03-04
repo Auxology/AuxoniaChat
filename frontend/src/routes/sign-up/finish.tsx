@@ -33,24 +33,27 @@ type LoaderData = {
 type FinishSignUpFormData = z.infer<typeof finishSignUpSchema>;
 
 export const Route = createFileRoute('/sign-up/finish')({
-    beforeLoad: async (): Promise<LoaderData> => {
+    loader: async (): Promise<LoaderData> => {
         try {
             const response = await axiosInstance.post('/signup/finish/check')
-            return { email: response.data.email }
+
+            return { email: response.data.email };
         }
         catch (err) {
             console.error('Failed to load finish page', err)
             throw redirect({
                 to: '/sign-up',
                 replace: true
-            })
+            });
         }
     },
     component: RouteComponent,
 })
 
 function RouteComponent() {
-    const { email } = Route.useLoaderData();
+    // Use the correct hook to access the loader data
+    const data = Route.useLoaderData();
+    const email = data?.email || 'your email';
     const [passwordValue, setPasswordValue] = useState("");
 
     // Password requirement checks
@@ -234,7 +237,7 @@ function RouteComponent() {
 
                                     {isError && (
                                         <div className="text-red-500 text-sm font-pitch-sans-medium text-center">
-                                            {error?.response?.data?.error || "An error occurred"}
+                                            {error?.response?.statusText || "An error occurred"}
                                         </div>
                                     )}
                                 </div>
