@@ -52,3 +52,17 @@ export async function getPasswordHash(email: string, authTag: string): Promise<s
         throw error;
     }
 }
+
+// Change password hash in database with email and authTag
+export async function resetUserPassword(email: string, authTag: string, newPasswordHash: string): Promise<void> {
+    try {
+        await query(`
+        UPDATE app.users
+        SET password_hash = $1
+        WHERE email = $2 AND authTag = $3
+        `, [newPasswordHash, email, authTag]);
+    } catch (error) {
+        console.error('Error changing password:', error);
+        throw error;
+    }
+}

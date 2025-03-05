@@ -8,6 +8,7 @@ import { initializeSchema } from './db/schema';
 import signUpRoute from "./routes/signUpRoute";
 import expressSession from './libs/express-session';
 import loginRoute from './routes/loginRoute';
+import forgotPasswordRoute from "./routes/forgotPasswordRoute";
 
 // App Config
 dotenv.config();
@@ -35,6 +36,7 @@ app.get('/', (req: Request, res: Response) => {
 // Routes
 app.use('/api', signUpRoute)
 app.use('/api', loginRoute)
+app.use('/api', forgotPasswordRoute)
 
 // Server
 const server = app.listen(port, async () => {

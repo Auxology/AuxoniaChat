@@ -92,11 +92,63 @@ export const deleteTemporarySession = async (email: string):Promise<void> => {
     await redisClient.del(`temp_session:${email}`);
 }
 
-export async function lockEmailVerificationCode(email: string):Promise<void> {
+export async function storePasswordResetCode(email: string, code: string):Promise<void> {
+    await redisClient.setEx('password_reset_code:' + email, 60 * 5, code);
+}
+
+export async function verifyPasswordResetCode(email: string, code: string):Promise<boolean> {
+    const storedCode:string | null = await redisClient.get('password_reset_code:' + email);
+
+    return code === storedCode;
+}
+
+export async function deletePasswordResetCode(email: string):Promise<void> {
+    await redisClient.del('password_reset_code:' + email);
+}
+
+export async function createForgotPasswordSession(email: string):Promise<string| null> {
+    const sessionToken = crypto.randomUUID();
+    // 10 Minute expiration
+    const expiration = 60 * 10;
+
+    const payload = {
+        email,
+        sessionToken,
+        expiresIn: expiration,
+    }
+
+    const existingSession:string | null = await redisClient.get(`forgot_password_session:${email}`);
+
+    if(existingSession){
+        await redisClient.del(`forgot_password_session:${email}`);
+    }
+
+    await redisClient.setEx(`forgot_password_session:${email}`, expiration, JSON.stringify(payload));
+
+    return sessionToken;
+}
+
+export async function checkForgotPasswordSession(email: string, sessionToken: string):Promise<boolean> {
+    const session:string | null = await redisClient.get(`forgot_password_session:${email}`);
+
+    if(!session){
+        return false;
+    }
+
+    const sessionData = JSON.parse(session);
+
+    return sessionData.sessionToken === sessionToken;
+}
+
+export async function deleteForgotPasswordSession(email: string):Promise<void> {
+    await redisClient.del(`forgot_password_session:${email}`);
+}
+
+export async function lockoutUser(email: string):Promise<void> {
     await redisClient.setEx('lock_email_verification_code:' + email, 60, 'locked');
 }
 
-export async function checkIfEmailVerificationCodeLocked(email: string):Promise<boolean> {
+export async function checkIfUserIsLocked(email: string):Promise<boolean> {
     const exists = await redisClient.exists('lock_email_verification_code:' + email);
 
     return Boolean(exists);

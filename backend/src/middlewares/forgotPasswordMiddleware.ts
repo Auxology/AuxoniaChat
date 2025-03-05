@@ -1,13 +1,10 @@
-import { Request, Response } from 'express';
-import {checkTemporarySession} from "../libs/redis";
-import {decodeJWT} from "@oslojs/jwt";
+import {Request, Response} from "express";
 import {clearTemporaryJWT} from "../libs/jwt";
-import '../types/types';
+import {decodeJWT} from "@oslojs/jwt";
+import {checkForgotPasswordSession} from "../libs/redis";
 
-//TODO: Change approach for this middleware
-export async function signUpProtection(req: Request, res: Response, next: Function): Promise<void> {
-    //1. Check if user has jwt token
-    const token = req.cookies['temp-session'];
+export async function forgotPasswordProtection(req: Request, res: Response, next: Function): Promise<void> {
+    const token = req.cookies['forgot-password-session'];
 
     if (!token) {
         clearTemporaryJWT(res);
@@ -19,18 +16,21 @@ export async function signUpProtection(req: Request, res: Response, next: Functi
     const decoded = decodeJWT(token) as {email: string, sessionToken:string};
 
     if (!decoded) {
+        clearTemporaryJWT(res);
         res.status(401).json({error: 'Unauthorized'});
         return;
     }
 
     //3. Verify temporary session
-    const isValid:boolean = await checkTemporarySession(decoded.email);
+    const isValid:boolean = await checkForgotPasswordSession(decoded.email, decoded.sessionToken);
 
     if (!isValid) {
+        clearTemporaryJWT(res);
         res.status(401).json({error: 'Unauthorized'});
         return;
     }
 
     req.email = decoded.email;
+
     next();
 }

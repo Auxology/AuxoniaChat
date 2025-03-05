@@ -4,12 +4,12 @@ import {emailInUse, validateEmail} from "../utils/email";
 import {clearCookieWithEmail, createCookieWithEmail} from "../utils/cookies";
 import { encryptEmail } from '../utils/encrypt';
 import {
-    checkIfEmailVerificationCodeLocked,
+    checkIfUserIsLocked,
     checkTemporarySession,
     createTemporarySession,
     deleteEmailVerificationCode,
     deleteTemporarySession,
-    lockEmailVerificationCode,
+    lockoutUser,
     storeEmailVerificationCode,
     verifyEmailVerificationCode
 } from "../libs/redis";
@@ -45,7 +45,7 @@ export const signUpStart = async (req: Request, res: Response):Promise<void> => 
         const {encrypted, authTag} = encryptEmail(email);
 
         // 4. Check if user is locked out
-        const isLocked:boolean = await checkIfEmailVerificationCodeLocked(email);
+        const isLocked:boolean = await checkIfUserIsLocked(email);
 
         if(isLocked) {
             res.status(429).json({ error: 'Too many requests' });
@@ -82,7 +82,7 @@ export const signUpStart = async (req: Request, res: Response):Promise<void> => 
         await sendEmailCode(email, verificationCode);
 
         // 9. Lock the email
-        await lockEmailVerificationCode(email);
+        await lockoutUser(email);
 
         res.status(200).json({ message: 'Signup started' });
     }
