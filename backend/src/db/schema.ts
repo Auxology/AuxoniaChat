@@ -17,6 +17,7 @@ export async function initializeSchema(): Promise<void> {
         email VARCHAR(255) UNIQUE NOT NULL,
         authTag VARCHAR(255) NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
+        recovery_codes VARCHAR(255)[] NOT NULL,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       )

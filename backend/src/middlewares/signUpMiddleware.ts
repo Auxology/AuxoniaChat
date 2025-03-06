@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
-import {checkTemporarySession} from "../libs/redis";
+import {verifyTemporarySession} from "../libs/redis";
 import {decodeJWT} from "@oslojs/jwt";
 import {clearTemporaryJWT} from "../libs/jwt";
 import '../types/types';
 
-//TODO: Change approach for this middleware
 export async function signUpProtection(req: Request, res: Response, next: Function): Promise<void> {
     //1. Check if user has jwt token
     const token = req.cookies['temp-session'];
@@ -24,7 +23,7 @@ export async function signUpProtection(req: Request, res: Response, next: Functi
     }
 
     //3. Verify temporary session
-    const isValid:boolean = await checkTemporarySession(decoded.email);
+    const isValid:boolean = await verifyTemporarySession(decoded.email, decoded.sessionToken);
 
     if (!isValid) {
         res.status(401).json({error: 'Unauthorized'});

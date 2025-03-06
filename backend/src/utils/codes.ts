@@ -7,7 +7,7 @@ export function generateRandomOTP(): string {
 }
 
 export function generateRandomRecoveryCode(): string {
-    const recoveryCodeBytes = new Uint8Array(10);
+    const recoveryCodeBytes = new Uint8Array(12);
     crypto.getRandomValues(recoveryCodeBytes);
     return encodeBase32UpperCaseNoPadding(recoveryCodeBytes);
 }

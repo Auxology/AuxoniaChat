@@ -3,12 +3,12 @@ import { query } from '../db/pg';
 
 
 
-export async function createUser(username: string, email: string, authTag: string, passwordHash: string): Promise<void> {
+export async function createUser(username: string, email: string, authTag: string, passwordHash: string, recoveryCodes: string []): Promise<void> {
     try {
         await query(`
-        INSERT INTO app.users(username, email, authTag, password_hash)
-        VALUES($1, $2, $3, $4)
-        `, [username, email, authTag, passwordHash]);
+        INSERT INTO app.users(username, email, authTag, password_hash, recovery_codes)
+        VALUES($1, $2, $3, $4, $5)
+        `, [username, email, authTag, passwordHash, recoveryCodes]);
     } catch (error) {
         console.error('Error creating user:', error);
         throw error;
@@ -63,6 +63,26 @@ export async function resetUserPassword(email: string, authTag: string, newPassw
         `, [newPasswordHash, email, authTag]);
     } catch (error) {
         console.error('Error changing password:', error);
+        throw error;
+    }
+}
+
+export async function getUserByRecoveryCode(recoveryCode:string):Promise<string | null> {
+    try{
+        const {rows} = await query(`
+        SELECT id
+        FROM app.users
+        WHERE $1 = ANY(recovery_codes)
+        `, [recoveryCode]);
+
+        if(rows && rows.length > 0){
+            return rows[0];
+        }
+
+        return null; // No user found with this recovery code
+    }
+    catch (error) {
+        console.error('Error getting user by recovery code:', error);
         throw error;
     }
 }

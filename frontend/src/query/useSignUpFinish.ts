@@ -20,7 +20,6 @@ export const useFinishSignUp = () => {
     return useMutation({
         mutationFn: finishSignUp,
         onSuccess: ():void => {
-            router.navigate({to: '/login'})
         },
         onError: (error: AxiosError) => {
             if(error.status === 429) {

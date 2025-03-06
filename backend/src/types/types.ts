@@ -14,5 +14,6 @@ declare module 'express-session' {
 declare module 'express' {
   interface Request {
     email?: string;
+    userId?: string;
   }
 }

@@ -88,6 +88,18 @@ export const checkTemporarySession = async (email: string):Promise<boolean> => {
     return Boolean(tempSession);
 }
 
+export const verifyTemporarySession = async (email: string, sessionToken:string):Promise<boolean> => {
+    const session:string | null = await redisClient.get(`temp_session:${email}`);
+
+    if(!session){
+        return false;
+    }
+
+    const sessionData = JSON.parse(session);
+
+    return sessionData.sessionToken === sessionToken;
+}
+
 export const deleteTemporarySession = async (email: string):Promise<void> => {
     await redisClient.del(`temp_session:${email}`);
 }
@@ -138,6 +150,44 @@ export async function checkForgotPasswordSession(email: string, sessionToken: st
     const sessionData = JSON.parse(session);
 
     return sessionData.sessionToken === sessionToken;
+}
+
+export async function createRecoverySession(email:string) : Promise<string | null> {
+    const sessionToken = crypto.randomUUID();
+    // 10 Minute expiration
+    const expiration = 60 * 10;
+
+    const payload = {
+        email,
+        sessionToken,
+        expiresIn: expiration,
+    }
+
+    const existingSession:string | null = await redisClient.get(`recovery_session:${email}`);
+
+    if(existingSession){
+        await redisClient.del(`recovery_session:${email}`);
+    }
+
+    await redisClient.setEx(`recovery_session:${email}`, expiration, JSON.stringify(payload));
+
+    return sessionToken;
+}
+
+export async function checkRecoverySession(email: string, sessionToken: string):Promise<boolean> {
+    const session:string | null = await redisClient.get(`recovery_session:${email}`);
+
+    if(!session){
+        return false;
+    }
+
+    const sessionData = JSON.parse(session);
+
+    return sessionData.sessionToken === sessionToken;
+}
+
+export async function deleteRecoverySession(email: string):Promise<void> {
+    await redisClient.del(`recovery_session:${email}`);
 }
 
 export async function deleteForgotPasswordSession(email: string):Promise<void> {

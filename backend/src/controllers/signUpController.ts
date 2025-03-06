@@ -13,7 +13,7 @@ import {
     storeEmailVerificationCode,
     verifyEmailVerificationCode
 } from "../libs/redis";
-import {generateRandomOTP} from "../utils/codes";
+import {generateRandomOTP, generateRandomRecoveryCode} from "../utils/codes";
 import {sendEmailCode} from "../libs/resend";
 import {clearTemporaryJWT, createTemporaryJWT} from "../libs/jwt";
 import {usernameInUse, validateUsername} from "../utils/username";
@@ -184,17 +184,20 @@ export const signUpFinish = async (req: Request, res: Response):Promise<void> =>
         //4. Encrypt the email
         const {encrypted, authTag} = encryptEmail(email);
 
-        //5. Create User
-        await createUser(username, encrypted, authTag, hashedPassword);
+        //5. Generate recovery codes
+        const recoveryCodes:string[] = [generateRandomRecoveryCode(),generateRandomRecoveryCode(), generateRandomRecoveryCode()];
 
-        //6. Clear the session
+        //6. Create User
+        await createUser(username, encrypted, authTag, hashedPassword, recoveryCodes);
+
+        //7. Clear the session
         await deleteTemporarySession(email);
         
-        //6. Clear the cookies
+        //8. Clear the cookies
         clearCookieWithEmail(res);
         clearTemporaryJWT(res);
 
-        res.status(200).json({ message: 'Signup Finished' });
+        res.status(200).json({ recoveryCodes: recoveryCodes });
     }
     catch (err) {
         console.error('Failed to finish signup', err);
@@ -232,13 +235,6 @@ export const checkSignUpFinish = async (req: Request, res: Response):Promise<voi
         const decoded = decodeJWT(token) as {email: string, sessionToken:string};
 
         if(!decoded) {
-            res.status(400).json({ error: 'Unauthorized' });
-            return;
-        }
-
-        const isValid:boolean = await checkTemporarySession(decoded.email);
-
-        if(!isValid) {
             res.status(400).json({ error: 'Unauthorized' });
             return;
         }
