@@ -152,24 +152,28 @@ export async function checkForgotPasswordSession(email: string, sessionToken: st
     return sessionData.sessionToken === sessionToken;
 }
 
-export async function createRecoverySession(email:string) : Promise<string | null> {
+export async function deleteForgotPasswordSession(email: string):Promise<void> {
+    await redisClient.del(`forgot_password_session:${email}`);
+}
+
+export async function createRecoverySession(userId:string) : Promise<string | null> {
     const sessionToken = crypto.randomUUID();
     // 10 Minute expiration
     const expiration = 60 * 10;
 
     const payload = {
-        email,
+        userId,
         sessionToken,
         expiresIn: expiration,
     }
 
-    const existingSession:string | null = await redisClient.get(`recovery_session:${email}`);
+    const existingSession:string | null = await redisClient.get(`recovery_session:${userId}`);
 
     if(existingSession){
-        await redisClient.del(`recovery_session:${email}`);
+        await redisClient.del(`recovery_session:${userId}`);
     }
 
-    await redisClient.setEx(`recovery_session:${email}`, expiration, JSON.stringify(payload));
+    await redisClient.setEx(`recovery_session:${userId}`, expiration, JSON.stringify(payload));
 
     return sessionToken;
 }
@@ -190,8 +194,57 @@ export async function deleteRecoverySession(email: string):Promise<void> {
     await redisClient.del(`recovery_session:${email}`);
 }
 
-export async function deleteForgotPasswordSession(email: string):Promise<void> {
-    await redisClient.del(`forgot_password_session:${email}`);
+export async function storeNewEmailCode(email: string, code: string):Promise<void> {
+    await redisClient.setEx('new_email_code:' + email, 60 * 5, code);
+}
+
+export async function verifyNewEmailCode(email: string, code: string):Promise<boolean> {
+    const storedCode:string | null = await redisClient.get('new_email_code:' + email);
+
+    return code === storedCode;
+}
+
+export async function deleteNewEmailCode(email: string):Promise<void> {
+    await redisClient.del('new_email_code:' + email);
+}
+
+export async function createAdvancedRecoverySession(email: string, userId:string):Promise<string | null> {
+    const sessionToken = crypto.randomUUID();
+    // 10 Minute expiration
+    const expiration = 60 * 10;
+
+    const payload = {
+        email,
+        sessionToken,
+        userId,
+        expiresIn: expiration,
+    }
+
+    const existingSession:string | null = await redisClient.get(`advanced_recovery_session:${email}`);
+
+    if(existingSession){
+        await redisClient.del(`advanced_recovery_session:${email}`);
+    }
+
+    await redisClient.setEx(`advanced_recovery_session:${email}`, expiration, JSON.stringify(payload));
+
+    return sessionToken;
+}
+
+export async function verifyAdvancedRecoverySession(email: string,userId:string, sessionToken: string):Promise<boolean> {
+    const session:string | null = await redisClient.get(`advanced_recovery_session:${email}`);
+
+    if(!session){
+        return false;
+    }
+
+    const sessionData = JSON.parse(session);
+
+    return sessionData.sessionToken === sessionToken && sessionData.userId === userId;
+}
+
+export async function deleteAdvancedRecoverySession(email: string):Promise<void> {
+    await redisClient.del(`advanced_recovery_session:${email}`);
 }
 
 export async function lockoutUser(email: string):Promise<void> {
@@ -202,4 +255,11 @@ export async function checkIfUserIsLocked(email: string):Promise<boolean> {
     const exists = await redisClient.exists('lock_email_verification_code:' + email);
 
     return Boolean(exists);
+}
+
+// This function should expect array of session ids and should delete all of them
+export async function deleteSessions(sessionIds: string[]):Promise<void> {
+    for(const sessionId of sessionIds){
+        await redisClient.del(`auxonia_sess:${sessionId}`);
+    }
 }

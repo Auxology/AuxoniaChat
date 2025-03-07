@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import {decryptEmail, encryptEmail} from "../utils/encrypt";
-import {getPasswordHash, getUserByEmail} from "../utils/user";
+import {getPasswordHash, getUserByEmail, storeSessionId} from "../utils/user";
 import { verifyPassword } from '../utils/password';
 
 export const login = async (req: Request, res: Response):Promise<void> => {
@@ -50,6 +50,9 @@ export const login = async (req: Request, res: Response):Promise<void> => {
         }
 
         req.session.isAuthenticated = true;
+
+        //5. Store sess inside pg
+        await storeSessionId(req.session.user.id, req.session.id)
 
         res.status(200).json({ message: 'Logged in successfully' });
     }
