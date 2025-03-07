@@ -1,5 +1,6 @@
 import { createClient } from 'redis';
 import dotenv from 'dotenv';
+import crypto from 'crypto';
 
 // Load environment variables
 dotenv.config();
@@ -178,8 +179,8 @@ export async function createRecoverySession(userId:string) : Promise<string | nu
     return sessionToken;
 }
 
-export async function checkRecoverySession(email: string, sessionToken: string):Promise<boolean> {
-    const session:string | null = await redisClient.get(`recovery_session:${email}`);
+export async function checkRecoverySession(userId: string, sessionToken: string):Promise<boolean> {
+    const session:string | null = await redisClient.get(`recovery_session:${userId}`);
 
     if(!session){
         return false;
@@ -190,8 +191,8 @@ export async function checkRecoverySession(email: string, sessionToken: string):
     return sessionData.sessionToken === sessionToken;
 }
 
-export async function deleteRecoverySession(email: string):Promise<void> {
-    await redisClient.del(`recovery_session:${email}`);
+export async function deleteRecoverySession(userId: string):Promise<void> {
+    await redisClient.del(`recovery_session:${userId}`);
 }
 
 export async function storeNewEmailCode(email: string, code: string):Promise<void> {

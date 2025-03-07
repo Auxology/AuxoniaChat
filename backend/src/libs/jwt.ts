@@ -74,7 +74,7 @@ export const clearForgotPasswordJWT = (res: Response): void => {
     res.clearCookie('forgot-password-session');
 }
 
-export const createRecoveryJWT = (email: string, sessionToken: string, res: Response) => {
+export const createRecoveryJWT = (userId: string, sessionToken: string, res: Response) => {
     // Define the header with algorithm and convert to string
     const headerStr: string = JSON.stringify({
         alg: joseAlgorithmHS256
@@ -82,7 +82,7 @@ export const createRecoveryJWT = (email: string, sessionToken: string, res: Resp
 
     // Define payload with expiration and convert to string
     const payloadStr: string = JSON.stringify({
-        email,
+        userId,
         sessionToken,
         exp: Math.floor(Date.now() / 1000) + 600 // 10 minutes from now in seconds
     });

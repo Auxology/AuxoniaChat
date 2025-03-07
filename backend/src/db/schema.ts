@@ -9,10 +9,13 @@ export async function initializeSchema(): Promise<void> {
     // Create schemas
     await query(`CREATE SCHEMA IF NOT EXISTS app`);
     
-    // Create users table
+    // Enable the UUID extension if not already enabled
+    await query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
+    
+    // Create users table with UUID
     await query(`
       CREATE TABLE IF NOT EXISTS app.users (
-        id SERIAL PRIMARY KEY UNIQUE NOT NULL,
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4() UNIQUE NOT NULL,
         username VARCHAR(50) UNIQUE NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         authTag VARCHAR(255) NOT NULL,
@@ -24,12 +27,12 @@ export async function initializeSchema(): Promise<void> {
       )
     `);
     
-    // Create messages table
+    // Create messages table with UUID references
     await query(`
       CREATE TABLE IF NOT EXISTS app.messages (
-        id SERIAL PRIMARY KEY,
-        sender_id INTEGER REFERENCES app.users(id),
-        receiver_id INTEGER REFERENCES app.users(id),
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        sender_id UUID REFERENCES app.users(id),
+        receiver_id UUID REFERENCES app.users(id),
         content TEXT NOT NULL,
         is_read BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

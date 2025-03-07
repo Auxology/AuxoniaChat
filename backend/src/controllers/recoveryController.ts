@@ -26,6 +26,7 @@ export const startRecovery = async (req: Request, res: Response):Promise<void> =
         //1. Search for the user with the recovery code
         const userId:string | null = await getUserByRecoveryCode(recoveryCode);
 
+
         if(!userId){
             res.status(404).json({message: 'User not found with this recovery code'});
             return;
@@ -136,7 +137,7 @@ export const verifyNewEmail = async (req: Request, res: Response):Promise<void> 
         await deleteNewEmailCode(email);
 
         // Delete old session
-        await deleteRecoverySession(email);
+        await deleteRecoverySession(userId);
         clearRecoveryJWT(res);
 
         // Create new session

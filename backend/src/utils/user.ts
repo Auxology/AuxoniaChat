@@ -67,16 +67,17 @@ export async function resetUserPassword(email: string, authTag: string, newPassw
     }
 }
 
-export async function getUserByRecoveryCode(recoveryCode:string):Promise<string | null> {
-    try{
-        const {rows} = await query(`
+export async function getUserByRecoveryCode(recoveryCode: string): Promise<string | null> {
+    try {
+        const { rows } = await query(`
         SELECT id
         FROM app.users
         WHERE $1 = ANY(recovery_codes)
         `, [recoveryCode]);
 
-        if(rows && rows.length > 0){
-            return rows[0];
+        if (rows && rows.length > 0) {
+            // Return just the ID string, not the entire row object
+            return rows[0].id;
         }
 
         return null; // No user found with this recovery code
