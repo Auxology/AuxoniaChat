@@ -57,7 +57,6 @@ Coming soon...
 
 ## 📋 Todo
 - Set up initial project structure
-- Implement authentication system
 - Design database schema
 - Create UI components
 - Set up WebSocket server
