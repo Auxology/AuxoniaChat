@@ -1,7 +1,6 @@
-import { createLazyFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, redirect, Link } from '@tanstack/react-router'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -13,42 +12,42 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
 import { motion } from "motion/react"
 import { ArrowLeft } from "lucide-react"
-import { useRecovery } from "@/query/useRecovery.ts"
+import { axiosInstance } from "@/lib/axios.ts"
+import { useRecoveryNewEmail } from "@/query/useRecoveryNewEmail.ts"
+import { EmailFormData, emailSchema } from "@/lib/zod.ts"
 
-// Form validation schema - updated for 20 character format
-const recoveryCodeSchema = z.object({
-  code: z.string()
-    .min(20, "Recovery code must be 20 characters")
-    .max(20, "Recovery code must be 20 characters")
-    .regex(/^[A-Z0-9]+$/, "Recovery code must only contain uppercase letters and numbers"),
-})
-
-type RecoveryFormData = z.infer<typeof recoveryCodeSchema>
-
-export const Route = createLazyFileRoute('/recover-account/')({
+export const Route = createFileRoute('/recover-account/new-email')({
+  loader: async () => {
+    try {
+      await axiosInstance.post('/recovery/new-email/check');
+      return {};
+    } catch {
+      throw redirect({
+        to: '/recover-account',
+        replace: true
+      });
+    }
+  },
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const form = useForm<RecoveryFormData>({
-    resolver: zodResolver(recoveryCodeSchema),
+  const form = useForm<EmailFormData>({
+    resolver: zodResolver(emailSchema),
     defaultValues: {
-      code: "",
+      email: "",
     },
   })
 
-  // Use the recovery mutation hook
-  const { mutate, isPending: isSubmitting, error } = useRecovery()
+  const { mutate, isPending, error } = useRecoveryNewEmail();
 
-  function onSubmit(values: RecoveryFormData) {
-    mutate(values.code)
+  function onSubmit(values: EmailFormData) {
+    mutate(values.email);
   }
 
-  // Get error message from error object
-  const errorMessage = error?.response?.statusText || "Failed to verify recovery code"
+  const errorMessage = error?.response?.statusText || error?.message || "Failed to submit email";
 
   return (
     <main className="min-h-[92.8vh] flex items-center justify-center px-4 py-8">
@@ -65,20 +64,20 @@ function RouteComponent() {
         <Card className="relative w-[350px] sm:w-[400px] bg-background rounded-2xl">
           <CardHeader>
             <div className="mb-2">
-              <Link to="/help">
+              <Link to="/recover-account">
                 <Button
                   variant="ghost"
                   size="sm"
                   className="text-paragraph hover:bg-transparent hover:text-headline"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to help
+                  Back
                 </Button>
               </Link>
             </div>
-            <CardTitle className="font-ogg text-headline text-2xl">Account Recovery</CardTitle>
+            <CardTitle className="font-ogg text-headline text-2xl">New Email Address</CardTitle>
             <CardDescription className="font-freight-text-pro-black text-paragraph">
-              For accounts with compromised email access. Enter your backup recovery code to regain account access.
+              Enter a new email address for your account. You'll need to verify this email in the next step.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -86,38 +85,35 @@ function RouteComponent() {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
                   control={form.control}
-                  name="code"
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-pitch-sans-medium text-headline">Recovery Code</FormLabel>
+                      <FormLabel className="font-pitch-sans-medium text-headline">New Email</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="" 
-                          maxLength={20}
+                          placeholder="Enter your new email address" 
+                          type="email"
                           {...field}
-                          className="font-pitch-sans-medium text-center text-lg tracking-widest focus:bg-white uppercase"
+                          className="font-pitch-sans-medium focus:bg-white"
                         />
                       </FormControl>
                       <FormMessage />
-                      <div className="text-xs text-paragraph/60 text-center mt-1 font-pitch-sans-medium">
-                        Format: 20 characters, uppercase letters and numbers
-                      </div>
                     </FormItem>
                   )}
                 />
                 <div className="space-y-4">
                   <Button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isPending}
                     className="w-full bg-button hover:bg-button/80 text-headline font-pitch-sans-medium"
                   >
-                    {isSubmitting ? (
+                    {isPending ? (
                       <>
                         <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-headline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        Verifying...
+                        Sending...
                       </>
                     ) : (
                       "Continue"
@@ -129,24 +125,6 @@ function RouteComponent() {
                       {errorMessage}
                     </div>
                   )}
-
-                  <div className="flex flex-col items-center gap-4 pt-2">
-                    <Link
-                      to="/login"
-                      className="text-sm font-pitch-sans-medium text-button hover:text-button/80 transition-colors"
-                    >
-                      Remember your password? Login
-                    </Link>
-
-                    <Separator className="w-1/2 bg-button/10" />
-
-                    <Link
-                      to="/contact" 
-                      className="text-sm font-pitch-sans-medium text-headline/80 hover:text-paragraph transition-colors"
-                    >
-                      Don't have a recovery code?
-                    </Link>
-                  </div>
                 </div>
               </form>
             </Form>

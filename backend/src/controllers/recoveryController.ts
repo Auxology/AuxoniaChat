@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import {getUserByRecoveryCode, recoverAccount, removeSessionId} from "../utils/user";
 import {
-    checkIfUserIsLocked, createAdvancedRecoverySession,
+    checkIfUserIsLocked, checkRecoverySession, createAdvancedRecoverySession,
     createRecoverySession, deleteAdvancedRecoverySession, deleteNewEmailCode, deleteRecoverySession, deleteSessions,
     lockoutUser,
-    storeNewEmailCode,
+    storeNewEmailCode, verifyAdvancedRecoverySession,
     verifyNewEmailCode
 } from "../libs/redis";
 import {clearRecoveryJWT, createAdvancedRecoveryJWT, createRecoveryJWT} from "../libs/jwt";
@@ -13,6 +13,7 @@ import {encryptEmail} from "../utils/encrypt";
 import {generateRandomOTP} from "../utils/codes";
 import {clearCookieWithEmail, createCookieWithEmail} from "../utils/cookies";
 import {hashPassword, validatePassword} from "../utils/password";
+import {decodeJWT} from "@oslojs/jwt";
 
 export const startRecovery = async (req: Request, res: Response):Promise<void> => {
     try{
@@ -212,6 +213,71 @@ export const finishRecovery = async (req: Request, res: Response):Promise<void> 
         await removeSessionId(userId,sessionToken);
 
         res.status(200).json({message: 'Account recovered'});
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+export const checkRecoveryProtection = async (req: Request, res: Response):Promise<void> => {
+    try{
+        const token = req.cookies['recovery-session'];
+
+        if(!token) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const decoded = decodeJWT(token) as {userId: string, sessionToken:string};
+
+        if(!decoded){
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const isValid:boolean = await checkRecoverySession(decoded.userId, decoded.sessionToken);
+
+        if(!isValid){
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        res.status(200).json({message: 'Authorized'});
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+
+export const checkAdvancedRecoveryProtection = async (req: Request, res: Response):Promise<void> => {
+    try{
+        const token = req.cookies['advanced-recovery-session'];
+
+        if (!token) {
+            res.status(401).json({error: 'Unauthorized'});
+            return;
+        }
+
+        //2. Decode jwt token
+        const decoded = decodeJWT(token) as {email:string, userId: string, sessionToken:string};
+
+        if (!decoded) {
+            res.status(401).json({error: 'Unauthorized'});
+            return;
+        }
+
+        //3. Verify recovery session
+        const isValid:boolean = await verifyAdvancedRecoverySession(decoded.email ,decoded.userId, decoded.sessionToken);
+
+        if (!isValid) {
+            res.status(401).json({error: 'Unauthorized'});
+            return;
+        }
+
+        res.status(200).json({message: 'Authorized'});
     }
     catch (error) {
         console.error(error);

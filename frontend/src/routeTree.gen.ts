@@ -20,6 +20,9 @@ import { Route as SignUpFinishImport } from './routes/sign-up/finish'
 import { Route as SecurityTermsImport } from './routes/security/terms'
 import { Route as SecurityPrivacyImport } from './routes/security/privacy'
 import { Route as SecurityCookiesImport } from './routes/security/cookies'
+import { Route as RecoverAccountVerifyImport } from './routes/recover-account/verify'
+import { Route as RecoverAccountNewEmailImport } from './routes/recover-account/new-email'
+import { Route as RecoverAccountFinishImport } from './routes/recover-account/finish'
 import { Route as ForgotPasswordVerifyImport } from './routes/forgot-password/verify'
 import { Route as ForgotPasswordFinishImport } from './routes/forgot-password/finish'
 import { Route as Errors429Import } from './routes/errors/429'
@@ -133,6 +136,24 @@ const SecurityCookiesRoute = SecurityCookiesImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const RecoverAccountVerifyRoute = RecoverAccountVerifyImport.update({
+  id: '/recover-account/verify',
+  path: '/recover-account/verify',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const RecoverAccountNewEmailRoute = RecoverAccountNewEmailImport.update({
+  id: '/recover-account/new-email',
+  path: '/recover-account/new-email',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const RecoverAccountFinishRoute = RecoverAccountFinishImport.update({
+  id: '/recover-account/finish',
+  path: '/recover-account/finish',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const ForgotPasswordVerifyRoute = ForgotPasswordVerifyImport.update({
   id: '/forgot-password/verify',
   path: '/forgot-password/verify',
@@ -181,6 +202,27 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password/verify'
       fullPath: '/forgot-password/verify'
       preLoaderRoute: typeof ForgotPasswordVerifyImport
+      parentRoute: typeof rootRoute
+    }
+    '/recover-account/finish': {
+      id: '/recover-account/finish'
+      path: '/recover-account/finish'
+      fullPath: '/recover-account/finish'
+      preLoaderRoute: typeof RecoverAccountFinishImport
+      parentRoute: typeof rootRoute
+    }
+    '/recover-account/new-email': {
+      id: '/recover-account/new-email'
+      path: '/recover-account/new-email'
+      fullPath: '/recover-account/new-email'
+      preLoaderRoute: typeof RecoverAccountNewEmailImport
+      parentRoute: typeof rootRoute
+    }
+    '/recover-account/verify': {
+      id: '/recover-account/verify'
+      path: '/recover-account/verify'
+      fullPath: '/recover-account/verify'
+      preLoaderRoute: typeof RecoverAccountVerifyImport
       parentRoute: typeof rootRoute
     }
     '/security/cookies': {
@@ -291,6 +333,9 @@ export interface FileRoutesByFullPath {
   '/errors/429': typeof Errors429Route
   '/forgot-password/finish': typeof ForgotPasswordFinishRoute
   '/forgot-password/verify': typeof ForgotPasswordVerifyRoute
+  '/recover-account/finish': typeof RecoverAccountFinishRoute
+  '/recover-account/new-email': typeof RecoverAccountNewEmailRoute
+  '/recover-account/verify': typeof RecoverAccountVerifyRoute
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
@@ -312,6 +357,9 @@ export interface FileRoutesByTo {
   '/errors/429': typeof Errors429Route
   '/forgot-password/finish': typeof ForgotPasswordFinishRoute
   '/forgot-password/verify': typeof ForgotPasswordVerifyRoute
+  '/recover-account/finish': typeof RecoverAccountFinishRoute
+  '/recover-account/new-email': typeof RecoverAccountNewEmailRoute
+  '/recover-account/verify': typeof RecoverAccountVerifyRoute
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
@@ -334,6 +382,9 @@ export interface FileRoutesById {
   '/errors/429': typeof Errors429Route
   '/forgot-password/finish': typeof ForgotPasswordFinishRoute
   '/forgot-password/verify': typeof ForgotPasswordVerifyRoute
+  '/recover-account/finish': typeof RecoverAccountFinishRoute
+  '/recover-account/new-email': typeof RecoverAccountNewEmailRoute
+  '/recover-account/verify': typeof RecoverAccountVerifyRoute
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
@@ -357,6 +408,9 @@ export interface FileRouteTypes {
     | '/errors/429'
     | '/forgot-password/finish'
     | '/forgot-password/verify'
+    | '/recover-account/finish'
+    | '/recover-account/new-email'
+    | '/recover-account/verify'
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
@@ -377,6 +431,9 @@ export interface FileRouteTypes {
     | '/errors/429'
     | '/forgot-password/finish'
     | '/forgot-password/verify'
+    | '/recover-account/finish'
+    | '/recover-account/new-email'
+    | '/recover-account/verify'
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
@@ -397,6 +454,9 @@ export interface FileRouteTypes {
     | '/errors/429'
     | '/forgot-password/finish'
     | '/forgot-password/verify'
+    | '/recover-account/finish'
+    | '/recover-account/new-email'
+    | '/recover-account/verify'
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
@@ -419,6 +479,9 @@ export interface RootRouteChildren {
   Errors429Route: typeof Errors429Route
   ForgotPasswordFinishRoute: typeof ForgotPasswordFinishRoute
   ForgotPasswordVerifyRoute: typeof ForgotPasswordVerifyRoute
+  RecoverAccountFinishRoute: typeof RecoverAccountFinishRoute
+  RecoverAccountNewEmailRoute: typeof RecoverAccountNewEmailRoute
+  RecoverAccountVerifyRoute: typeof RecoverAccountVerifyRoute
   SecurityCookiesRoute: typeof SecurityCookiesRoute
   SecurityPrivacyRoute: typeof SecurityPrivacyRoute
   SecurityTermsRoute: typeof SecurityTermsRoute
@@ -440,6 +503,9 @@ const rootRouteChildren: RootRouteChildren = {
   Errors429Route: Errors429Route,
   ForgotPasswordFinishRoute: ForgotPasswordFinishRoute,
   ForgotPasswordVerifyRoute: ForgotPasswordVerifyRoute,
+  RecoverAccountFinishRoute: RecoverAccountFinishRoute,
+  RecoverAccountNewEmailRoute: RecoverAccountNewEmailRoute,
+  RecoverAccountVerifyRoute: RecoverAccountVerifyRoute,
   SecurityCookiesRoute: SecurityCookiesRoute,
   SecurityPrivacyRoute: SecurityPrivacyRoute,
   SecurityTermsRoute: SecurityTermsRoute,
@@ -470,6 +536,9 @@ export const routeTree = rootRoute
         "/errors/429",
         "/forgot-password/finish",
         "/forgot-password/verify",
+        "/recover-account/finish",
+        "/recover-account/new-email",
+        "/recover-account/verify",
         "/security/cookies",
         "/security/privacy",
         "/security/terms",
@@ -497,6 +566,15 @@ export const routeTree = rootRoute
     },
     "/forgot-password/verify": {
       "filePath": "forgot-password/verify.tsx"
+    },
+    "/recover-account/finish": {
+      "filePath": "recover-account/finish.tsx"
+    },
+    "/recover-account/new-email": {
+      "filePath": "recover-account/new-email.tsx"
+    },
+    "/recover-account/verify": {
+      "filePath": "recover-account/verify.tsx"
     },
     "/security/cookies": {
       "filePath": "security/cookies.tsx"
