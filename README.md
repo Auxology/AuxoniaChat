@@ -56,7 +56,6 @@ Coming soon...
 ⚠️ **Note**: This project is currently in the planning and initial development phase.
 
 ## 📋 Todo
-- Set up initial project structure
 - Design database schema
 - Create UI components
 - Set up WebSocket server
