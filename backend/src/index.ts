@@ -10,6 +10,7 @@ import expressSession from './libs/express-session';
 import loginRoute from './routes/loginRoute';
 import forgotPasswordRoute from "./routes/forgotPasswordRoute";
 import recoveryRoute from "./routes/recoveryRoute";
+import userRoute from "./routes/userRoutes";
 
 // App Config
 dotenv.config();
@@ -39,6 +40,7 @@ app.use('/api', signUpRoute)
 app.use('/api', loginRoute)
 app.use('/api', forgotPasswordRoute)
 app.use('/api', recoveryRoute)
+app.use('/api', userRoute)
 
 // Server
 const server = app.listen(port, async () => {

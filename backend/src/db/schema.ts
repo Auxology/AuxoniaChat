@@ -21,7 +21,8 @@ export async function initializeSchema(): Promise<void> {
         authTag VARCHAR(255) NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         recovery_codes VARCHAR(255)[] NOT NULL,
-        sess_id VARCHAR(255) [],
+        sess_id VARCHAR(255) [],  
+        avatar_url VARCHAR(255), default_avatar_url VARCHAR(255) DEFAULT 'https://ui-avatars.com/api/?name=John+Doe',
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       )
