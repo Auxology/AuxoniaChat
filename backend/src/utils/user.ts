@@ -15,16 +15,22 @@ export async function createUser(username: string, email: string, authTag: strin
     }
 }
 
-export async function getUserByEmail(email: string, authTag: string): Promise<any | null> {
+export async function getUserByEmail(email: string, authTag: string): Promise<UserData | null> {
     try {
         const { rows } = await query(`
-        SELECT id, username, email, authTag
+        SELECT id, username, email, authtag, avatar_url
         FROM app.users
         WHERE email = $1 AND authTag = $2
         `, [email, authTag]);
 
         if (rows && rows.length > 0) {
-            return rows[0];
+            return {
+                id: rows[0].id,
+                username: rows[0].username,
+                email: rows[0].email,
+                authTag: rows[0].authtag,
+                avatar_url: rows[0].avatar_url
+            }
         }
 
         return null; // No user found with this email and authTag
