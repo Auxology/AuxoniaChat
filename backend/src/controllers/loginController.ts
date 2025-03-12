@@ -78,7 +78,7 @@ export const logout = async (req: Request, res: Response):Promise<void> => {
 
 export const testLogin = async (req: Request, res: Response):Promise<void> => {
     if(req.session.isAuthenticated) {
-        res.status(200).json({ message: 'You are logged in' });
+        res.status(200).json({ isAuthenticated: true });
     } else {
         res.status(401).json({ error: 'You are not logged in' });
     }

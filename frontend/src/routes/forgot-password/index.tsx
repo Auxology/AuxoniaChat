@@ -1,4 +1,4 @@
-import { createLazyFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { motion } from "motion/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { useForgotPassword } from "@/query/useForgotPassword";
+import { requireNonAuth } from '@/utils/routeGuards';
 
 // Form validation schema
 const forgotPasswordSchema = z.object({
@@ -26,7 +27,10 @@ const forgotPasswordSchema = z.object({
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
-export const Route = createLazyFileRoute('/forgot-password/')({
+export const Route = createFileRoute('/forgot-password/')({
+  beforeLoad: async () => {
+    return await requireNonAuth();
+  },
   component: RouteComponent,
 });
 
@@ -121,7 +125,7 @@ function RouteComponent() {
 
                   {isError && (
                     <div className="text-red-500 text-sm font-pitch-sans-medium text-center">
-                      {error?.response?.data?.error || "Failed to send reset code"}
+                      {error?.response?.statusText || "Failed to send reset code"}
                     </div>
                   )}
 

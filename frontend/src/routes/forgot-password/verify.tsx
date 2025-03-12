@@ -181,7 +181,7 @@ function RouteComponent() {
 
                   {verifyError && (
                     <div className="text-red-500 text-sm font-pitch-sans-medium text-center">
-                      {verifyError?.response?.data?.error || "Invalid verification code"}
+                      {verifyError?.response?.statusText || "Invalid verification code"}
                     </div>
                   )}
 

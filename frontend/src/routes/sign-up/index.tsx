@@ -1,4 +1,4 @@
-import { createLazyFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
@@ -16,12 +16,15 @@ import { Separator } from "@/components/ui/separator"
 import { motion } from "motion/react"
 import {useStartSignUp} from "@/query/useSignUp.ts";
 import {EmailFormData, emailSchema} from "@/lib/zod.ts";
-
+import {requireNonAuth} from "@/utils/routeGuards";
 
 // Form validation schema
 
 
-export const Route = createLazyFileRoute('/sign-up/')({
+export const Route = createFileRoute('/sign-up/')({
+  beforeLoad: async () => {
+    return await requireNonAuth();
+  },
   component: RouteComponent,
 })
 

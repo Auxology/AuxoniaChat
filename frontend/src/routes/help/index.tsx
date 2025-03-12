@@ -1,11 +1,15 @@
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { motion } from "motion/react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Key, UserRoundX, LogIn } from "lucide-react"
 import { Link } from "@tanstack/react-router"
+import { requireNonAuth } from "@/utils/routeGuards"
 
-export const Route = createLazyFileRoute('/help/')({
+export const Route = createFileRoute('/help/')({
+    beforeLoad: async () => {
+        return await requireNonAuth();
+    },
     component: RouteComponent,
 })
 

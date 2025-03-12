@@ -1,4 +1,4 @@
-import { createLazyFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -17,6 +17,7 @@ import { Separator } from "@/components/ui/separator"
 import { motion } from "motion/react"
 import { ArrowLeft } from "lucide-react"
 import { useRecovery } from "@/query/useRecovery.ts"
+import { requireNonAuth } from '@/utils/routeGuards'
 
 // Form validation schema - updated for 20 character format
 const recoveryCodeSchema = z.object({
@@ -28,7 +29,10 @@ const recoveryCodeSchema = z.object({
 
 type RecoveryFormData = z.infer<typeof recoveryCodeSchema>
 
-export const Route = createLazyFileRoute('/recover-account/')({
+export const Route = createFileRoute('/recover-account/')({
+  beforeLoad: async () => {
+    return await requireNonAuth();
+  },
   component: RouteComponent,
 })
 

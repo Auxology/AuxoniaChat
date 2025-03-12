@@ -14,6 +14,11 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as SignUpIndexImport } from './routes/sign-up/index'
+import { Route as RecoverAccountIndexImport } from './routes/recover-account/index'
+import { Route as LoginIndexImport } from './routes/login/index'
+import { Route as HelpIndexImport } from './routes/help/index'
+import { Route as ForgotPasswordIndexImport } from './routes/forgot-password/index'
 import { Route as ChatIndexImport } from './routes/chat/index'
 import { Route as SignUpVerifyImport } from './routes/sign-up/verify'
 import { Route as SignUpFinishImport } from './routes/sign-up/finish'
@@ -29,12 +34,7 @@ import { Route as Errors429Import } from './routes/errors/429'
 
 // Create Virtual Routes
 
-const SignUpIndexLazyImport = createFileRoute('/sign-up/')()
 const SecurityIndexLazyImport = createFileRoute('/security/')()
-const RecoverAccountIndexLazyImport = createFileRoute('/recover-account/')()
-const LoginIndexLazyImport = createFileRoute('/login/')()
-const HelpIndexLazyImport = createFileRoute('/help/')()
-const ForgotPasswordIndexLazyImport = createFileRoute('/forgot-password/')()
 const ContactIndexLazyImport = createFileRoute('/contact/')()
 const AboutIndexLazyImport = createFileRoute('/about/')()
 
@@ -46,46 +46,12 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const SignUpIndexLazyRoute = SignUpIndexLazyImport.update({
-  id: '/sign-up/',
-  path: '/sign-up/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/sign-up/index.lazy').then((d) => d.Route))
-
 const SecurityIndexLazyRoute = SecurityIndexLazyImport.update({
   id: '/security/',
   path: '/security/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() =>
   import('./routes/security/index.lazy').then((d) => d.Route),
-)
-
-const RecoverAccountIndexLazyRoute = RecoverAccountIndexLazyImport.update({
-  id: '/recover-account/',
-  path: '/recover-account/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() =>
-  import('./routes/recover-account/index.lazy').then((d) => d.Route),
-)
-
-const LoginIndexLazyRoute = LoginIndexLazyImport.update({
-  id: '/login/',
-  path: '/login/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/login/index.lazy').then((d) => d.Route))
-
-const HelpIndexLazyRoute = HelpIndexLazyImport.update({
-  id: '/help/',
-  path: '/help/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/help/index.lazy').then((d) => d.Route))
-
-const ForgotPasswordIndexLazyRoute = ForgotPasswordIndexLazyImport.update({
-  id: '/forgot-password/',
-  path: '/forgot-password/',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() =>
-  import('./routes/forgot-password/index.lazy').then((d) => d.Route),
 )
 
 const ContactIndexLazyRoute = ContactIndexLazyImport.update({
@@ -99,6 +65,36 @@ const AboutIndexLazyRoute = AboutIndexLazyImport.update({
   path: '/about/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/about/index.lazy').then((d) => d.Route))
+
+const SignUpIndexRoute = SignUpIndexImport.update({
+  id: '/sign-up/',
+  path: '/sign-up/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const RecoverAccountIndexRoute = RecoverAccountIndexImport.update({
+  id: '/recover-account/',
+  path: '/recover-account/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LoginIndexRoute = LoginIndexImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const HelpIndexRoute = HelpIndexImport.update({
+  id: '/help/',
+  path: '/help/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ForgotPasswordIndexRoute = ForgotPasswordIndexImport.update({
+  id: '/forgot-password/',
+  path: '/forgot-password/',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const ChatIndexRoute = ChatIndexImport.update({
   id: '/chat/',
@@ -267,6 +263,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatIndexImport
       parentRoute: typeof rootRoute
     }
+    '/forgot-password/': {
+      id: '/forgot-password/'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/help/': {
+      id: '/help/'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/recover-account/': {
+      id: '/recover-account/'
+      path: '/recover-account'
+      fullPath: '/recover-account'
+      preLoaderRoute: typeof RecoverAccountIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/sign-up/': {
+      id: '/sign-up/'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof SignUpIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/about/': {
       id: '/about/'
       path: '/about'
@@ -281,46 +312,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactIndexLazyImport
       parentRoute: typeof rootRoute
     }
-    '/forgot-password/': {
-      id: '/forgot-password/'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordIndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/help/': {
-      id: '/help/'
-      path: '/help'
-      fullPath: '/help'
-      preLoaderRoute: typeof HelpIndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/login/': {
-      id: '/login/'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginIndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/recover-account/': {
-      id: '/recover-account/'
-      path: '/recover-account'
-      fullPath: '/recover-account'
-      preLoaderRoute: typeof RecoverAccountIndexLazyImport
-      parentRoute: typeof rootRoute
-    }
     '/security/': {
       id: '/security/'
       path: '/security'
       fullPath: '/security'
       preLoaderRoute: typeof SecurityIndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/sign-up/': {
-      id: '/sign-up/'
-      path: '/sign-up'
-      fullPath: '/sign-up'
-      preLoaderRoute: typeof SignUpIndexLazyImport
       parentRoute: typeof rootRoute
     }
   }
@@ -342,14 +338,14 @@ export interface FileRoutesByFullPath {
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
   '/chat': typeof ChatIndexRoute
+  '/forgot-password': typeof ForgotPasswordIndexRoute
+  '/help': typeof HelpIndexRoute
+  '/login': typeof LoginIndexRoute
+  '/recover-account': typeof RecoverAccountIndexRoute
+  '/sign-up': typeof SignUpIndexRoute
   '/about': typeof AboutIndexLazyRoute
   '/contact': typeof ContactIndexLazyRoute
-  '/forgot-password': typeof ForgotPasswordIndexLazyRoute
-  '/help': typeof HelpIndexLazyRoute
-  '/login': typeof LoginIndexLazyRoute
-  '/recover-account': typeof RecoverAccountIndexLazyRoute
   '/security': typeof SecurityIndexLazyRoute
-  '/sign-up': typeof SignUpIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
@@ -366,14 +362,14 @@ export interface FileRoutesByTo {
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
   '/chat': typeof ChatIndexRoute
+  '/forgot-password': typeof ForgotPasswordIndexRoute
+  '/help': typeof HelpIndexRoute
+  '/login': typeof LoginIndexRoute
+  '/recover-account': typeof RecoverAccountIndexRoute
+  '/sign-up': typeof SignUpIndexRoute
   '/about': typeof AboutIndexLazyRoute
   '/contact': typeof ContactIndexLazyRoute
-  '/forgot-password': typeof ForgotPasswordIndexLazyRoute
-  '/help': typeof HelpIndexLazyRoute
-  '/login': typeof LoginIndexLazyRoute
-  '/recover-account': typeof RecoverAccountIndexLazyRoute
   '/security': typeof SecurityIndexLazyRoute
-  '/sign-up': typeof SignUpIndexLazyRoute
 }
 
 export interface FileRoutesById {
@@ -391,14 +387,14 @@ export interface FileRoutesById {
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
   '/chat/': typeof ChatIndexRoute
+  '/forgot-password/': typeof ForgotPasswordIndexRoute
+  '/help/': typeof HelpIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/recover-account/': typeof RecoverAccountIndexRoute
+  '/sign-up/': typeof SignUpIndexRoute
   '/about/': typeof AboutIndexLazyRoute
   '/contact/': typeof ContactIndexLazyRoute
-  '/forgot-password/': typeof ForgotPasswordIndexLazyRoute
-  '/help/': typeof HelpIndexLazyRoute
-  '/login/': typeof LoginIndexLazyRoute
-  '/recover-account/': typeof RecoverAccountIndexLazyRoute
   '/security/': typeof SecurityIndexLazyRoute
-  '/sign-up/': typeof SignUpIndexLazyRoute
 }
 
 export interface FileRouteTypes {
@@ -417,14 +413,14 @@ export interface FileRouteTypes {
     | '/sign-up/finish'
     | '/sign-up/verify'
     | '/chat'
-    | '/about'
-    | '/contact'
     | '/forgot-password'
     | '/help'
     | '/login'
     | '/recover-account'
-    | '/security'
     | '/sign-up'
+    | '/about'
+    | '/contact'
+    | '/security'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -440,14 +436,14 @@ export interface FileRouteTypes {
     | '/sign-up/finish'
     | '/sign-up/verify'
     | '/chat'
-    | '/about'
-    | '/contact'
     | '/forgot-password'
     | '/help'
     | '/login'
     | '/recover-account'
-    | '/security'
     | '/sign-up'
+    | '/about'
+    | '/contact'
+    | '/security'
   id:
     | '__root__'
     | '/'
@@ -463,14 +459,14 @@ export interface FileRouteTypes {
     | '/sign-up/finish'
     | '/sign-up/verify'
     | '/chat/'
-    | '/about/'
-    | '/contact/'
     | '/forgot-password/'
     | '/help/'
     | '/login/'
     | '/recover-account/'
-    | '/security/'
     | '/sign-up/'
+    | '/about/'
+    | '/contact/'
+    | '/security/'
   fileRoutesById: FileRoutesById
 }
 
@@ -488,14 +484,14 @@ export interface RootRouteChildren {
   SignUpFinishRoute: typeof SignUpFinishRoute
   SignUpVerifyRoute: typeof SignUpVerifyRoute
   ChatIndexRoute: typeof ChatIndexRoute
+  ForgotPasswordIndexRoute: typeof ForgotPasswordIndexRoute
+  HelpIndexRoute: typeof HelpIndexRoute
+  LoginIndexRoute: typeof LoginIndexRoute
+  RecoverAccountIndexRoute: typeof RecoverAccountIndexRoute
+  SignUpIndexRoute: typeof SignUpIndexRoute
   AboutIndexLazyRoute: typeof AboutIndexLazyRoute
   ContactIndexLazyRoute: typeof ContactIndexLazyRoute
-  ForgotPasswordIndexLazyRoute: typeof ForgotPasswordIndexLazyRoute
-  HelpIndexLazyRoute: typeof HelpIndexLazyRoute
-  LoginIndexLazyRoute: typeof LoginIndexLazyRoute
-  RecoverAccountIndexLazyRoute: typeof RecoverAccountIndexLazyRoute
   SecurityIndexLazyRoute: typeof SecurityIndexLazyRoute
-  SignUpIndexLazyRoute: typeof SignUpIndexLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -512,14 +508,14 @@ const rootRouteChildren: RootRouteChildren = {
   SignUpFinishRoute: SignUpFinishRoute,
   SignUpVerifyRoute: SignUpVerifyRoute,
   ChatIndexRoute: ChatIndexRoute,
+  ForgotPasswordIndexRoute: ForgotPasswordIndexRoute,
+  HelpIndexRoute: HelpIndexRoute,
+  LoginIndexRoute: LoginIndexRoute,
+  RecoverAccountIndexRoute: RecoverAccountIndexRoute,
+  SignUpIndexRoute: SignUpIndexRoute,
   AboutIndexLazyRoute: AboutIndexLazyRoute,
   ContactIndexLazyRoute: ContactIndexLazyRoute,
-  ForgotPasswordIndexLazyRoute: ForgotPasswordIndexLazyRoute,
-  HelpIndexLazyRoute: HelpIndexLazyRoute,
-  LoginIndexLazyRoute: LoginIndexLazyRoute,
-  RecoverAccountIndexLazyRoute: RecoverAccountIndexLazyRoute,
   SecurityIndexLazyRoute: SecurityIndexLazyRoute,
-  SignUpIndexLazyRoute: SignUpIndexLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -545,14 +541,14 @@ export const routeTree = rootRoute
         "/sign-up/finish",
         "/sign-up/verify",
         "/chat/",
-        "/about/",
-        "/contact/",
         "/forgot-password/",
         "/help/",
         "/login/",
         "/recover-account/",
-        "/security/",
-        "/sign-up/"
+        "/sign-up/",
+        "/about/",
+        "/contact/",
+        "/security/"
       ]
     },
     "/": {
@@ -594,29 +590,29 @@ export const routeTree = rootRoute
     "/chat/": {
       "filePath": "chat/index.tsx"
     },
+    "/forgot-password/": {
+      "filePath": "forgot-password/index.tsx"
+    },
+    "/help/": {
+      "filePath": "help/index.tsx"
+    },
+    "/login/": {
+      "filePath": "login/index.tsx"
+    },
+    "/recover-account/": {
+      "filePath": "recover-account/index.tsx"
+    },
+    "/sign-up/": {
+      "filePath": "sign-up/index.tsx"
+    },
     "/about/": {
       "filePath": "about/index.lazy.tsx"
     },
     "/contact/": {
       "filePath": "contact/index.lazy.tsx"
     },
-    "/forgot-password/": {
-      "filePath": "forgot-password/index.lazy.tsx"
-    },
-    "/help/": {
-      "filePath": "help/index.lazy.tsx"
-    },
-    "/login/": {
-      "filePath": "login/index.lazy.tsx"
-    },
-    "/recover-account/": {
-      "filePath": "recover-account/index.lazy.tsx"
-    },
     "/security/": {
       "filePath": "security/index.lazy.tsx"
-    },
-    "/sign-up/": {
-      "filePath": "sign-up/index.lazy.tsx"
     }
   }
 }

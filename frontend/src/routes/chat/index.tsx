@@ -1,24 +1,14 @@
-import {createFileRoute, redirect} from '@tanstack/react-router'
-import {axiosInstance} from "@/lib/axios.ts";
+import {createFileRoute} from '@tanstack/react-router'
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Sidebar } from "@/components/sidebar.tsx";
+import { requireAuth } from '@/utils/routeGuards';
 
 export const Route = createFileRoute('/chat/')({
     beforeLoad: async () => {
-        try{
-            const response = await axiosInstance.post('/login/isAuthenticated');
-            return response.data.isAuthenticated;
-        }
-        catch(error) {
-            console.error(error);
-            throw redirect({
-                to: '/login',
-                replace: true,
-            })
-        }
+        return await requireAuth();
     },
     component: RouteComponent,
 })
