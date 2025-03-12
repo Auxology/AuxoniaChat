@@ -3,7 +3,7 @@ import 'express-session';
 declare module 'express-session' {
   interface SessionData {
     user: {
-      id: number;
+      id: string;
       username: string;
       email: string;
     };
@@ -16,4 +16,12 @@ declare module 'express' {
     email?: string;
     userId?: string;
   }
+}
+
+export interface UserData {
+    id: string;
+    username: string;
+    email: string;
+    avatar_url: string | null;
+    authTag: string;
 }

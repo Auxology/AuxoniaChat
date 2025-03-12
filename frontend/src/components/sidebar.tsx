@@ -1,19 +1,26 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Search, MessageSquare, Plus, User } from "lucide-react"
+import { Search, MessageSquare, Plus, User, Settings, LogOut } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { axiosInstance } from "@/lib/axios.ts"
 import { Link } from "@tanstack/react-router"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 // User data interface
 interface UserData {
     id: string;
     username: string;
     email: string;
-    avatarUrl: string | null;
+    avatar_url: string | null;
 }
 
 // Server interface
@@ -30,8 +37,13 @@ const fetchUserProfile = async (): Promise<UserData> => {
 }
 
 const fetchUserServers = async (): Promise<Server[]> => {
-    const response = await axiosInstance.get('/servers');
-    return response.data;
+    try {
+        const response = await axiosInstance.get('/user/servers');
+        return Array.isArray(response.data) ? response.data : [];
+    } catch (error) {
+        console.error("Failed to fetch servers:", error);
+        return [];
+    }
 }
 
 export function Sidebar() {
@@ -46,7 +58,7 @@ export function Sidebar() {
         retry: 1
     })
 
-    // Fetch user servers
+    // Fetch user servers with better error handling
     const { 
         data: servers = [], 
         isLoading: isLoadingServers 
@@ -61,11 +73,6 @@ export function Sidebar() {
     const getUserInitials = (): string => {
         if (!userData?.username) return "U";
         return userData.username.charAt(0).toUpperCase();
-    }
-
-    // Get server initials for server avatar fallback
-    const getServerInitials = (serverName: string): string => {
-        return serverName.charAt(0).toUpperCase();
     }
 
     return (
@@ -141,31 +148,74 @@ export function Sidebar() {
                     </Tooltip>
                 </TooltipProvider>
 
-                {/* User Avatar */}
-                <TooltipProvider>
-                    <Tooltip delayDuration={300}>
-                        <TooltipTrigger asChild>
-                            <Avatar className="h-12 w-12 border-2 border-muted/20 hover:border-paragraph/30 rounded-full transition-all">
-                                {userData?.avatarUrl ? (
+                {/* User Avatar with Dropdown Menu */}
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Avatar className="h-12 w-12 border-2 border-muted/20 hover:border-paragraph/30 rounded-full transition-all cursor-pointer">
+                            {userData?.avatar_url ? (
+                                <AvatarImage
+                                    src={userData.avatar_url}
+                                    alt={`${userData.username}'s avatar`}
+                                    className="rounded-full object-cover"
+                                />
+                            ) : (
+                                <AvatarFallback className="bg-button text-headline">
+                                    {isLoadingUser ? <User className="h-5 w-5" /> : getUserInitials()}
+                                </AvatarFallback>
+                            )}
+                        </Avatar>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="right" align="end" className="w-56 bg-card border border-muted/20">
+                        {/* Header with user info */}
+                        <div className="flex items-center p-2 gap-3">
+                            <Avatar className="h-10 w-10">
+                                {userData?.avatar_url ? (
                                     <AvatarImage
-                                        src={userData.avatarUrl}
+                                        src={userData.avatar_url}
                                         alt={`${userData.username}'s avatar`}
-                                        className="rounded-full object-cover"
                                     />
                                 ) : (
                                     <AvatarFallback className="bg-button text-headline">
-                                        {isLoadingUser ? <User className="h-5 w-5" /> : getUserInitials()}
+                                        {getUserInitials()}
                                     </AvatarFallback>
                                 )}
                             </Avatar>
-                        </TooltipTrigger>
-                        <TooltipContent side="right">
-                            <p>
-                                {isLoadingUser ? "Loading..." : userData?.username || "User Profile"}
-                            </p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+                            <div className="flex flex-col">
+                                <p className="font-pitch-sans-medium text-headline text-sm">
+                                    {isLoadingUser ? "Loading..." : userData?.username || "User"}
+                                </p>
+                                <p className="text-xs text-paragraph truncate">
+                                    {userData?.email || ""}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <DropdownMenuSeparator className="bg-muted/20" />
+                        
+                        {/* Menu items */}
+                        <Link to="/settings/profile" className="w-full">
+                            <DropdownMenuItem className="cursor-pointer flex items-center gap-2 text-paragraph hover:text-headline py-2">
+                                <Settings className="h-4 w-4" />
+                                <span>Settings</span>
+                            </DropdownMenuItem>
+                        </Link>
+                        
+                        <DropdownMenuSeparator className="bg-muted/20" />
+                        
+                        <DropdownMenuItem 
+                            className="cursor-pointer flex items-center gap-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 py-2"
+                            onClick={() => {
+                                // Handle logout logic here
+                                axiosInstance.post('/logout').then(() => {
+                                    window.location.href = '/login';
+                                });
+                            }}
+                        >
+                            <LogOut className="h-4 w-4" />
+                            <span>Log Out</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
         </div>
     )
@@ -178,7 +228,7 @@ function ServerIcon({ server }: { server: Server }) {
             <Tooltip delayDuration={300}>
                 <TooltipTrigger asChild>
                     <Link 
-                        to={`/chat/servers/$serverId`}
+                        to="/chat/servers/$serverId"
                         params={{ serverId: server.id }}
                         className="block"
                     >

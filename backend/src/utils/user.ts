@@ -1,6 +1,6 @@
 // Those are functions related to user
-import { query } from '../db/pg';
-
+import {query} from '../db/pg';
+import {UserData} from '../types/types';
 
 
 export async function createUser(username: string, email: string, authTag: string, passwordHash: string, recoveryCodes: string []): Promise<void> {
@@ -115,7 +115,7 @@ export async function recoverAccount(userId: string, email: string, authTag: str
     }
 }
 
-export async function storeSessionId(userId:number, sessionId: any):Promise<void> {
+export async function storeSessionId(userId:string, sessionId: any):Promise<void> {
     try {
         await query(`
         UPDATE app.users
@@ -150,6 +150,31 @@ export async function removeSessionId(userId: string, sessionIds: string | strin
         }
     } catch (error) {
         console.error('Error removing session id(s):', error);
+        throw error;
+    }
+}
+
+export async function getUserProfileById(userId:string): Promise<UserData | null> {
+    try {
+        const { rows } = await query(`
+        SELECT id, username, email, authtag, avatar_url
+        FROM app.users
+        WHERE id = $1
+        `, [userId]);
+
+        if (rows && rows.length > 0) {
+            return {
+                id: rows[0].id,
+                username: rows[0].username,
+                email: rows[0].email,
+                authTag: rows[0].authtag,
+                avatar_url: rows[0].avatar_url
+            };
+        }
+
+        return null; // No user found with this ID
+    } catch (error) {
+        console.error('Error getting user profile:', error);
         throw error;
     }
 }

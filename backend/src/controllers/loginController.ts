@@ -63,6 +63,8 @@ export const login = async (req: Request, res: Response):Promise<void> => {
 }
 
 export const logout = async (req: Request, res: Response):Promise<void> => {
+    res.clearCookie('auxonia_sid');
+
     req.session.destroy((err):void => {
         if(err) {
             console.error('Failed to log out', err);
