@@ -140,7 +140,7 @@ export const finishForgotPassword = async (req: Request, res: Response):Promise<
         }
 
         // Check password
-        const isValidPassword: Promise<boolean> = validatePassword(password);
+        const isValidPassword: boolean = await validatePassword(password);
 
         if (!isValidPassword) {
             res.status(400).json({error: 'Invalid password'});

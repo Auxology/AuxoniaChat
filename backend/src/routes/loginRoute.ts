@@ -6,6 +6,6 @@ const loginRoute: Router = Router();
 
 loginRoute.post('/login', login);
 loginRoute.post('/logout', logout);
-loginRoute.post('/login/isAuthenticated', isAuthenticated, testLogin);
+loginRoute.post('/login/isAuthenticated', testLogin);
 
 export default loginRoute;

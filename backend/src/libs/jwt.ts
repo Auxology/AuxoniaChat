@@ -21,7 +21,12 @@ export const createTemporaryJWT = (email: string, sessionToken: string, res: Res
     });
 
     // Convert the JWT_KEY to Uint8Array
-    const signatureKey = textToUint8Array(process.env.JWT_KEY!);
+    // Remove non-null assertion
+    const JWT_KEY = process.env.JWT_KEY;
+    if (!JWT_KEY) {
+        throw new Error('Missing JWT_KEY in environment variables');
+    }
+    const signatureKey = textToUint8Array(JWT_KEY);
 
     // Create the token with string parameters
     const token:string = encodeJWT(headerStr, payloadStr, signatureKey);
@@ -54,8 +59,12 @@ export const createForgotPasswordJWT = (email: string, sessionToken: string, res
         exp: Math.floor(Date.now() / 1000) + 600 // 10 minutes from now in seconds
     });
 
-    // Convert the JWT_KEY to Uint8Array
-    const signatureKey = textToUint8Array(process.env.JWT_KEY!);
+    // Remove non-null assertion
+    const JWT_KEY = process.env.JWT_KEY;
+    if (!JWT_KEY) {
+        throw new Error('Missing JWT_KEY in environment variables');
+    }
+    const signatureKey = textToUint8Array(JWT_KEY);
 
     // Create the token with string parameters
     const token: string = encodeJWT(headerStr, payloadStr, signatureKey);
@@ -88,7 +97,12 @@ export const createRecoveryJWT = (userId: string, sessionToken: string, res: Res
     });
 
     // Convert the JWT_KEY to Uint8Array
-    const signatureKey = textToUint8Array(process.env.JWT_KEY!);
+    // Remove non-null assertion
+    const JWT_KEY = process.env.JWT_KEY;
+    if (!JWT_KEY) {
+        throw new Error('Missing JWT_KEY in environment variables');
+    }
+    const signatureKey = textToUint8Array(JWT_KEY);
 
     // Create the token with string parameters
     const token: string = encodeJWT(headerStr, payloadStr, signatureKey);
@@ -122,7 +136,12 @@ export const createAdvancedRecoveryJWT = (email: string, userId:string,sessionTo
     });
 
     // Convert the JWT_KEY to Uint8Array
-    const signatureKey = textToUint8Array(process.env.JWT_KEY!);
+    // Remove non-null assertion
+    const JWT_KEY = process.env.JWT_KEY;
+    if (!JWT_KEY) {
+        throw new Error('Missing JWT_KEY in environment variables');
+    }
+    const signatureKey = textToUint8Array(JWT_KEY);
 
     // Create the token with string parameters
     const token: string = encodeJWT(headerStr, payloadStr, signatureKey);

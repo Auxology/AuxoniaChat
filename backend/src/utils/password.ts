@@ -5,7 +5,7 @@ import {passwordSchema} from "../libs/zod";
 import * as argon2 from "argon2";
 
 export async function validatePassword(password:string):Promise<boolean> {
-    return Boolean(passwordSchema.safeParse(password).success);
+    return passwordSchema.safeParse(password).success;
 }
 
 export async function hashPassword(password:string):Promise<string> {

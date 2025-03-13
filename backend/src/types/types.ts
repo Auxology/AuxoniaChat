@@ -25,3 +25,10 @@ export interface UserData {
     avatar_url: string | null;
     authTag: string;
 }
+
+export interface ServerData {
+    id: string;
+    name: string;
+    iconUrl: string | null;
+    ownerId: string;
+}

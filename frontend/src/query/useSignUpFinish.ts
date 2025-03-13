@@ -22,7 +22,7 @@ export const useFinishSignUp = () => {
         onSuccess: ():void => {
         },
         onError: (error: AxiosError) => {
-            if(error.status === 429) {
+            if(error.response?.status === 429) {
                 router.navigate({to: '/errors/429'})
             }
         },

@@ -88,7 +88,7 @@ export const signUpStart = async (req: Request, res: Response):Promise<void> => 
     }
     catch (err) {
         console.error('Failed to start signup', err);
-        return;
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }
 

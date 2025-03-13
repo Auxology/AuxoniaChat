@@ -7,7 +7,7 @@ import {emailSchema} from "../libs/zod";
 export function validateEmail(email: string):boolean {
     const isValid = emailSchema.safeParse(email);
 
-    return Boolean(isValid.success)
+    return isValid.success
 }
 
 // Check if email is already in use

@@ -33,7 +33,7 @@ export const login = async (req: Request, res: Response):Promise<void> => {
         }
 
         // Compare the hashed password with the password provided by the user
-        const correctPassword:boolean = await verifyPassword(password, hashedPassword!);
+        const correctPassword:boolean = await verifyPassword(password, hashedPassword);
 
         if(!correctPassword) {
             res.status(401).json({ error: 'Invalid email or password' });
@@ -77,9 +77,11 @@ export const logout = async (req: Request, res: Response):Promise<void> => {
 }
 
 export const testLogin = async (req: Request, res: Response):Promise<void> => {
-    if(req.session.isAuthenticated) {
+    // Check if user is authenticated directly without middleware
+    if(req.session && req.session.isAuthenticated) {
         res.status(200).json({ isAuthenticated: true });
     } else {
-        res.status(401).json({ error: 'You are not logged in' });
+        // This shouldn't be an error, just a status indicator
+        res.status(200).json({ isAuthenticated: false });
     }
 }

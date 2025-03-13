@@ -1,6 +1,6 @@
 // Those are functions related to user
 import {query} from '../db/pg';
-import {UserData} from '../types/types';
+import {ServerData, UserData} from '../types/types';
 
 
 export async function createUser(username: string, email: string, authTag: string, passwordHash: string, recoveryCodes: string []): Promise<void> {
@@ -181,6 +181,42 @@ export async function getUserProfileById(userId:string): Promise<UserData | null
         return null; // No user found with this ID
     } catch (error) {
         console.error('Error getting user profile:', error);
+        throw error;
+    }
+}
+
+export async function createNewServer(serverData: ServerData): Promise<void> {
+    try {
+        // Insert server into database
+        await query(`
+            INSERT INTO app.servers (id, name, icon_url, owner_id)
+            VALUES ($1, $2, $3, $4)
+        `, [serverData.id, serverData.name, serverData.iconUrl, serverData.ownerId]);
+
+        // Add the owner as a member of the server
+        await query(`
+            INSERT INTO app.server_members (server_id, user_id, role)
+            VALUES ($1, $2, 'owner')
+        `, [serverData.id, serverData.ownerId]);
+    } catch (error) {
+        console.error('Error creating server:', error);
+        throw error;
+    }
+}
+
+export async function getServersByUserId(userId: string):Promise<any[]>{
+    try {
+        const { rows } = await query(`
+            SELECT s.id, s.name, s.icon_url as "iconUrl", sm.role
+            FROM app.servers s
+            JOIN app.server_members sm ON s.id = sm.server_id
+            WHERE sm.user_id = $1
+            ORDER BY s.name
+        `, [userId]);
+
+        return rows;
+    } catch (error) {
+        console.error('Error getting servers for user:', error);
         throw error;
     }
 }

@@ -80,9 +80,9 @@ function RouteComponent() {
 
   useEffect(() => {
     let timer: number | undefined;
-
+    
     if (resendSuccess && resendCooldown <= 0) {
-      setResendCooldown(60); // 60 seconds cooldown
+      setResendCooldown(60); // 60 seconds
     }
 
     if (resendCooldown > 0) {
@@ -90,11 +90,11 @@ function RouteComponent() {
         setResendCooldown(prev => prev - 1);
       }, 1000);
     }
-
+    
     return () => {
       if (timer) clearInterval(timer);
     };
-  }, [resendSuccess, resendCooldown]);
+}, [resendSuccess, resendCooldown]);
 
   function handleResend() {
     if (resendCooldown > 0) return;
