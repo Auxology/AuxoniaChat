@@ -60,3 +60,33 @@ export function useUserServers() {
         staleTime: 1000 * 60 * 2, // 2 minutes
     });
 }
+
+export function useJoinServer() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (serverId: string) => {
+            const response = await axiosInstance.post("/user/servers/join", { serverId });
+            return response.data;
+        },
+        onSuccess: () => {
+            // Invalidate and refetch servers list
+            queryClient.invalidateQueries({ queryKey: ["userServers"] });
+
+            // Show success notification
+            toast.success("Joined server", {
+                description: "You have successfully joined the server.",
+                duration: 5000,
+            });
+        },
+        onError: (error: any) => {
+            const message = error?.response?.data?.message || "There was an error joining the server.";
+            
+            // Show error notification
+            toast.error("Failed to join server", {
+                description: message,
+                duration: 5000,
+            });
+        },
+    });
+}

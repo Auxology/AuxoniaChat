@@ -32,3 +32,24 @@ export interface ServerData {
     iconUrl: string | null;
     ownerId: string;
 }
+
+export interface UserServers {
+    id: string;
+    name: string;
+    iconUrl: string;
+    role: string;
+}
+
+// This is very specific to the isMember function in the userController.ts file
+export interface ServerDataForUser {
+    id: string;
+    name: string;
+    iconUrl: string | null;
+}
+
+export interface ServerMembers {
+    id: string;
+    username: string;
+    avatar_url: string;
+    role: string;
+}

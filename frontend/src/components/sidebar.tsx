@@ -16,7 +16,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CreateServerDialog } from "./create-server";
-import { useUserServers } from "@/query/useServerActions";
+import { JoinServerDialog } from "./join-server";
+import { Server, useUserServers } from "@/query/useServerActions";
 import { toast } from "sonner";
 
 // User data interface
@@ -35,6 +36,7 @@ const fetchUserProfile = async (): Promise<UserData> => {
 
 export function Sidebar() {
   const [createServerOpen, setCreateServerOpen] = useState(false);
+  const [joinServerOpen, setJoinServerOpen] = useState(false);
   
   // Fetch user profile
   const { 
@@ -157,6 +159,38 @@ export function Sidebar() {
           </Tooltip>
         </TooltipProvider>
 
+        {/* Add join server button */}
+        <TooltipProvider>
+          <Tooltip delayDuration={300}>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full bg-card text-blue-500 hover:bg-blue-500 hover:text-headline"
+                onClick={() => setJoinServerOpen(true)}
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  className="h-5 w-5"
+                >
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                  <polyline points="10 17 15 12 10 7" />
+                  <line x1="15" y1="12" x2="3" y2="12" />
+                </svg>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>Join a Server</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
         {/* User Avatar Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -224,6 +258,9 @@ export function Sidebar() {
 
       {/* Create Server Dialog */}
       <CreateServerDialog open={createServerOpen} onOpenChange={setCreateServerOpen} />
+      
+      {/* Add Join Server Dialog */}
+      <JoinServerDialog open={joinServerOpen} onOpenChange={setJoinServerOpen} />
     </div>
   );
 }
