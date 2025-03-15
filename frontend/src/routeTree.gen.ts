@@ -15,6 +15,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as SignUpIndexImport } from './routes/sign-up/index'
+import { Route as SettingsIndexImport } from './routes/settings/index'
 import { Route as RecoverAccountIndexImport } from './routes/recover-account/index'
 import { Route as LoginIndexImport } from './routes/login/index'
 import { Route as HelpIndexImport } from './routes/help/index'
@@ -22,7 +23,6 @@ import { Route as ForgotPasswordIndexImport } from './routes/forgot-password/ind
 import { Route as ChatIndexImport } from './routes/chat/index'
 import { Route as SignUpVerifyImport } from './routes/sign-up/verify'
 import { Route as SignUpFinishImport } from './routes/sign-up/finish'
-import { Route as SettingsProfileImport } from './routes/settings/profile'
 import { Route as SecurityTermsImport } from './routes/security/terms'
 import { Route as SecurityPrivacyImport } from './routes/security/privacy'
 import { Route as SecurityCookiesImport } from './routes/security/cookies'
@@ -74,6 +74,12 @@ const SignUpIndexRoute = SignUpIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const SettingsIndexRoute = SettingsIndexImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const RecoverAccountIndexRoute = RecoverAccountIndexImport.update({
   id: '/recover-account/',
   path: '/recover-account/',
@@ -113,12 +119,6 @@ const SignUpVerifyRoute = SignUpVerifyImport.update({
 const SignUpFinishRoute = SignUpFinishImport.update({
   id: '/sign-up/finish',
   path: '/sign-up/finish',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const SettingsProfileRoute = SettingsProfileImport.update({
-  id: '/settings/profile',
-  path: '/settings/profile',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -256,13 +256,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SecurityTermsImport
       parentRoute: typeof rootRoute
     }
-    '/settings/profile': {
-      id: '/settings/profile'
-      path: '/settings/profile'
-      fullPath: '/settings/profile'
-      preLoaderRoute: typeof SettingsProfileImport
-      parentRoute: typeof rootRoute
-    }
     '/sign-up/finish': {
       id: '/sign-up/finish'
       path: '/sign-up/finish'
@@ -310,6 +303,13 @@ declare module '@tanstack/react-router' {
       path: '/recover-account'
       fullPath: '/recover-account'
       preLoaderRoute: typeof RecoverAccountIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsIndexImport
       parentRoute: typeof rootRoute
     }
     '/sign-up/': {
@@ -363,7 +363,6 @@ export interface FileRoutesByFullPath {
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
-  '/settings/profile': typeof SettingsProfileRoute
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
   '/chat': typeof ChatIndexRoute
@@ -371,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/help': typeof HelpIndexRoute
   '/login': typeof LoginIndexRoute
   '/recover-account': typeof RecoverAccountIndexRoute
+  '/settings': typeof SettingsIndexRoute
   '/sign-up': typeof SignUpIndexRoute
   '/about': typeof AboutIndexLazyRoute
   '/contact': typeof ContactIndexLazyRoute
@@ -389,7 +389,6 @@ export interface FileRoutesByTo {
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
-  '/settings/profile': typeof SettingsProfileRoute
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
   '/chat': typeof ChatIndexRoute
@@ -397,6 +396,7 @@ export interface FileRoutesByTo {
   '/help': typeof HelpIndexRoute
   '/login': typeof LoginIndexRoute
   '/recover-account': typeof RecoverAccountIndexRoute
+  '/settings': typeof SettingsIndexRoute
   '/sign-up': typeof SignUpIndexRoute
   '/about': typeof AboutIndexLazyRoute
   '/contact': typeof ContactIndexLazyRoute
@@ -416,7 +416,6 @@ export interface FileRoutesById {
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
-  '/settings/profile': typeof SettingsProfileRoute
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
   '/chat/': typeof ChatIndexRoute
@@ -424,6 +423,7 @@ export interface FileRoutesById {
   '/help/': typeof HelpIndexRoute
   '/login/': typeof LoginIndexRoute
   '/recover-account/': typeof RecoverAccountIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/sign-up/': typeof SignUpIndexRoute
   '/about/': typeof AboutIndexLazyRoute
   '/contact/': typeof ContactIndexLazyRoute
@@ -444,7 +444,6 @@ export interface FileRouteTypes {
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
-    | '/settings/profile'
     | '/sign-up/finish'
     | '/sign-up/verify'
     | '/chat'
@@ -452,6 +451,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/login'
     | '/recover-account'
+    | '/settings'
     | '/sign-up'
     | '/about'
     | '/contact'
@@ -469,7 +469,6 @@ export interface FileRouteTypes {
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
-    | '/settings/profile'
     | '/sign-up/finish'
     | '/sign-up/verify'
     | '/chat'
@@ -477,6 +476,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/login'
     | '/recover-account'
+    | '/settings'
     | '/sign-up'
     | '/about'
     | '/contact'
@@ -494,7 +494,6 @@ export interface FileRouteTypes {
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
-    | '/settings/profile'
     | '/sign-up/finish'
     | '/sign-up/verify'
     | '/chat/'
@@ -502,6 +501,7 @@ export interface FileRouteTypes {
     | '/help/'
     | '/login/'
     | '/recover-account/'
+    | '/settings/'
     | '/sign-up/'
     | '/about/'
     | '/contact/'
@@ -521,7 +521,6 @@ export interface RootRouteChildren {
   SecurityCookiesRoute: typeof SecurityCookiesRoute
   SecurityPrivacyRoute: typeof SecurityPrivacyRoute
   SecurityTermsRoute: typeof SecurityTermsRoute
-  SettingsProfileRoute: typeof SettingsProfileRoute
   SignUpFinishRoute: typeof SignUpFinishRoute
   SignUpVerifyRoute: typeof SignUpVerifyRoute
   ChatIndexRoute: typeof ChatIndexRoute
@@ -529,6 +528,7 @@ export interface RootRouteChildren {
   HelpIndexRoute: typeof HelpIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   RecoverAccountIndexRoute: typeof RecoverAccountIndexRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
   SignUpIndexRoute: typeof SignUpIndexRoute
   AboutIndexLazyRoute: typeof AboutIndexLazyRoute
   ContactIndexLazyRoute: typeof ContactIndexLazyRoute
@@ -547,7 +547,6 @@ const rootRouteChildren: RootRouteChildren = {
   SecurityCookiesRoute: SecurityCookiesRoute,
   SecurityPrivacyRoute: SecurityPrivacyRoute,
   SecurityTermsRoute: SecurityTermsRoute,
-  SettingsProfileRoute: SettingsProfileRoute,
   SignUpFinishRoute: SignUpFinishRoute,
   SignUpVerifyRoute: SignUpVerifyRoute,
   ChatIndexRoute: ChatIndexRoute,
@@ -555,6 +554,7 @@ const rootRouteChildren: RootRouteChildren = {
   HelpIndexRoute: HelpIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
   RecoverAccountIndexRoute: RecoverAccountIndexRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
   SignUpIndexRoute: SignUpIndexRoute,
   AboutIndexLazyRoute: AboutIndexLazyRoute,
   ContactIndexLazyRoute: ContactIndexLazyRoute,
@@ -582,7 +582,6 @@ export const routeTree = rootRoute
         "/security/cookies",
         "/security/privacy",
         "/security/terms",
-        "/settings/profile",
         "/sign-up/finish",
         "/sign-up/verify",
         "/chat/",
@@ -590,6 +589,7 @@ export const routeTree = rootRoute
         "/help/",
         "/login/",
         "/recover-account/",
+        "/settings/",
         "/sign-up/",
         "/about/",
         "/contact/",
@@ -627,9 +627,6 @@ export const routeTree = rootRoute
     "/security/terms": {
       "filePath": "security/terms.tsx"
     },
-    "/settings/profile": {
-      "filePath": "settings/profile.tsx"
-    },
     "/sign-up/finish": {
       "filePath": "sign-up/finish.tsx"
     },
@@ -650,6 +647,9 @@ export const routeTree = rootRoute
     },
     "/recover-account/": {
       "filePath": "recover-account/index.tsx"
+    },
+    "/settings/": {
+      "filePath": "settings/index.tsx"
     },
     "/sign-up/": {
       "filePath": "sign-up/index.tsx"

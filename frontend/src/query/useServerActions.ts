@@ -1,6 +1,7 @@
 import {QueryClient, useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/axios";
 import { toast } from "sonner";
+import {AxiosError} from "axios";
 
 // Server types
 export interface Server {
@@ -33,10 +34,11 @@ export function useCreateServer() {
                 duration: 5000,
             });
         },
-        onError: (error):void => {
+        onError: (error:AxiosError):void => {
+            const message = (error.response?.data as { message?: string })?.message || "There was an error joining the server.";
             // Show error notification with Sonner
             toast.error("Failed to create server", {
-                description: "There was an error creating your server. Please try again.",
+                description: message,
                 duration: 5000,
             });
             console.error("Server creation error:", error);
@@ -79,8 +81,8 @@ export function useJoinServer() {
                 duration: 5000,
             });
         },
-        onError: (error: any) => {
-            const message = error?.response?.data?.message || "There was an error joining the server.";
+        onError: (error:AxiosError) => {
+            const message:string = (error.response?.data as { message?: string })?.message || "There was an error joining the server.";
             
             // Show error notification
             toast.error("Failed to join server", {

@@ -236,7 +236,7 @@ export function Sidebar() {
             <DropdownMenuSeparator className="bg-muted/20" />
             
             {/* Menu items */}
-            <Link to="/settings/profile" className="w-full">
+            <Link to="/settings" className="w-full">
               <DropdownMenuItem className="cursor-pointer flex items-center gap-2 text-paragraph hover:text-headline py-2">
                 <Settings className="h-4 w-4" />
                 <span>Settings</span>
