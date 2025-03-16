@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { requireAuth } from '@/utils/routeGuards';
 import { axiosInstance } from "@/lib/axios";
 import { toast } from "sonner";
+import { useSocket } from '@/hooks/useSocket';
 
 // Types
 interface Server {
@@ -76,6 +77,7 @@ function RouteComponent() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [membersOpen, setMembersOpen] = useState(true); // Members sidebar is open by default on desktop
+  useSocket();
 
   // Fetch server details using custom hook
   const {

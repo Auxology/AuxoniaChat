@@ -5,6 +5,7 @@ import { Menu } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Sidebar } from "@/components/sidebar.tsx";
 import { requireAuth } from '@/utils/routeGuards';
+import { useSocket } from '@/hooks/useSocket'
 
 export const Route = createFileRoute('/chat/')({
     beforeLoad: async () => {
@@ -15,6 +16,7 @@ export const Route = createFileRoute('/chat/')({
 
 function RouteComponent() {
     const [open, setOpen] = useState(false)
+    useSocket();
 
     return (
         <div className="flex h-screen bg-chat text-headline">
