@@ -3,9 +3,25 @@ import { useEffect, useState } from "react";
 import { io } from 'socket.io-client';
 import { axiosInstance } from "@/lib/axios";
 
-
-
 export const useSocket = () => {
+    const [onlineUsers, setOnlineUsers] = useState<Map<string, boolean>>(new Map());
+
+    const addOnlineUser = (userId: string) => {
+        setOnlineUsers(prev => {
+            const newMap = new Map(prev);
+            newMap.set(userId, true);
+            return newMap;
+        })
+    }
+
+    const removeOnlineUser = (userId: string) => {
+        setOnlineUsers(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(userId);
+            return newMap;
+        })
+    }
+
     const { data: userData } = useQuery({
         queryKey: ['userProfile'],
         queryFn: async () => {
@@ -29,26 +45,37 @@ export const useSocket = () => {
 
         socketInstance.on('connect', () => {
             console.log('Connected to socket server');
+            addOnlineUser(userData.id);
         });
 
         socketInstance.on('disconnect', () => {
             console.log('Disconnected from socket server');
         });
 
-        socketInstance.on('users:online', (userId:string) => {
+        // Single user came online
+        socketInstance.on('user:online', (userId: string) => {
             console.log(`User ${userId} is online`);
+            addOnlineUser(userId);
         });
 
-        socketInstance.on('users:offline', (userId:string) => {
+        socketInstance.on('user:offline', (userId: string) => {
             console.log(`User ${userId} is offline`);
+            removeOnlineUser(userId);
         });
 
+        // Initial list of online users (array format)
         socketInstance.on('users:online', (userIds: string[]) => {
-            userIds.forEach(id => console.log(`User ${id} is online`));
+            console.log(`Received list of online users:`, userIds);
+            userIds.forEach(id => addOnlineUser(id)); // ADD users, not remove!
         });
 
         return () => {
             socketInstance.disconnect();
         };
     }, [userData]);
+
+    return {
+        onlineUsers,
+        isOnline: (userId: string) => onlineUsers.has(userId)
+    }
 }

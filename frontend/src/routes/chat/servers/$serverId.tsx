@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Menu, Users, X } from "lucide-react";
@@ -77,7 +77,6 @@ function RouteComponent() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [membersOpen, setMembersOpen] = useState(true); // Members sidebar is open by default on desktop
-  useSocket();
 
   // Fetch server details using custom hook
   const {
@@ -345,13 +344,13 @@ function RouteComponent() {
 
 // Member Item Component
 function MemberItem({ member }: { member: Member }) {
-  // Status indicator color
-  const statusColor = {
-    online: "bg-emerald-500",
-    idle: "bg-amber-500",
-    dnd: "bg-red-500",
-    offline: "bg-gray-500",
-  };
+  const { isOnline } = useSocket();
+  const isUserOnline = isOnline(member.id);
+
+  // Status indicator color based on online status from socket
+  const statusColor = isUserOnline 
+    ? "bg-emerald-500" // User is online
+    : "bg-gray-500";   // User is offline
 
   // Safe username initial
   const getUserInitial = () => {
@@ -374,7 +373,7 @@ function MemberItem({ member }: { member: Member }) {
         <span 
           className={cn(
             "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-sidebar",
-            member.status ? statusColor[member.status] : "bg-gray-500"
+            statusColor
           )}
         />
       </div>
