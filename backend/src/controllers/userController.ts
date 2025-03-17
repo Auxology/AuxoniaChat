@@ -6,10 +6,12 @@ import {
     getUserProfileById,
     isMember,
     getServerByServerId,
-    joinServerWithIds
+    joinServerWithIds, updateUserProfilePicture
 } from '../utils/user';
 import {decryptEmail} from '../utils/encrypt';
 import {ServerDataForUser, ServerMembers, UserData, UserServers} from "../types/types";
+import { } from '../utils/user';
+import {uploadProfilePicture} from "../libs/cloudinary";
 
 export const getUserProfile = async (req: Request, res: Response):Promise<void> => {
     try{
@@ -36,6 +38,33 @@ export const getUserProfile = async (req: Request, res: Response):Promise<void> 
     }
     catch (error) {
         console.error(`Error in getUserProfile: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+export const changeUserProfilePicture = async (req: Request, res: Response):Promise<void> => {
+    try{
+        if(!req.session.user?.id) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        if(!req.file) {
+            res.status(400).json({message: 'Image is required'});
+            return;
+        }
+
+        const userId:string = req.session.user.id;
+
+        // Upload image to cloudinary
+        const avatarUrl:string = await uploadProfilePicture(req.file);
+
+        await updateUserProfilePicture(userId, avatarUrl);
+
+        res.status(200).json({message: 'Profile picture updated'});
+    }
+    catch(error){
+        console.error(`Error in changeUserProfilePicture: ${error}`);
         res.status(500).json({message: 'Internal server error'});
     }
 }

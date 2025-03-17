@@ -291,3 +291,16 @@ export async function joinServerWithIds(userId: string, serverId: string): Promi
         throw error;
     }
 }
+
+export async function updateUserProfilePicture(userId: string, avatarUrl: string): Promise<void> {
+    try {
+      await query(`
+        UPDATE app.users
+        SET avatar_url = $1
+        WHERE id = $2
+      `, [avatarUrl, userId]);
+    } catch (error) {
+      console.error('Error updating profile picture:', error);
+      throw error;
+    }
+}

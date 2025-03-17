@@ -1,6 +1,5 @@
 import { redirect } from "@tanstack/react-router";
 import { axiosInstance } from "@/lib/axios";
-import {io} from 'socket.io-client'
 
 // Guard for authenticated routes
 export async function requireAuth() {
