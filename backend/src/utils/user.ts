@@ -304,3 +304,16 @@ export async function updateUserProfilePicture(userId: string, avatarUrl: string
       throw error;
     }
 }
+
+export async function updateUsername(userId:string, username:string): Promise<void> {
+    try {
+        await query(`
+        UPDATE app.users
+        SET username = $1
+        WHERE id = $2
+        `, [username, userId]);
+    } catch (error) {
+        console.error('Error updating username:', error);
+        throw error;
+    }
+}

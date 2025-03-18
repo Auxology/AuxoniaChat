@@ -6,7 +6,7 @@ import {
     createServer,
     getServerById,
     getServerMembers,
-    joinServer, changeUserProfilePicture
+    joinServer, changeUserProfilePicture, changeUsername
 } from "../controllers/userController";
 import { upload } from '../middlewares/multer';
 
@@ -20,6 +20,7 @@ userRoute.get('/user/servers/:serverId', isAuthenticated, getServerById);
 userRoute.get('/user/servers/:serverId/members', isAuthenticated, getServerMembers);
 userRoute.post('/user/servers/join', isAuthenticated, joinServer);
 userRoute.post('/user/profile/avatar', isAuthenticated, upload.single('avatar'), changeUserProfilePicture)
+userRoute.post('/user/profile/username', isAuthenticated, changeUsername);
 
 
 export default userRoute;

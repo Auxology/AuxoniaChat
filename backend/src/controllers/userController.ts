@@ -6,12 +6,13 @@ import {
     getUserProfileById,
     isMember,
     getServerByServerId,
-    joinServerWithIds, updateUserProfilePicture
+    joinServerWithIds, updateUserProfilePicture, updateUsername
 } from '../utils/user';
 import {decryptEmail} from '../utils/encrypt';
 import {ServerDataForUser, ServerMembers, UserData, UserServers} from "../types/types";
 import { } from '../utils/user';
 import {uploadProfilePicture} from "../libs/cloudinary";
+import {usernameInUse} from "../utils/username";
 
 export const getUserProfile = async (req: Request, res: Response):Promise<void> => {
     try{
@@ -54,10 +55,14 @@ export const changeUserProfilePicture = async (req: Request, res: Response):Prom
             return;
         }
 
-        const userId:string = req.session.user.id;
+        const userId:string = req.session.user.id
+
+        console.log(userId)
 
         // Upload image to cloudinary
         const avatarUrl:string = await uploadProfilePicture(req.file);
+
+        console.log(avatarUrl);
 
         await updateUserProfilePicture(userId, avatarUrl);
 
@@ -65,6 +70,40 @@ export const changeUserProfilePicture = async (req: Request, res: Response):Prom
     }
     catch(error){
         console.error(`Error in changeUserProfilePicture: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+export const changeUsername = async (req: Request, res: Response):Promise<void> => {
+    try{
+        if(!req.session.user?.id) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const userId:string = req.session.user.id;
+        const {username} = req.body;
+
+        if(!username || username.trim() === '') {
+            res.status(400).json({message: 'Username is required'});
+            return;
+        }
+
+        // Check if username is already taken
+        const isUsernameTaken:boolean = await usernameInUse(username);
+
+        if(isUsernameTaken) {
+            res.status(400).json({message: 'Username is already taken'});
+            return;
+        }
+
+        // Update username
+        await updateUsername(userId, username);
+
+        res.status(200).json({message: 'Username updated'});
+    }
+    catch (error) {
+        console.error(`Error in changeUsername: ${error}`);
         res.status(500).json({message: 'Internal server error'});
     }
 }

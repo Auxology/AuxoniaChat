@@ -9,6 +9,7 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
+    
   return (
     <QueryClientProvider client={queryClient}>
       <div>

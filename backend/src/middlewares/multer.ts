@@ -9,7 +9,7 @@ const fileFilter = (req: Express.Request, file: Express.Multer.File, callback: m
   if (file.mimetype.startsWith('image/')) {
     callback(null, true);
   } else {
-    callback(new Error('Only image files are allowed'));
+    throw ('Please upload an image');
   }
 };
 
