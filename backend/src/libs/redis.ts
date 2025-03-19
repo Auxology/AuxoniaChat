@@ -244,6 +244,58 @@ export async function verifyAdvancedRecoverySession(email: string,userId:string,
     return sessionData.sessionToken === sessionToken && sessionData.userId === userId;
 }
 
+export async function storePasswordChangeCode(userId: string, code: string):Promise<void> {
+    await redisClient.setEx('password_change_code:' + userId, 60 * 5, code);
+}
+
+export async function verifyPasswordChangeCode(userId: string, code: string):Promise<boolean> {
+    const storedCode:string | null = await redisClient.get('password_change_code:' + userId);
+
+    return code === storedCode;
+}
+
+export async function deletePasswordChangeCode(userId: string):Promise<void> {
+    await redisClient.del('password_change_code:' + userId);
+}
+
+export async function createPasswordChangeSession(userId: string):Promise<string | null> {
+    const sessionToken = crypto.randomUUID();
+    // 10 Minute expiration
+    const expiration = 60 * 10;
+
+    const payload = {
+        userId,
+        sessionToken,
+        expiresIn: expiration,
+    }
+
+    const existingSession:string | null = await redisClient.get(`password_change_session:${userId}`);
+
+    if(existingSession){
+        await redisClient.del(`password_change_session:${userId}`);
+    }
+
+    await redisClient.setEx(`password_change_session:${userId}`, expiration, JSON.stringify(payload));
+
+    return sessionToken;
+}
+
+export async function checkPasswordChangeSession(userId: string, sessionToken: string):Promise<boolean> {
+    const session:string | null = await redisClient.get(`password_change_session:${userId}`);
+
+    if(!session){
+        return false;
+    }
+
+    const sessionData = JSON.parse(session);
+
+    return sessionData.sessionToken === sessionToken;
+}
+
+export async function deletePasswordChangeSession(userId: string):Promise<void> {
+    await redisClient.del(`password_change_session:${userId}`);
+}
+
 export async function deleteAdvancedRecoverySession(email: string):Promise<void> {
     await redisClient.del(`advanced_recovery_session:${email}`);
 }
@@ -264,3 +316,14 @@ export async function deleteSessions(sessionIds: string[]):Promise<void> {
         await redisClient.del(`auxonia_sess:${sessionId}`);
     }
 }
+
+export async function lockoutUserById(userId: string):Promise<void> {
+    await redisClient.setEx('lock_user:' + userId, 60, 'locked');
+}
+
+export async function checkIfUserIsLockedById(userId: string):Promise<boolean> {
+    const exists = await redisClient.exists('lock_user:' + userId);
+
+    return Boolean(exists);
+}
+

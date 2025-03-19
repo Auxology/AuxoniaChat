@@ -23,6 +23,7 @@ import { Route as ForgotPasswordIndexImport } from './routes/forgot-password/ind
 import { Route as ChatIndexImport } from './routes/chat/index'
 import { Route as SignUpVerifyImport } from './routes/sign-up/verify'
 import { Route as SignUpFinishImport } from './routes/sign-up/finish'
+import { Route as SettingsSecurityImport } from './routes/settings/security'
 import { Route as SecurityTermsImport } from './routes/security/terms'
 import { Route as SecurityPrivacyImport } from './routes/security/privacy'
 import { Route as SecurityCookiesImport } from './routes/security/cookies'
@@ -119,6 +120,12 @@ const SignUpVerifyRoute = SignUpVerifyImport.update({
 const SignUpFinishRoute = SignUpFinishImport.update({
   id: '/sign-up/finish',
   path: '/sign-up/finish',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SettingsSecurityRoute = SettingsSecurityImport.update({
+  id: '/settings/security',
+  path: '/settings/security',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -256,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SecurityTermsImport
       parentRoute: typeof rootRoute
     }
+    '/settings/security': {
+      id: '/settings/security'
+      path: '/settings/security'
+      fullPath: '/settings/security'
+      preLoaderRoute: typeof SettingsSecurityImport
+      parentRoute: typeof rootRoute
+    }
     '/sign-up/finish': {
       id: '/sign-up/finish'
       path: '/sign-up/finish'
@@ -363,6 +377,7 @@ export interface FileRoutesByFullPath {
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
+  '/settings/security': typeof SettingsSecurityRoute
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
   '/chat': typeof ChatIndexRoute
@@ -389,6 +404,7 @@ export interface FileRoutesByTo {
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
+  '/settings/security': typeof SettingsSecurityRoute
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
   '/chat': typeof ChatIndexRoute
@@ -416,6 +432,7 @@ export interface FileRoutesById {
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
+  '/settings/security': typeof SettingsSecurityRoute
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
   '/chat/': typeof ChatIndexRoute
@@ -444,6 +461,7 @@ export interface FileRouteTypes {
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
+    | '/settings/security'
     | '/sign-up/finish'
     | '/sign-up/verify'
     | '/chat'
@@ -469,6 +487,7 @@ export interface FileRouteTypes {
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
+    | '/settings/security'
     | '/sign-up/finish'
     | '/sign-up/verify'
     | '/chat'
@@ -494,6 +513,7 @@ export interface FileRouteTypes {
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
+    | '/settings/security'
     | '/sign-up/finish'
     | '/sign-up/verify'
     | '/chat/'
@@ -521,6 +541,7 @@ export interface RootRouteChildren {
   SecurityCookiesRoute: typeof SecurityCookiesRoute
   SecurityPrivacyRoute: typeof SecurityPrivacyRoute
   SecurityTermsRoute: typeof SecurityTermsRoute
+  SettingsSecurityRoute: typeof SettingsSecurityRoute
   SignUpFinishRoute: typeof SignUpFinishRoute
   SignUpVerifyRoute: typeof SignUpVerifyRoute
   ChatIndexRoute: typeof ChatIndexRoute
@@ -547,6 +568,7 @@ const rootRouteChildren: RootRouteChildren = {
   SecurityCookiesRoute: SecurityCookiesRoute,
   SecurityPrivacyRoute: SecurityPrivacyRoute,
   SecurityTermsRoute: SecurityTermsRoute,
+  SettingsSecurityRoute: SettingsSecurityRoute,
   SignUpFinishRoute: SignUpFinishRoute,
   SignUpVerifyRoute: SignUpVerifyRoute,
   ChatIndexRoute: ChatIndexRoute,
@@ -582,6 +604,7 @@ export const routeTree = rootRoute
         "/security/cookies",
         "/security/privacy",
         "/security/terms",
+        "/settings/security",
         "/sign-up/finish",
         "/sign-up/verify",
         "/chat/",
@@ -626,6 +649,9 @@ export const routeTree = rootRoute
     },
     "/security/terms": {
       "filePath": "security/terms.tsx"
+    },
+    "/settings/security": {
+      "filePath": "settings/security.tsx"
     },
     "/sign-up/finish": {
       "filePath": "sign-up/finish.tsx"

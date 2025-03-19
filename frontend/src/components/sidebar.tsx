@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Search, MessageSquare, Plus, User, Settings, LogOut } from "lucide-react";
+import { Search, MessageSquare, Plus, User, Settings, LogOut, Shield } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/axios.ts";
 import { Link } from "@tanstack/react-router";
@@ -240,6 +240,14 @@ export function Sidebar() {
               <DropdownMenuItem className="cursor-pointer flex items-center gap-2 text-paragraph hover:text-headline py-2">
                 <Settings className="h-4 w-4" />
                 <span>Settings</span>
+              </DropdownMenuItem>
+            </Link>
+            
+            {/* New Security Menu Item */}
+            <Link to="/settings/security" className="w-full">
+              <DropdownMenuItem className="cursor-pointer flex items-center gap-2 text-paragraph hover:text-headline py-2">
+                <Shield className="h-4 w-4" />
+                <span>Security & Privacy</span>
               </DropdownMenuItem>
             </Link>
             

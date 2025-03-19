@@ -59,6 +59,7 @@ export async function getPasswordHash(email: string, authTag: string): Promise<s
     }
 }
 
+
 // Change password hash in database with email and authTag
 export async function resetUserPassword(email: string, authTag: string, newPasswordHash: string): Promise<void> {
     try {
@@ -305,6 +306,7 @@ export async function updateUserProfilePicture(userId: string, avatarUrl: string
     }
 }
 
+// This function will update the username in the database
 export async function updateUsername(userId:string, username:string): Promise<void> {
     try {
         await query(`
@@ -314,6 +316,35 @@ export async function updateUsername(userId:string, username:string): Promise<vo
         `, [username, userId]);
     } catch (error) {
         console.error('Error updating username:', error);
+        throw error;
+    }
+}
+
+// This function will update the password hash in the database
+export async function updatePassword(userId:string, newPasswordHash:string): Promise<void> {
+    try {
+        await query(`
+        UPDATE app.users
+        SET password_hash = $1
+        WHERE id = $2
+        `, [newPasswordHash, userId]);
+    } catch (error) {
+        console.error('Error updating password:', error);
+        throw error;
+    }
+}
+
+// Get all user session
+export async function getSessionsById(userId: string): Promise<string[]> {
+    try {
+        const { rows } = await query(`
+        SELECT sess_id FROM app.users
+        WHERE id = $1
+        `, [userId]);
+
+        return rows[0].sess_id;
+    } catch (error) {
+        console.error('Error getting sessions:', error);
         throw error;
     }
 }

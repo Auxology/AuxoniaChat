@@ -6,13 +6,32 @@ import {
     getUserProfileById,
     isMember,
     getServerByServerId,
-    joinServerWithIds, updateUserProfilePicture, updateUsername
+    joinServerWithIds,
+    updateUserProfilePicture,
+    updateUsername,
+    updatePassword,
+    getSessionsById,
+    removeSessionId,
+    getPasswordHash
 } from '../utils/user';
 import {decryptEmail} from '../utils/encrypt';
 import {ServerDataForUser, ServerMembers, UserData, UserServers} from "../types/types";
 import { } from '../utils/user';
 import {uploadProfilePicture} from "../libs/cloudinary";
 import {usernameInUse} from "../utils/username";
+import {generateRandomOTP} from "../utils/codes";
+import {
+    checkIfUserIsLockedById,
+    createPasswordChangeSession,
+    deletePasswordChangeCode,
+    deletePasswordChangeSession,
+    deleteSessions,
+    lockoutUserById,
+    storePasswordChangeCode,
+    verifyPasswordChangeCode
+} from "../libs/redis";
+import {clearPasswordChangeJWT, createPasswordChangeJWT} from "../libs/jwt";
+import {hashPassword, validatePassword} from "../utils/password";
 
 export const getUserProfile = async (req: Request, res: Response):Promise<void> => {
     try{
@@ -254,6 +273,153 @@ export const joinServer = async (req:Request, res:Response):Promise<void> => {
     }
     catch (error) {
         console.error(`Error in joinServer: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+export const requestPasswordChange = async (req:Request, res:Response):Promise<void> => {
+    try {
+        if(!req.session.user?.id) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const userId:string = req.session.user.id;
+
+        // Check if user is locked out
+        const isLocked:boolean = await checkIfUserIsLockedById(userId);
+
+        if(isLocked) {
+            res.status(400).json({message: 'User is locked out for 5 minutes'});
+            return;
+        }
+
+        // Get users email from database
+        const userData:UserData | null = await getUserProfileById(userId);
+
+        if(!userData) {
+            res.status(404).json({message: 'User not found'});
+            return;
+        }
+
+        // Decrypt email
+        const email:string = decryptEmail(userData.email, userData.authTag);
+
+        // Generate random code
+        const otpCode:string = generateRandomOTP();
+
+        // HERE WE WILL SEND THE CODE TO THE USER VIA EMAIL
+
+        // Store code in redis
+        await storePasswordChangeCode(userId, otpCode);
+
+        // Lock out user for 5 minutes
+        await lockoutUserById(userId);
+
+        res.status(200).json({message: 'Code sent to email'});
+    }
+    catch(error) {
+        console.error(`Error in requestPasswordChange: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+export const verifyPasswordChange = async (req:Request, res:Response):Promise<void> => {
+    try {
+        if(!req.session.user?.id) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const userId:string = req.session.user.id;
+
+        const {code} = req.body;
+
+        if(!code) {
+            res.status(400).json({message: 'Code is required'});
+            return;
+        }
+
+        // Verify if code is correct
+        const iCorrect:boolean = await verifyPasswordChangeCode(userId, code);
+
+        if(!iCorrect) {
+            res.status(400).json({message: 'Invalid code'});
+            return;
+        }
+
+        // Now we create session allowing user to change password
+        const sessionToken :string | null = await createPasswordChangeSession(userId);
+
+        if(!sessionToken) {
+            res.status(500).json({message: 'Internal server error'});
+            return;
+        }
+
+        // Create jwt cookie
+        createPasswordChangeJWT(userId, sessionToken, res);
+
+        await deletePasswordChangeCode(userId);
+
+        res.status(200).json({message: 'Code verified'});
+    }
+    catch(error) {
+        console.error(`Error in verifyPasswordChange: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+export const changePassword = async (req:Request, res:Response):Promise<void> => {
+    try {
+        if(!req.userId) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const userId:string = req.userId;
+
+        const {password} = req.body;
+
+        const isValidPassword:boolean = await validatePassword(password);
+
+        if(!isValidPassword) {
+            res.status(400).json({message: 'Invalid password'});
+            return;
+        }
+
+        // Hash password
+        const hashedPassword:string = await hashPassword(password);
+
+        // Check if password is the same as the current password
+        const userData:UserData | null = await getUserProfileById(userId);
+
+        if(!userData) {
+            res.status(404).json({message: 'User not found'});
+            return;
+        }
+
+        const passwordHash:string | null = await getPasswordHash(userData.email, userData.authTag)
+
+        if(passwordHash === hashedPassword) {
+            res.status(400).json({message: 'Password is the same as the current password'});
+            return;
+        }
+        /// Update password in database
+        await updatePassword(userId, hashedPassword);
+
+        // Get rid of all session
+        await deletePasswordChangeSession(userId);
+        clearPasswordChangeJWT(res);
+
+        const sessionId:string[]= await getSessionsById(userId);
+
+        await deleteSessions(sessionId);
+        await removeSessionId(userId, sessionId)
+
+        res.status(200).json({message: 'Password updated'});
+    }
+    catch(error) {
+        console.error(`Error in changePassword: ${error}`);
         res.status(500).json({message: 'Internal server error'});
     }
 }

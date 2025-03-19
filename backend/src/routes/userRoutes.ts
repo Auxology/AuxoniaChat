@@ -6,9 +6,10 @@ import {
     createServer,
     getServerById,
     getServerMembers,
-    joinServer, changeUserProfilePicture, changeUsername
+    joinServer, changeUserProfilePicture, changeUsername, requestPasswordChange, verifyPasswordChange, changePassword
 } from "../controllers/userController";
 import { upload } from '../middlewares/multer';
+import {changePasswordProtection} from "../middlewares/changePasswordMiddleware";
 
 
 const userRoute:Router = Router();
@@ -21,6 +22,10 @@ userRoute.get('/user/servers/:serverId/members', isAuthenticated, getServerMembe
 userRoute.post('/user/servers/join', isAuthenticated, joinServer);
 userRoute.post('/user/profile/avatar', isAuthenticated, upload.single('avatar'), changeUserProfilePicture)
 userRoute.post('/user/profile/username', isAuthenticated, changeUsername);
+
+userRoute.post('/user/security/request-password-change', isAuthenticated, requestPasswordChange);
+userRoute.post('/user/security/verify-password-change', isAuthenticated, verifyPasswordChange);
+userRoute.post('/user/security/complete-password-change', isAuthenticated, changePasswordProtection, changePassword)
 
 
 export default userRoute;
