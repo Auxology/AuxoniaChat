@@ -105,6 +105,50 @@ export const deleteTemporarySession = async (email: string):Promise<void> => {
     await redisClient.del(`temp_session:${email}`);
 }
 
+export const storeTwoFactorCode = async (email: string, code: string):Promise<void> => {
+    await redisClient.setEx('two_factor_code:' + email, 60 * 5, code);
+}
+
+export const verifyTwoFactorCode = async (email: string, code: string):Promise<boolean> => {
+    const storedCode:string | null = await redisClient.get('two_factor_code:' + email);
+
+    return code === storedCode;
+}
+
+export async function createTwoFaSession(email: string):Promise<string | null> {
+    const sessionToken = crypto.randomUUID();
+    // 10 Minute expiration
+    const expiration = 60 * 10;
+
+    const payload = {
+        email,
+        sessionToken,
+        expiresIn: expiration,
+    }
+
+    const existingSession:string | null = await redisClient.get(`two_fa_session:${email}`);
+
+    if(existingSession){
+        await redisClient.del(`two_fa_session:${email}`);
+    }
+
+    await redisClient.setEx(`two_fa_session:${email}`, expiration, JSON.stringify(payload));
+
+    return sessionToken;
+}
+
+export async function checkTwoFaSession(email:string, sessionToken:string):Promise<boolean> {
+    const session:string | null = await redisClient.get(`two_fa_session:${email}`);
+
+    if(!session){
+        return false;
+    }
+
+    const sessionData = JSON.parse(session);
+
+    return sessionData.sessionToken === sessionToken;
+}
+
 export async function storePasswordResetCode(email: string, code: string):Promise<void> {
     await redisClient.setEx('password_reset_code:' + email, 60 * 5, code);
 }
@@ -298,6 +342,20 @@ export async function deletePasswordChangeSession(userId: string):Promise<void> 
 
 export async function deleteAdvancedRecoverySession(email: string):Promise<void> {
     await redisClient.del(`advanced_recovery_session:${email}`);
+}
+
+export async function storeEmailChangeCode(email: string, code: string):Promise<void> {
+    await redisClient.setEx('email_change_code:' + email, 60 * 5, code);
+}
+
+export async function verifyEmailChangeCode(email: string, code: string):Promise<boolean> {
+    const storedCode:string | null = await redisClient.get('email_change_code:' + email);
+
+    return code === storedCode;
+}
+
+export async function deleteEmailChangeCode(email: string):Promise<void> {
+    await redisClient.del('email_change_code:' + email);
 }
 
 export async function lockoutUser(email: string):Promise<void> {

@@ -198,6 +198,14 @@ export const finishRecovery = async (req: Request, res: Response):Promise<void> 
         const {encrypted, authTag} = encryptEmail(email);
         const hashedPassword:string = await hashPassword(password);
 
+        // Recheck if email is in use
+        const emailIsUsed:boolean = await emailInUse(encrypted);
+
+        if(emailIsUsed){
+            res.status(400).json({message: 'Email already in use'});
+            return;
+        }
+
         // Recover account
         // This will also return session ids
         const sessionToken:string[] = await recoverAccount(userId, encrypted, authTag, hashedPassword);

@@ -348,3 +348,47 @@ export async function getSessionsById(userId: string): Promise<string[]> {
         throw error;
     }
 }
+
+// Get session by email and authTag
+export async function getSessionByEmail(email: string, authTag: string): Promise<string[]> {
+    try {
+        const { rows } = await query(`
+        SELECT sess_id FROM app.users
+        WHERE email = $1 AND authTag = $2
+        `, [email, authTag]);
+
+        return rows[0].sess_id;
+    } catch (error) {
+        console.error('Error getting session:', error);
+        throw error;
+    }
+}
+
+// Remove session by email and authTag + session id
+export async function removeSessionByEmail(email:string, authTag:string, sessionId:string[]): Promise<void> {
+    try {
+        await query(`
+        UPDATE app.users
+        SET sess_id = array_remove(sess_id, $1)
+        WHERE email = $2 AND authTag = $3
+        `, [sessionId, email, authTag]);
+    } catch (error) {
+        console.error('Error removing session:', error);
+        throw error;
+    }
+}
+
+
+// This will update user's email, it should expect the new email and authTag
+export async function updateEmail(userId: string, email: string, authTag: string): Promise<void> {
+    try {
+        await query(`
+        UPDATE app.users
+        SET email = $1, authTag = $2
+        WHERE id = $3
+        `, [email, authTag, userId]);
+    } catch (error) {
+        console.error('Error updating email:', error);
+        throw error;
+    }
+}

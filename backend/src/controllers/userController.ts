@@ -12,26 +12,27 @@ import {
     updatePassword,
     getSessionsById,
     removeSessionId,
-    getPasswordHash
+    getPasswordHash, updateEmail
 } from '../utils/user';
-import {decryptEmail} from '../utils/encrypt';
+import {decryptEmail, encryptEmail} from '../utils/encrypt';
 import {ServerDataForUser, ServerMembers, UserData, UserServers} from "../types/types";
-import { } from '../utils/user';
 import {uploadProfilePicture} from "../libs/cloudinary";
 import {usernameInUse} from "../utils/username";
 import {generateRandomOTP} from "../utils/codes";
 import {
     checkIfUserIsLockedById,
-    createPasswordChangeSession,
+    createPasswordChangeSession, deleteEmailChangeCode,
     deletePasswordChangeCode,
     deletePasswordChangeSession,
     deleteSessions,
-    lockoutUserById,
-    storePasswordChangeCode,
+    lockoutUserById, storeEmailChangeCode,
+    storePasswordChangeCode, verifyEmailChangeCode,
     verifyPasswordChangeCode
 } from "../libs/redis";
 import {clearPasswordChangeJWT, createPasswordChangeJWT} from "../libs/jwt";
 import {hashPassword, validatePassword} from "../utils/password";
+import {emailInUse, validateEmail} from "../utils/email";
+import {clearCookieWithEmail, createCookieWithEmail} from "../utils/cookies";
 
 export const getUserProfile = async (req: Request, res: Response):Promise<void> => {
     try{
@@ -420,6 +421,129 @@ export const changePassword = async (req:Request, res:Response):Promise<void> =>
     }
     catch(error) {
         console.error(`Error in changePassword: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+export const requestEmailChange = async (req:Request, res:Response):Promise<void> => {
+    try{
+        if(!req.session.user?.id) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const userId:string = req.session.user.id;
+        const {email} = req.body;
+
+        // Validate email
+        const isValidEmail:boolean = validateEmail(email);
+
+        if(!isValidEmail) {
+            res.status(400).json({message: 'Invalid email'});
+            return;
+        }
+
+        // Check if user is locked out
+        const isLocked:boolean = await checkIfUserIsLockedById(userId)
+
+        if(isLocked) {
+            res.status(400).json({message: 'User is locked out for 5 minutes'});
+            return;
+        }
+
+        const {encrypted, authTag} = encryptEmail(email);
+
+        // Check if email is already in use
+        const emailIsUsed:boolean = await emailInUse(encrypted);
+
+        if(emailIsUsed) {
+            res.status(400).json({message: 'Email is already in use'});
+            return;
+        }
+
+        // Generate random code
+        const otpCode:string = generateRandomOTP()
+
+        // HERE WE WILL SEND THE CODE TO THE USER VIA EMAIL
+
+        // Store code in redis
+        await storeEmailChangeCode(email, otpCode);
+
+        // Store new email in cookie
+        createCookieWithEmail(res, email);
+
+        // Lockout user
+        await lockoutUserById(userId);
+
+        res.status(200).json({message: 'Code sent to email'});
+    }
+    catch(error) {
+        console.error(`Error in requestEmailChange: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+export const verifyEmailChange = async (req:Request, res:Response):Promise<void> => {
+    try{
+        if(!req.session.user?.id) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const userId:string = req.session.user.id;
+
+        if(!req.cookies.user_email) {
+            res.status(400).json({message: 'Email is required'});
+            return;
+        }
+
+        const email:string = req.cookies.user_email;
+
+        const {code} = req.body;
+
+        if(!code) {
+            res.status(400).json({message: 'Code is required'});
+            return;
+        }
+
+        // Verify code
+        const isValidCode:boolean = await verifyEmailChangeCode(email, code);
+
+        if(!isValidCode) {
+            res.status(400).json({message: 'Invalid code'});
+            return;
+        }
+
+        // Encrypt new email
+        const {encrypted, authTag} = encryptEmail(email);
+
+        const isUsed:boolean = await emailInUse(encrypted);
+
+        if(isUsed) {
+            res.status(400).json({message: 'Email is already in use'});
+            return;
+        }
+
+        // Update email in database
+        await updateEmail(userId, encrypted, authTag);
+
+        // Clear the code
+        await deleteEmailChangeCode(email);
+
+        // Delete email cookie
+        clearCookieWithEmail(res);
+
+        // Get session
+        const sessionId:string[]= await getSessionsById(userId);
+
+        // Delete all sessions
+        await deleteSessions(sessionId);
+        await removeSessionId(userId, sessionId);
+
+        res.status(200).json({message: 'Email updated'});
+    }
+    catch(error) {
+        console.error(`Error in verifyEmailChange: ${error}`);
         res.status(500).json({message: 'Internal server error'});
     }
 }

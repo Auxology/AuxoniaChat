@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import {encryptEmail} from "../utils/encrypt";
-import {getUserByEmail, resetUserPassword} from "../utils/user";
+import {getSessionByEmail, getUserByEmail, removeSessionByEmail, resetUserPassword} from "../utils/user";
 import {validateEmail} from "../utils/email";
 import {clearCookieWithEmail, createCookieWithEmail} from "../utils/cookies";
 import {generateRandomOTP} from "../utils/codes";
 import {
     checkIfUserIsLocked, createForgotPasswordSession, deleteForgotPasswordSession,
-    deletePasswordResetCode,
+    deletePasswordResetCode, deleteSessions,
     lockoutUser,
     storePasswordResetCode,
     verifyPasswordResetCode
@@ -156,13 +156,19 @@ export const finishForgotPassword = async (req: Request, res: Response):Promise<
         // Encrypt email
         const {encrypted: encryptedEmail, authTag} = encryptEmail(email);
 
-
         // Update user
         await resetUserPassword(encryptedEmail, authTag, hashedPassword);
 
         // Delete the temporary session
         await deleteForgotPasswordSession(email);
         clearForgotPasswordJWT(res);
+
+        // Get all sessions
+        const sessionId: string[] = await getSessionByEmail(encryptedEmail, authTag)
+
+        // Delete all sessions
+        await deleteSessions(sessionId);
+        await removeSessionByEmail(encryptedEmail, authTag, sessionId);
 
         res.status(200).json({message: 'Password Reset Successful'});
     }

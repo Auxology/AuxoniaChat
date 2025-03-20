@@ -19,7 +19,7 @@ export const useLogin = () => {
     return useMutation({
         mutationFn: login,
         onSuccess: ():void => {
-            router.navigate({to: "/chat"});
+            router.navigate({to: "/login/verify"});
         },
         onError: (error: AxiosError):void => {
             if(error.response?.status === 429) {

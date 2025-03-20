@@ -27,16 +27,6 @@ const emailSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" })
 })
 
-// Password validation schema
-const passwordSchema = z.object({
-  password: z.string()
-    .min(8, { message: "Password must be at least 8 characters" })
-    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
-    .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
-    .regex(/[0-9]/, { message: "Password must contain at least one number" })
-    .regex(/[^A-Za-z0-9]/, { message: "Password must contain at least one special character" })
-})
-
 // Verification code schema
 const verificationSchema = z.object({
   code: z.string().length(8, { message: "Verification code must be 8 characters" })
@@ -99,7 +89,7 @@ export const Route = createFileRoute('/settings/security')({
 })
 
 function RouteComponent() {
-  // State for multi-step forms
+  // State for forms
   const [passwordChangeStep, setPasswordChangeStep] = useState<"idle" | "verification" | "newPassword">("idle");
   const [emailChangeStep, setEmailChangeStep] = useState<"idle" | "verification">("idle");
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -221,6 +211,7 @@ function RouteComponent() {
       setEmailChangeStep("idle");
       emailForm.reset();
       verifyEmailForm.reset();
+      window.location.reload();
     },
     onError: () => {
       toast.error("Invalid verification code", {
