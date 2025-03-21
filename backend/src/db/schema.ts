@@ -57,6 +57,7 @@ export async function initializeSchema(): Promise<void> {
         server_id UUID REFERENCES app.servers(id) NOT NULL,
         name VARCHAR(50) NOT NULL,
         type VARCHAR(20) NOT NULL DEFAULT 'text',
+        description TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       )
     `);

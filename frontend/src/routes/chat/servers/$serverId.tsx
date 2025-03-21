@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Menu, Users, X } from "lucide-react";
+import { Menu, Users, X, Plus, Hash } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Sidebar } from "@/components/sidebar.tsx";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,6 +13,10 @@ import { requireAuth } from '@/utils/routeGuards';
 import { axiosInstance } from "@/lib/axios";
 import { toast } from "sonner";
 import { useSocket } from '@/hooks/useSocket';
+import { useServerChannels } from "@/query/useChannel";
+import { CreateChannelDialog } from "@/components/create-channel";
+
+
 
 // Types
 interface Server {
@@ -77,6 +81,10 @@ function RouteComponent() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [membersOpen, setMembersOpen] = useState(true); // Members sidebar is open by default on desktop
+  const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
+  const { data: channels, isLoading: isLoadingChannels } = useServerChannels(serverId);
+
+  
 
   // Fetch server details using custom hook
   const {
@@ -100,6 +108,29 @@ function RouteComponent() {
     data: members,
     isLoading: isLoadingMembers,
   } = useServerMembers(serverId);
+
+  const [currentUser, setCurrentUser] = useState<{id: string} | null>(null);
+
+  // Add this useEffect to fetch the current user
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axiosInstance.get('/user/profile');
+        setCurrentUser(response.data);
+      } catch (error) {
+        console.error('Failed to fetch current user:', error);
+      }
+    };
+    
+    fetchCurrentUser();
+  }, []);
+
+  // Determine if current user is the server owner
+  const isCurrentUserOwner = Array.isArray(members) && currentUser &&
+    members.some(member => 
+      member.role === 'owner' && 
+      member.id === currentUser.id
+    );
 
   // Group members by role - safely handle potentially undefined members
   const ownerMembers = Array.isArray(members) ? members.filter(member => member.role === 'owner') : [];
@@ -172,6 +203,17 @@ function RouteComponent() {
               <h1 className="font-pitch-sans-medium text-headline">
                 {isLoadingServer ? 'Loading...' : server?.name || 'Server'}
               </h1>
+              {isCurrentUserOwner && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsCreateChannelOpen(true)}
+                  className="ml-2 p-0 h-7 w-7"
+                  title="Create Channel"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              )}
             </div>
 
             <div className="ml-auto flex items-center">
@@ -282,6 +324,57 @@ function RouteComponent() {
                 </Button>
               </div>
 
+              {/* Channels sidebar section */}
+              <div className="px-3 mt-6">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-xs font-pitch-sans-medium text-paragraph uppercase">Channels</h3>
+                  {isCurrentUserOwner && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsCreateChannelOpen(true)}
+                      className="h-6 w-6 p-0"
+                      title="Create Channel"
+                    >
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+                
+                {isLoadingChannels ? (
+                  // Loading skeleton
+                  <div className="space-y-2">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="flex items-center space-x-2 h-8 px-2">
+                        <div className="w-4 h-4 rounded bg-muted/20 animate-pulse"></div>
+                        <div className="h-4 w-24 bg-muted/20 animate-pulse rounded"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : channels && channels.length > 0 ? (
+                  <div className="space-y-1">
+                    {channels.map((channel) => (
+                      <Button
+                        key={channel.id}
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-start font-pitch-sans-medium text-paragraph"
+                        title={channel.description || channel.name}
+                      >
+                        <Hash className="h-4 w-4 mr-2" />
+                        {channel.name}
+                      </Button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-xs text-paragraph py-2 px-2">
+                    {isCurrentUserOwner 
+                      ? "Click the + to create a channel" 
+                      : "No channels yet"}
+                  </div>
+                )}
+              </div>
+
               {/* Members List */}
               <ScrollArea className="flex-1 p-3">
                 {isLoadingMembers ? (
@@ -338,6 +431,11 @@ function RouteComponent() {
           )}
         </div>
       </div>
+      <CreateChannelDialog 
+        serverId={serverId}
+        open={isCreateChannelOpen}
+        onOpenChange={setIsCreateChannelOpen}
+      />
     </div>
   );
 }

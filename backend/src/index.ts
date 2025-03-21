@@ -13,6 +13,7 @@ import recoveryRoute from "./routes/recoveryRoute";
 import userRoute from "./routes/userRoutes";
 import { createServer } from 'http'; // Add this import
 import { initSocketManager } from './libs/socket'; // Add this import
+import channelRoute from './routes/channel';
 
 // App Config
 dotenv.config();
@@ -49,6 +50,7 @@ app.use('/api', loginRoute);
 app.use('/api', forgotPasswordRoute);
 app.use('/api', recoveryRoute);
 app.use('/api', userRoute);
+app.use('/api', channelRoute);
 
 // Server - Use the HTTP server instead of app to listen
 server.listen(port, async () => {

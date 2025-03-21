@@ -221,6 +221,8 @@ export async function getServersByUserId(userId: string):Promise<UserServers[]>{
     }
 }
 
+// This one is more complex, it will check if the user is a member of the server
+// and return the server data if they are
 export async function isMember(serverId: string, userId: string): Promise<ServerDataForUser| null> {
     try {
         const { rows } = await query(`
@@ -231,6 +233,22 @@ export async function isMember(serverId: string, userId: string): Promise<Server
         `, [serverId, userId]);
 
         return rows[0] as ServerDataForUser;
+    } catch (error) {
+        console.error('Error checking if user is member:', error);
+        throw error;
+    }
+}
+
+// This just checks if the user is a member of the server
+export async function checkIfUserIsMember(userId: string, serverId: string): Promise<boolean> {
+    try {
+        const { rows } = await query(`
+            SELECT user_id
+            FROM app.server_members
+            WHERE user_id = $1 AND server_id = $2
+        `, [userId, serverId]);
+
+        return rows.length > 0;
     } catch (error) {
         console.error('Error checking if user is member:', error);
         throw error;

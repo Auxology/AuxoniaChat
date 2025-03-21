@@ -369,8 +369,27 @@ export async function checkIfUserIsLocked(email: string):Promise<boolean> {
 }
 
 // This function should expect array of session ids and should delete all of them
-export async function deleteSessions(sessionIds: string[]):Promise<void> {
-    for(const sessionId of sessionIds){
+export async function deleteSessions(sessionIds: string[] | string | null | undefined): Promise<void> {
+    // If sessionIds is null, undefined, or empty array, return early
+    if (!sessionIds) {
+        console.log('No session IDs provided to delete');
+        return;
+    }
+    
+    // Convert to array if it's a single string
+    const ids = Array.isArray(sessionIds) ? sessionIds : [sessionIds];
+    
+    // Filter out any null or undefined values
+    const validIds = ids.filter(id => id);
+    
+    // Only proceed if we have valid IDs
+    if (validIds.length === 0) {
+        console.log('No valid session IDs to delete');
+        return;
+    }
+
+    // Delete each session
+    for (const sessionId of validIds) {
         await redisClient.del(`auxonia_sess:${sessionId}`);
     }
 }
