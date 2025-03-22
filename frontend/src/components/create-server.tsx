@@ -25,11 +25,11 @@ import { X } from "lucide-react";
 import { useCreateServer } from "@/query/useServerActions";
 import {toast} from "sonner";
 
+// Updated schema to make iconUrl optional
 const serverSchema = z.object({
   name: z.string()
     .min(3, "Server name must be at least 3 characters")
-    .max(50, "Server name must be less than 50 characters"),
-  iconUrl: z.string().optional()
+    .max(50, "Server name must be less than 50 characters")
 });
 
 type ServerFormValues = z.infer<typeof serverSchema>;
@@ -41,22 +41,27 @@ interface CreateServerDialogProps {
 
 export function CreateServerDialog({ open, onOpenChange }: CreateServerDialogProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [iconFile, setIconFile] = useState<File | null>(null);
   
   const form = useForm<ServerFormValues>({
     resolver: zodResolver(serverSchema),
     defaultValues: {
-      name: "",
-      iconUrl: undefined
+      name: ""
     }
   });
 
   const createServerMutation = useCreateServer();
 
   async function onSubmit(data: ServerFormValues) {
-    createServerMutation.mutate(data, {
+    // Pass the file to the mutation
+    createServerMutation.mutate({
+      ...data,
+      iconFile: iconFile || undefined
+    }, {
       onSuccess: () => {
         form.reset();
         setPreviewUrl(null);
+        setIconFile(null);
         onOpenChange(false);
       }
     });
@@ -74,16 +79,17 @@ export function CreateServerDialog({ open, onOpenChange }: CreateServerDialogPro
       return;
     }
     
-    // For this MVP, simply create a URL for preview
-    // In a real app, you'd upload to a service like AWS S3 or Cloudinary
+    // Store the file for submission
+    setIconFile(file);
+    
+    // Create URL for preview only
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
-    form.setValue("iconUrl", url);
   }
 
   function clearPreview() {
     setPreviewUrl(null);
-    form.setValue("iconUrl", undefined);
+    setIconFile(null);
     // Reset the file input
     const fileInput = document.getElementById("serverIcon") as HTMLInputElement;
     if (fileInput) fileInput.value = "";

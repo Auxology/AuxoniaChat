@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { createNewChannel, getServerChannels, getServerRole } from '../utils/channel';
 import { randomUUID } from 'crypto';
-import { checkIfUserIsMember, isMember } from '../utils/user';
+import { checkIfUserIsMember } from '../utils/user';
 
 export const createChannel = async (req: Request, res: Response): Promise<void> => {
     try{
@@ -25,7 +25,7 @@ export const createChannel = async (req: Request, res: Response): Promise<void> 
         }
 
         // Check if role of user
-        const role = await getServerRole(userId, serverId);
+        const role:string | null = await getServerRole(userId, serverId);
 
         if(!role){
             res.status(403).send('Forbidden');
@@ -71,7 +71,7 @@ export const getChannels = async (req: Request, res: Response): Promise<void> =>
         }
 
         // Check if user is member of server
-        const isMemberOfServer = await checkIfUserIsMember(userId, serverId);
+        const isMemberOfServer:boolean = await checkIfUserIsMember(userId, serverId);
 
         if(!isMemberOfServer){
             console.log('User is not a member of server');

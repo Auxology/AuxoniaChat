@@ -22,7 +22,7 @@ const userRoute:Router = Router();
 
 userRoute.get('/user/profile', isAuthenticated, getUserProfile);
 userRoute.get('/user/servers', isAuthenticated, getUserServers)
-userRoute.post('/user/servers/create', isAuthenticated, createServer);
+userRoute.post('/user/servers/create', isAuthenticated, upload.single('server'), createServer);
 userRoute.get('/user/servers/:serverId', isAuthenticated, getServerById);
 userRoute.get('/user/servers/:serverId/members', isAuthenticated, getServerMembers);
 userRoute.post('/user/servers/join', isAuthenticated, joinServer);

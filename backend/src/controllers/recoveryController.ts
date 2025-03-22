@@ -7,7 +7,7 @@ import {
     storeNewEmailCode, verifyAdvancedRecoverySession,
     verifyNewEmailCode
 } from "../libs/redis";
-import {clearRecoveryJWT, createAdvancedRecoveryJWT, createRecoveryJWT} from "../libs/jwt";
+import {clearAdvancedRecoveryJWT, clearRecoveryJWT, createAdvancedRecoveryJWT, createRecoveryJWT} from "../libs/jwt";
 import {emailInUse, validateEmail} from "../utils/email";
 import {encryptEmail} from "../utils/encrypt";
 import {generateRandomOTP} from "../utils/codes";
@@ -213,6 +213,7 @@ export const finishRecovery = async (req: Request, res: Response):Promise<void> 
         // Delete old session
         await deleteAdvancedRecoverySession(email);
         clearRecoveryJWT(res);
+        clearAdvancedRecoveryJWT(res);
 
         // Destroy session
         await deleteSessions(sessionToken);

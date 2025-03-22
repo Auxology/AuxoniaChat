@@ -16,7 +16,7 @@ import {
 } from '../utils/user';
 import {decryptEmail, encryptEmail} from '../utils/encrypt';
 import {ServerDataForUser, ServerMembers, UserData, UserServers} from "../types/types";
-import {uploadProfilePicture} from "../libs/cloudinary";
+import {deleteProfilePicture, uploadProfilePicture, uploadServerImage} from "../libs/cloudinary";
 import {usernameInUse} from "../utils/username";
 import {generateRandomOTP} from "../utils/codes";
 import {
@@ -77,12 +77,18 @@ export const changeUserProfilePicture = async (req: Request, res: Response):Prom
 
         const userId:string = req.session.user.id
 
-        console.log(userId)
+        const userData:UserData | null = await getUserProfileById(userId);
+
+        if(!userData) {
+            res.status(404).json({message: 'User not found'});
+            return;
+        }
+
+        // Delete old image from cloudinary
+        await deleteProfilePicture(userData.avatar_url!);
 
         // Upload image to cloudinary
         const avatarUrl:string = await uploadProfilePicture(req.file);
-
-        console.log(avatarUrl);
 
         await updateUserProfilePicture(userId, avatarUrl);
 
@@ -156,15 +162,17 @@ export const createServer = async (req: Request, res: Response):Promise<void> =>
 
         const userId:string = req.session.user.id;
 
-        const {name, iconUrl} = req.body;
+        const {name} = req.body;
+
 
         if (!name || name.trim() === '') {
             res.status(400).json({ message: 'Server name is required' });
             return;
         }
 
-        // In a real application, you would upload the icon to a storage service
-        // and store the URL in the database
+        // Also expect file with image
+        // Do not throw error if no file is provided
+        const iconUrl:string | undefined = req.file ? await uploadServerImage(req.file) : undefined;
 
         const serverId:string = crypto.randomUUID();
 

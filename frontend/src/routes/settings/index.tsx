@@ -22,7 +22,6 @@ import { toast } from "sonner"
 import { axiosInstance } from "@/lib/axios"
 import { useRef, useState } from "react"
 import { requireAuth } from "@/utils/routeGuards"
-import {useSocket} from "@/hooks/useSocket.ts";
 
 // Username validation schema
 const usernameSchema = z.object({

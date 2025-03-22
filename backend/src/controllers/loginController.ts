@@ -1,18 +1,17 @@
 import { Request, Response } from 'express';
-import {decryptEmail, encryptEmail} from "../utils/encrypt";
+import {encryptEmail} from "../utils/encrypt";
 import {getPasswordHash, getUserByEmail, storeSessionId} from "../utils/user";
 import { verifyPassword } from '../utils/password';
 import {generateRandomOTP} from "../utils/codes";
 import {
     checkIfUserIsLocked, checkTwoFaSession,
-    createTwoFaSession,
+    createTwoFaSession, deleteTwoFactorCode, deleteTwoFaSession,
     lockoutUser,
     storeTwoFactorCode,
     verifyTwoFactorCode
 } from "../libs/redis";
-import {createCookieWithEmail} from "../utils/cookies";
-import {createTwoFaJWT} from "../libs/jwt";
-import session from "express-session";
+import {clearCookieWithEmail, createCookieWithEmail} from "../utils/cookies";
+import {clearTwoFaJWT, createTwoFaJWT} from "../libs/jwt";
 import {decodeJWT} from "@oslojs/jwt";
 
 export const requestLogin = async (req: Request, res: Response):Promise<void> => {
@@ -25,6 +24,12 @@ export const requestLogin = async (req: Request, res: Response):Promise<void> =>
 
     // Check if user is locked
     const isLocked:boolean = await checkIfUserIsLocked(email);
+
+    // To many requests
+    if(isLocked) {
+        res.status(429).json({error: 'Too many requests'});
+        return;
+    }
 
     try{
         //1. Encrypt email to see if it exists
@@ -150,6 +155,12 @@ export const login = async (req: Request, res: Response):Promise<void> => {
             res.status(401).json({ error: 'Invalid email or password' });
             return;
         }
+
+        //3. Get rid of all two fa session
+        await deleteTwoFactorCode(email);
+        await deleteTwoFaSession(email);
+        clearTwoFaJWT(res);
+        clearCookieWithEmail(res);
 
         //4. Store user info in session
         req.session.user = {

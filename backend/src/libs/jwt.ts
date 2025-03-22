@@ -22,7 +22,7 @@ export const createTemporaryJWT = (email: string, sessionToken: string, res: Res
 
     // Convert the JWT_KEY to Uint8Array
     // Remove non-null assertion
-    const JWT_KEY = process.env.JWT_KEY;
+    const JWT_KEY:string | undefined = process.env.JWT_KEY;
     if (!JWT_KEY) {
         throw new Error('Missing JWT_KEY in environment variables');
     }
@@ -60,7 +60,7 @@ export const createForgotPasswordJWT = (email: string, sessionToken: string, res
     });
 
     // Remove non-null assertion
-    const JWT_KEY = process.env.JWT_KEY;
+    const JWT_KEY:string | undefined = process.env.JWT_KEY;
     if (!JWT_KEY) {
         throw new Error('Missing JWT_KEY in environment variables');
     }
@@ -98,7 +98,7 @@ export const createRecoveryJWT = (userId: string, sessionToken: string, res: Res
 
     // Convert the JWT_KEY to Uint8Array
     // Remove non-null assertion
-    const JWT_KEY = process.env.JWT_KEY;
+    const JWT_KEY:string | undefined = process.env.JWT_KEY;
     if (!JWT_KEY) {
         throw new Error('Missing JWT_KEY in environment variables');
     }
@@ -137,7 +137,7 @@ export const createAdvancedRecoveryJWT = (email: string, userId:string,sessionTo
 
     // Convert the JWT_KEY to Uint8Array
     // Remove non-null assertion
-    const JWT_KEY = process.env.JWT_KEY;
+    const JWT_KEY:string | undefined = process.env.JWT_KEY;
     if (!JWT_KEY) {
         throw new Error('Missing JWT_KEY in environment variables');
     }
@@ -175,7 +175,7 @@ export const createPasswordChangeJWT = (userId: string, sessionToken: string, re
 
     // Convert the JWT_KEY to Uint8Array
     // Remove non-null assertion
-    const JWT_KEY = process.env.JWT_KEY;
+    const JWT_KEY:string | undefined = process.env.JWT_KEY;
     if (!JWT_KEY) {
         throw new Error('Missing JWT_KEY in environment variables');
     }
@@ -213,7 +213,7 @@ export const createTwoFaJWT = (email: string, sessionToken: string, res: Respons
 
     // Convert the JWT_KEY to Uint8Array
     // Remove non-null assertion
-    const JWT_KEY = process.env.JWT_KEY;
+    const JWT_KEY:string | undefined = process.env.JWT_KEY;
     if (!JWT_KEY) {
         throw new Error('Missing JWT_KEY in environment variables');
     }
@@ -230,4 +230,8 @@ export const createTwoFaJWT = (email: string, sessionToken: string, res: Respons
     });
 
     return token;
+}
+
+export const clearTwoFaJWT = (res: Response): void => {
+    res.clearCookie('2fa-session');
 }

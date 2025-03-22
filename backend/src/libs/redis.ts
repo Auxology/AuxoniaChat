@@ -115,6 +115,10 @@ export const verifyTwoFactorCode = async (email: string, code: string):Promise<b
     return code === storedCode;
 }
 
+export const deleteTwoFactorCode = async (email: string):Promise<void> => {
+    await redisClient.del('two_factor_code:' + email);
+}
+
 export async function createTwoFaSession(email: string):Promise<string | null> {
     const sessionToken = crypto.randomUUID();
     // 10 Minute expiration
@@ -147,6 +151,10 @@ export async function checkTwoFaSession(email:string, sessionToken:string):Promi
     const sessionData = JSON.parse(session);
 
     return sessionData.sessionToken === sessionToken;
+}
+
+export async function deleteTwoFaSession(email: string):Promise<void> {
+    await redisClient.del(`two_fa_session:${email}`);
 }
 
 export async function storePasswordResetCode(email: string, code: string):Promise<void> {

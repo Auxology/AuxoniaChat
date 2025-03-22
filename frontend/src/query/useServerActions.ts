@@ -13,6 +13,7 @@ export interface Server {
 interface CreateServerRequest {
     name: string;
     iconUrl?: string;
+    iconFile?: File;  // Add this for file uploads
 }
 
 // Create server mutation
@@ -21,8 +22,25 @@ export function useCreateServer() {
 
     return useMutation({
         mutationFn: async (data: CreateServerRequest) => {
-            const response = await axiosInstance.post("/user/servers/create", data);
-            return response.data;
+            // If we have a file, use FormData to send it
+            if (data.iconFile) {
+                const formData = new FormData();
+                formData.append('name', data.name);
+                formData.append('server', data.iconFile);
+                
+                const response = await axiosInstance.post("/user/servers/create", formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                return response.data;
+            } else {
+                // No file, just send the name
+                const response = await axiosInstance.post("/user/servers/create", {
+                    name: data.name
+                });
+                return response.data;
+            }
         },
         onSuccess: (data):void => {
             // Invalidate and refetch servers list
@@ -35,7 +53,7 @@ export function useCreateServer() {
             });
         },
         onError: (error:AxiosError):void => {
-            const message = (error.response?.data as { message?: string })?.message || "There was an error joining the server.";
+            const message = (error.response?.data as { message?: string })?.message || "There was an error creating the server.";
             // Show error notification with Sonner
             toast.error("Failed to create server", {
                 description: message,

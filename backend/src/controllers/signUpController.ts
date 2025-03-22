@@ -44,6 +44,11 @@ export const signUpStart = async (req: Request, res: Response):Promise<void> => 
         // 3. Encrypt
         const {encrypted, authTag} = encryptEmail(email);
 
+        if(!encrypted || !authTag) {
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        }
+
         // 4. Check if user is locked out
         const isLocked:boolean = await checkIfUserIsLocked(email);
 
