@@ -2,6 +2,7 @@ import {QueryClient, useMutation, useQuery, useQueryClient} from "@tanstack/reac
 import { axiosInstance } from "@/lib/axios";
 import { toast } from "sonner";
 import {AxiosError} from "axios";
+import { useNavigate } from "@tanstack/react-router";
 
 // Server types
 export interface Server {
@@ -28,7 +29,7 @@ export function useCreateServer() {
                 formData.append('name', data.name);
                 formData.append('server', data.iconFile);
                 
-                const response = await axiosInstance.post("/user/servers/create", formData, {
+                const response = await axiosInstance.post("/servers/create", formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
@@ -36,7 +37,7 @@ export function useCreateServer() {
                 return response.data;
             } else {
                 // No file, just send the name
-                const response = await axiosInstance.post("/user/servers/create", {
+                const response = await axiosInstance.post("/servers/create", {
                     name: data.name
                 });
                 return response.data;
@@ -70,7 +71,7 @@ export function useUserServers() {
         queryKey: ["userServers"],
         queryFn: async () => {
             try {
-                const response = await axiosInstance.get("/user/servers");
+                const response = await axiosInstance.get("/servers/get");
                 return Array.isArray(response.data) ? response.data : [];
             } catch (error) {
                 console.error("Failed to fetch servers:", error);
@@ -86,7 +87,7 @@ export function useJoinServer() {
 
     return useMutation({
         mutationFn: async (serverId: string) => {
-            const response = await axiosInstance.post("/user/servers/join", { serverId });
+            const response = await axiosInstance.post("/servers/join", { serverId });
             return response.data;
         },
         onSuccess: () => {
@@ -108,5 +109,58 @@ export function useJoinServer() {
                 duration: 5000,
             });
         },
+    });
+}
+
+export function useLeaveServer() {
+    const queryClient = useQueryClient();
+    const navigate = useNavigate(); // Import this from @tanstack/react-router
+
+    return useMutation({
+        mutationFn: async (serverId: string) => {
+            const response = await axiosInstance.post("/servers/leave", { serverId });
+            return response.data;
+        },
+        onSuccess: () => {
+            // Invalidate and refetch servers list
+            queryClient.invalidateQueries({ queryKey: ["userServers"] });
+
+            // Navigate away from the server page to the chat home
+            navigate({ to: '/chat' });
+
+            // Show success notification
+            toast.success("Left server", {
+                description: "You have successfully left the server.",
+                duration: 5000,
+            });
+        },
+        onError: (error: AxiosError) => {
+            const message: string = (error.response?.data as { message?: string })?.message || "There was an error leaving the server.";
+            
+            // Show error notification
+            toast.error("Failed to leave server", {
+                description: message,
+                duration: 5000,
+            });
+        },
+    });
+}
+
+export function useSearchServers(searchTerm: string) {
+    return useQuery({
+        queryKey: ["searchServers", searchTerm],
+        queryFn: async () => {
+            try {
+                const response = await axiosInstance.get("/servers/search", {
+                    params: { q: searchTerm }
+                });
+                return Array.isArray(response.data) ? response.data : [];
+            } catch (error) {
+                console.error("Failed to search servers:", error);
+                return [];
+            }
+        },
+        enabled: Boolean(searchTerm) && searchTerm.length > 2,
+        staleTime: 1000 * 30, // 30 seconds, to keep the data fresh
     });
 }

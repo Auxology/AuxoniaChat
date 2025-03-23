@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CreateServerDialog } from "./create-server";
 import { JoinServerDialog } from "./join-server";
+import { ServerSearchDialog } from "./server-search-dialog";
 import { Server, useUserServers } from "@/query/useServerActions";
 import { toast } from "sonner";
 
@@ -37,6 +38,7 @@ const fetchUserProfile = async (): Promise<UserData> => {
 export function Sidebar() {
   const [createServerOpen, setCreateServerOpen] = useState(false);
   const [joinServerOpen, setJoinServerOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   
   // Fetch user profile
   const { 
@@ -82,12 +84,17 @@ export function Sidebar() {
         <TooltipProvider>
           <Tooltip delayDuration={300}>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full bg-button text-headline hover:bg-button/80">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="rounded-full bg-button text-headline hover:bg-button/80"
+                onClick={() => setSearchOpen(true)}
+              >
                 <Search className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="right">
-              <p>Search</p>
+              <p>Search Servers</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -269,6 +276,9 @@ export function Sidebar() {
       
       {/* Add Join Server Dialog */}
       <JoinServerDialog open={joinServerOpen} onOpenChange={setJoinServerOpen} />
+
+      {/* Add the Server Search Dialog */}
+      <ServerSearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );
 }

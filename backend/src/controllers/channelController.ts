@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { createNewChannel, getServerChannels, getServerRole } from '../utils/channel';
 import { randomUUID } from 'crypto';
-import { checkIfUserIsMember } from '../utils/user';
+import { checkIfUserIsMember } from '../utils/server';
 
 export const createChannel = async (req: Request, res: Response): Promise<void> => {
     try{

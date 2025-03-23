@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useEffect, } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Menu, Users, X, Plus, Hash } from "lucide-react";
+import { Menu, Users, X, Plus, Hash, LogOut } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Sidebar } from "@/components/sidebar.tsx";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useSocket } from '@/hooks/useSocket';
 import { useServerChannels } from "@/query/useChannel";
 import { CreateChannelDialog } from "@/components/create-channel";
+import { useLeaveServer } from "@/query/useServerActions";
 
 
 
@@ -39,7 +40,7 @@ function useServerDetails(serverId: string) {
     queryKey: ['server', serverId],
     queryFn: async () => {
       try {
-        const response = await axiosInstance.get(`/user/servers/${serverId}`);
+        const response = await axiosInstance.get(`/servers/${serverId}`);
         return response.data as Server;
       } catch (error) {
         console.error('Failed to fetch server details:', error);
@@ -56,7 +57,7 @@ function useServerMembers(serverId: string) {
     queryKey: ['serverMembers', serverId],
     queryFn: async () => {
       try {
-        const response = await axiosInstance.get(`/user/servers/${serverId}/members`);
+        const response = await axiosInstance.get(`/servers/${serverId}/members`);
         return response.data as Member[];
       } catch (error) {
         console.error('Failed to fetch server members:', error);
@@ -83,8 +84,7 @@ function RouteComponent() {
   const [membersOpen, setMembersOpen] = useState(true); // Members sidebar is open by default on desktop
   const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
   const { data: channels, isLoading: isLoadingChannels } = useServerChannels(serverId);
-
-  
+  const leaveServerMutation = useLeaveServer();
 
   // Fetch server details using custom hook
   const {
@@ -155,6 +155,13 @@ function RouteComponent() {
       // Here you'll integrate with your WebSocket/chat service
       console.log("Sending message:", message);
       input.value = '';
+    }
+  };
+
+  // Add this function to handle server leaving
+  const handleLeaveServer = () => {
+    if (confirm("Are you sure you want to leave this server?")) {
+      leaveServerMutation.mutate(serverId);
     }
   };
 
@@ -427,6 +434,20 @@ function RouteComponent() {
                   </div>
                 )}
               </ScrollArea>
+              {/* Add Leave Server button at the bottom */}
+              <div className="p-3 border-t border-muted/20 mt-auto">
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="w-full justify-start font-pitch-sans-medium text-muted-foreground"
+                  onClick={handleLeaveServer}
+                  disabled={isCurrentUserOwner || leaveServerMutation.isPending}
+                  title={isCurrentUserOwner ? "Server owners cannot leave their own server" : "Leave Server"}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  {leaveServerMutation.isPending ? "Leaving..." : "Leave Server"}
+                </Button>
+              </div>
             </div>
           )}
         </div>
