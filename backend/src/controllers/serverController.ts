@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createNewServer, getAllServerMembers, getServerByServerId, getServersByUserId, isMember, joinServerWithIds, leaveServerWithIds, searchServersByName } from '../utils/server';
+import { createNewServer, deleteServerWithId, getAllServerMembers, getServerByServerId, getServersByUserId, isMember, joinServerWithIds, leaveServerWithIds, searchServersByName, hasPendingJoinRequest, createJoinRequest, getJoinRequestsByServerId, approveJoinRequestById, rejectJoinRequestById } from '../utils/server';
 import { ServerDataForUser, ServerMembers, UserServers } from '../types/types';
 import {uploadServerImage} from "../libs/cloudinary";
 
@@ -193,6 +193,45 @@ export const leaveServer = async (req:Request, res:Response):Promise<void> => {
     }
 }
 
+// Keep in mind this will delete the server for all users
+// Only the owner of the server should be able to delete the server
+export const deleteServer = async (req:Request, res:Response):Promise<void> => {
+    try{
+        if(!req.session.isAuthenticated) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const userId = req.session.user?.id as string;
+        const {serverId} = req.body;
+
+        if(!serverId) {
+            res.status(400).json({message: 'Server id is required'});
+            return;
+        }
+
+        // Check if user is the owner of this server
+        const members = await getAllServerMembers(serverId); // This will return all members of the server
+
+        const isOwner = members.find(member => member.id === userId && member.role === 'owner');
+
+        if(!isOwner) {
+            res.status(403).json({message: 'Forbidden'});
+            return;
+        }
+        
+
+        // Now delete the server
+        await deleteServerWithId(serverId);
+
+        res.status(200).json({message: 'Server deleted'});
+    }
+    catch(error) {
+        console.error(`Error in deleteServer: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
 export const searchServers = async (req:Request, res:Response):Promise<void> => {
     try {
         if(!req.session.isAuthenticated) {
@@ -214,5 +253,176 @@ export const searchServers = async (req:Request, res:Response):Promise<void> => 
     catch(error) {
         console.error(`Error in searchServers: ${error}`);
         res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+// Reqeust to join a server
+export const requestJoinServer = async (req:Request, res:Response):Promise<void> => {
+    try{
+        if(!req.session.isAuthenticated) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const userId = req.session.user?.id as string;
+        const {serverId} = req.body;
+
+        if(!serverId) {
+            res.status(400).json({message: 'Server id is required'});
+            return;
+        }
+
+        // Check if server exists
+        const serverExists:boolean = await getServerByServerId(serverId);
+
+        if(!serverExists) {
+            res.status(404).json({message: 'Server not found'});
+            return;
+        }
+
+        // Check if user is already a member of this server
+        const isMemberOfServer = await isMember(serverId, userId);
+
+        if(isMemberOfServer) {
+            res.status(400).json({message: 'User already a member of this server'});
+            return;
+        }
+
+        // Check if there is already a request pending
+        const hasPending = await hasPendingJoinRequest(userId, serverId);
+
+        if(hasPending) {
+            res.status(400).json({message: 'Request already pending'});
+            return;
+        }
+
+        // Create join request
+        await createJoinRequest(userId, serverId);
+
+        res.status(200).json({message: 'Request sent'});
+    }
+    catch(error) {
+        console.error(`Error in requestJoinServer: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+// Get all pending requests
+export const getServerJoinRequests = async (req:Request, res:Response):Promise<void> => {
+    try{
+        if(!req.session.isAuthenticated) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const userId = req.session.user?.id as string;
+        const {serverId} = req.params;
+
+        if(!serverId) {
+            res.status(400).json({message: 'Server id is required'});
+            return;
+        }
+
+        // Check if user is an admin or owner of this server
+        const members =  await getAllServerMembers(serverId);
+        const isAdminOrOwner = members.find(member => member.id === userId && (member.role === 'owner' || member.role === 'admin'));
+
+        if(!isAdminOrOwner) {
+            res.status(403).json({message: 'Forbidden'});
+            return;
+        }
+
+        // Get join requests
+        const request = await getJoinRequestsByServerId(serverId);
+
+        res.status(200).json(request);
+    }
+    catch(error) {
+        console.error(`Error in getServerMembers: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+// Approve join request
+export const approveJoinRequest = async (req:Request, res:Response):Promise<void> => {
+    try{
+
+        if(!req.session.isAuthenticated) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const userId:string = req.session.user?.id as string;
+        const {serverId, requestId} = req.body;
+
+        if(!serverId || !requestId) {
+            res.status(400).json({message: 'Server id and request id is required'});
+            return;
+        }
+
+        // Check if user is an admin or owner of this server
+        const members =  await getAllServerMembers(serverId);
+        const isAdminOrOwner = members.find(member => member.id === userId && (member.role === 'owner' || member.role === 'admin'));
+
+        if(!isAdminOrOwner) {
+            res.status(403).json({message: 'Forbidden'});
+            return;
+        }
+
+        // Approve join request
+        const result = await approveJoinRequestById(requestId);
+
+        if(!result) {
+            res.status(404).json({message: 'Request not found'});
+            return;
+        }
+
+        res.status(200).json({message: 'Request approved'});
+    }
+    catch(error) {
+        console.error(`Error in approveJoinRequest: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+// Reject a join request
+export const rejectJoinRequest = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId: string = req.session.user?.id as string;
+        const { requestId, serverId } = req.body;
+
+        if (!userId) {
+            res.status(401).json({ message: 'Unauthorized' });
+            return;
+        }
+
+        if (!requestId || !serverId) {
+            res.status(400).json({ message: 'Request ID and Server ID are required' });
+            return;
+        }
+
+        // Check if user is an admin or owner of the server
+        const members = await getAllServerMembers(serverId);
+        const isAdminOrOwner = members.some(m => 
+            m.id === userId && (m.role === 'owner' || m.role === 'admin')
+        );
+
+        if (!isAdminOrOwner) {
+            res.status(403).json({ message: 'Only server admins can reject join requests' });
+            return;
+        }
+
+        // Reject the request
+        const result = await rejectJoinRequestById(requestId);
+        
+        if (!result) {
+            res.status(404).json({ message: 'Request not found' });
+            return;
+        }
+
+        res.status(200).json({ message: 'Request rejected' });
+    } catch (error) {
+        console.error(`Error in rejectJoinRequest: ${error}`);
+        res.status(500).json({ message: 'Internal server error' });
     }
 }

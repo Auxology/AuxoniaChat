@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useEffect, } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Menu, Users, X, Plus, Hash, LogOut } from "lucide-react";
+import { Menu, Users, X, Plus, Hash, LogOut, Trash2 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Sidebar } from "@/components/sidebar.tsx";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,7 +15,8 @@ import { toast } from "sonner";
 import { useSocket } from '@/hooks/useSocket';
 import { useServerChannels } from "@/query/useChannel";
 import { CreateChannelDialog } from "@/components/create-channel";
-import { useLeaveServer } from "@/query/useServerActions";
+import { useLeaveServer, useDeleteServer } from "@/query/useServerActions";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 
 
 
@@ -85,6 +86,9 @@ function RouteComponent() {
   const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
   const { data: channels, isLoading: isLoadingChannels } = useServerChannels(serverId);
   const leaveServerMutation = useLeaveServer();
+  const deleteServerMutation = useDeleteServer();
+  const [confirmLeaveOpen, setConfirmLeaveOpen] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   // Fetch server details using custom hook
   const {
@@ -160,9 +164,12 @@ function RouteComponent() {
 
   // Add this function to handle server leaving
   const handleLeaveServer = () => {
-    if (confirm("Are you sure you want to leave this server?")) {
-      leaveServerMutation.mutate(serverId);
-    }
+    setConfirmLeaveOpen(true);
+  };
+
+  // Add this function to handle server deletion
+  const handleDeleteServer = () => {
+    setConfirmDeleteOpen(true);
   };
 
   // Rest of your component remains unchanged
@@ -434,24 +441,81 @@ function RouteComponent() {
                   </div>
                 )}
               </ScrollArea>
-              {/* Add Leave Server button at the bottom */}
+              {/* Server Actions Section */}
               <div className="p-3 border-t border-muted/20 mt-auto">
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="w-full justify-start font-pitch-sans-medium text-muted-foreground"
-                  onClick={handleLeaveServer}
-                  disabled={isCurrentUserOwner || leaveServerMutation.isPending}
-                  title={isCurrentUserOwner ? "Server owners cannot leave their own server" : "Leave Server"}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  {leaveServerMutation.isPending ? "Leaving..." : "Leave Server"}
-                </Button>
+                {isCurrentUserOwner ? (
+                  // Delete Server button for owners
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="w-full justify-start font-pitch-sans-medium text-destructive-foreground group"
+                    onClick={() => setConfirmDeleteOpen(true)}
+                    disabled={deleteServerMutation.isPending}
+                  >
+                    {deleteServerMutation.isPending ? (
+                      <>
+                        <span className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+                        Deleting...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4 mr-2 transition-transform group-hover:scale-110" />
+                        Delete Server
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  // Leave Server button for regular members
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full justify-start font-pitch-sans-medium text-paragraph border-muted/30 hover:text-destructive hover:border-destructive group"
+                    onClick={() => setConfirmLeaveOpen(true)}
+                    disabled={leaveServerMutation.isPending}
+                  >
+                    {leaveServerMutation.isPending ? (
+                      <>
+                        <span className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+                        Leaving...
+                      </>
+                    ) : (
+                      <>
+                        <LogOut className="h-4 w-4 mr-2 transition-transform group-hover:scale-110" />
+                        Leave Server
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
             </div>
           )}
         </div>
       </div>
+      <ConfirmDialog
+        open={confirmLeaveOpen}
+        onOpenChange={setConfirmLeaveOpen}
+        title="Leave Server"
+        description={`Are you sure you want to leave "${server?.name || 'this server'}"? You can rejoin with an invite later.`}
+        confirmText="Leave Server"
+        onConfirm={() => {
+          leaveServerMutation.mutate(serverId);
+          setConfirmLeaveOpen(false);
+        }}
+      />
+
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        onOpenChange={setConfirmDeleteOpen}
+        title="Delete Server"
+        description={`Are you sure you want to DELETE "${server?.name || 'this server'}"? This action cannot be undone and will remove the server for all members.`}
+        confirmText="Delete Server"
+        onConfirm={() => {
+          deleteServerMutation.mutate(serverId);
+          setConfirmDeleteOpen(false);
+        }}
+        variant="destructive"
+      />
+
       <CreateChannelDialog 
         serverId={serverId}
         open={isCreateChannelOpen}

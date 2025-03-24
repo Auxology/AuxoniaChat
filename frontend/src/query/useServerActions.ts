@@ -146,6 +146,40 @@ export function useLeaveServer() {
     });
 }
 
+export function useDeleteServer() {
+    const queryClient = useQueryClient();
+    const navigate = useNavigate(); // Import this from @tanstack/react-router
+
+    return useMutation({
+        mutationFn: async (serverId: string) => {
+            const response = await axiosInstance.post("/servers/delete", { serverId });
+            return response.data;
+        },
+        onSuccess: () => {
+            // Invalidate and refetch servers list
+            queryClient.invalidateQueries({ queryKey: ["userServers"] });
+
+            // Navigate away from the server page to the chat home
+            navigate({ to: '/chat' });
+
+            // Show success notification
+            toast.success("Server deleted", {
+                description: "You have successfully deleted the server.",
+                duration: 5000,
+            });
+        },
+        onError: (error: AxiosError) => {
+            const message: string = (error.response?.data as { message?: string })?.message || "There was an error deleting the server.";
+            
+            // Show error notification
+            toast.error("Failed to delete server", {
+                description: message,
+                duration: 5000,
+            });
+        },
+    });
+}
+
 export function useSearchServers(searchTerm: string) {
     return useQuery({
         queryKey: ["searchServers", searchTerm],

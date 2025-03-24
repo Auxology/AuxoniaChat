@@ -141,6 +141,38 @@ export async function leaveServerWithIds(userId: string, serverId: string): Prom
     }
 }
 
+export async function deleteServerWithId(serverId: string): Promise<void> {
+    try {
+        // Begin transaction
+        await query('BEGIN');
+
+        try{
+            // Delete server members
+            await query(`
+                DELETE FROM app.server_members
+                WHERE server_id = $1
+            `, [serverId]);
+    
+            // Delete server
+            await query(`
+                DELETE FROM app.servers
+                WHERE id = $1
+            `, [serverId]);
+    
+            // Commit transaction
+            await query('COMMIT');
+        }
+        catch(error){
+            // Rollback transaction
+            await query('ROLLBACK');
+            throw error;
+        }
+    } catch (error) {
+        console.error('Error deleting server:', error);
+        throw error;
+    }
+}
+
 // This function will deal with server search
 // This also excludes the servers that the user is already a member of
 export async function searchServersByName(userId: string, searchQuery: string): Promise<UserServers[]> {
@@ -159,6 +191,126 @@ export async function searchServersByName(userId: string, searchQuery: string): 
         return rows as UserServers[];
     } catch (error) {
         console.error('Error searching for servers:', error);
+        throw error;
+    }
+}
+
+// Check if user already has pending request to join the server
+export async function hasPendingJoinRequest(userId:string, serverId:string): Promise<boolean> {
+    try {
+        const { rows } = await query(`
+            SELECT id
+            FROM app.server_join_requests
+            WHERE user_id = $1 AND server_id = $2
+        `, [userId, serverId]);
+
+        return rows.length > 0;
+    } catch (error) {
+        console.error('Error checking if user has pending request:', error);
+        throw error;
+    }
+}
+
+// This will create joing request
+export async function createJoinRequest(userId:string, serverId:string): Promise<void> {
+    try {
+        await query(`
+            INSERT INTO app.server_join_requests (user_id, server_id)
+            VALUES ($1, $2)
+        `, [userId, serverId]);
+    } catch (error) {
+        console.error('Error creating join request:', error);
+        throw error;
+    }
+}
+
+export async function getJoinRequestsByServerId(serverId:string):Promise<string[]> {
+    try {
+        const { rows } = await query(`
+            SELECT user_id
+            FROM app.server_join_requests
+            WHERE server_id = $1
+        `, [serverId]);
+
+        return rows.map(row => row.user_id);
+    } catch (error) {
+        console.error('Error getting join requests:', error);
+        throw error;
+    }
+}
+
+export async function approveJoinRequestById(requestId: string): Promise<{userId: string, serverId: string} | null> {
+    try {
+        // Begin transaction
+        await query('BEGIN');
+        
+        try {
+            // First get the user_id and server_id from the request
+            const { rows } = await query(`
+                SELECT user_id, server_id
+                FROM app.server_join_requests
+                WHERE id = $1
+            `, [requestId]);
+            
+            if (rows.length === 0) {
+                await query('ROLLBACK');
+                return null;
+            }
+            
+            const { user_id: userId, server_id: serverId } = rows[0];
+            
+            // Add the user to the server members
+            await query(`
+                INSERT INTO app.server_members (server_id, user_id, role)
+                VALUES ($1, $2, 'member')
+                ON CONFLICT (server_id, user_id) DO NOTHING
+            `, [serverId, userId]);
+            
+            // Delete the request (or optionally update status to 'approved')
+            await query(`
+                DELETE FROM app.server_join_requests
+                WHERE id = $1
+            `, [requestId]);
+            
+            // Commit transaction
+            await query('COMMIT');
+            
+            return { userId, serverId };
+        } catch (error) {
+            await query('ROLLBACK');
+            throw error;
+        }
+    } catch (error) {
+        console.error('Error approving join request:', error);
+        throw error;
+    }
+}
+
+export async function rejectJoinRequestById(requestId: string): Promise<{userId: string, serverId: string} | null> {
+    try {
+        // Get the request details first
+        const { rows } = await query(`
+            SELECT user_id, server_id
+            FROM app.server_join_requests
+            WHERE id = $1 AND status = 'pending'
+        `, [requestId]);
+        
+        if (rows.length === 0) {
+            return null;
+        }
+        
+        const { user_id: userId, server_id: serverId } = rows[0];
+        
+        // Update request status
+        await query(`
+            UPDATE app.server_join_requests
+            SET status = 'rejected'
+            WHERE id = $1
+        `, [requestId]);
+        
+        return { userId, serverId };
+    } catch (error) {
+        console.error('Error rejecting join request:', error);
         throw error;
     }
 }

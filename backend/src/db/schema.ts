@@ -74,6 +74,18 @@ export async function initializeSchema(): Promise<void> {
       )
     `);
 
+    // Server Join Requests
+    await query(`
+      CREATE TABLE IF NOT EXISTS app.server_join_requests (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      server_id UUID NOT NULL REFERENCES app.servers(id) ON DELETE CASCADE,
+      user_id UUID NOT NULL REFERENCES app.users(id) ON DELETE CASCADE,
+      status VARCHAR(20) NOT NULL DEFAULT 'pending',
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+      UNIQUE(server_id, user_id)
+      )
+    `);
+
     console.log('Database schema initialized successfully');
   } catch (error) {
     console.error('Error initializing database schema:', error);
