@@ -20,7 +20,7 @@ import {
   FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useJoinServer } from "@/query/useServerActions";
+import { useRequestJoinServer } from "@/query/useServerActions";
 
 // Schema for server join form
 const joinServerSchema = z.object({
@@ -42,12 +42,12 @@ export function JoinServerDialog({ open, onOpenChange }: JoinServerDialogProps) 
     }
   });
 
-  const joinServerMutation = useJoinServer();
+  const requestJoinServerMutation = useRequestJoinServer();
   const [isLoading, setIsLoading] = useState(false);
 
   async function onSubmit(data: JoinServerFormValues) {
     setIsLoading(true);
-    joinServerMutation.mutate(data.serverId, {
+    requestJoinServerMutation.mutate(data.serverId, {
       onSuccess: () => {
         form.reset();
         onOpenChange(false);
@@ -63,9 +63,9 @@ export function JoinServerDialog({ open, onOpenChange }: JoinServerDialogProps) 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px] bg-card border border-muted/20 text-headline">
         <DialogHeader>
-          <DialogTitle className="font-ogg text-headline text-2xl">Join a Server</DialogTitle>
+          <DialogTitle className="font-ogg text-headline text-2xl">Request to Join a Server</DialogTitle>
           <DialogDescription className="text-paragraph">
-            Enter the server ID to join an existing server.
+            Enter the server ID to request joining an existing server. Server owners will need to approve your request.
           </DialogDescription>
         </DialogHeader>
         
@@ -104,7 +104,7 @@ export function JoinServerDialog({ open, onOpenChange }: JoinServerDialogProps) 
                 className="bg-button hover:bg-button/80 text-headline font-pitch-sans-medium w-full sm:w-auto"
                 disabled={isLoading}
               >
-                {isLoading ? "Joining..." : "Join Server"}
+                {isLoading ? "Sending request..." : "Request to Join"}
               </Button>
             </DialogFooter>
           </form>

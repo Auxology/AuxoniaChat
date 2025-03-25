@@ -198,3 +198,117 @@ export function useSearchServers(searchTerm: string) {
         staleTime: 1000 * 30, // 30 seconds, to keep the data fresh
     });
 }
+
+export function useRequestJoinServer() {
+    return useMutation({
+        mutationFn: async (serverId: string) => {
+            const response = await axiosInstance.post("/servers/request-join", { serverId });
+            return response.data;
+        },
+        onSuccess: () => {
+            toast.success("Join request sent", {
+                description: "The server owner will review your request.",
+                duration: 5000,
+            });
+        },
+        onError: (error: AxiosError) => {
+            const message: string = (error.response?.data as { message?: string })?.message 
+                || "There was an error sending your join request.";
+            
+            toast.error("Failed to request server join", {
+                description: message,
+                duration: 5000,
+            });
+        },
+    });
+}
+
+export function useServerJoinRequests(serverId: string) {
+    return useQuery({
+        queryKey: ["serverJoinRequests", serverId],
+        queryFn: async () => {
+            const response = await axiosInstance.get(`/servers/${serverId}/join-requests`);
+            return response.data;
+        },
+        enabled: Boolean(serverId)
+    });
+}
+
+export function useApproveJoinRequest() {
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationFn: async ({requestId, serverId}: {requestId: string, serverId: string}) => {
+            const response = await axiosInstance.post("/servers/approve-join", { requestId, serverId });
+            return response.data;
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["serverJoinRequests", variables.serverId] });
+            queryClient.invalidateQueries({ queryKey: ["serverMembers", variables.serverId] });
+            
+            toast.success("Request approved", {
+                description: "User has been added to the server.",
+                duration: 5000,
+            });
+        },
+        onError: (error: AxiosError) => {
+            const message: string = (error.response?.data as { message?: string })?.message 
+                || "There was an error approving the join request.";
+            
+            toast.error("Failed to approve request", {
+                description: message,
+                duration: 5000,
+            });
+        },
+    });
+}
+
+export function useRejectJoinRequest() {
+    const queryClient = useQueryClient();
+    
+    return useMutation({
+        mutationFn: async ({requestId, serverId}: {requestId: string, serverId: string}) => {
+            const response = await axiosInstance.post("/servers/reject-join", { requestId, serverId });
+            return response.data;
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["serverJoinRequests", variables.serverId] });
+            
+            toast.success("Request rejected", {
+                description: "The join request has been rejected.",
+                duration: 5000,
+            });
+        },
+        onError: (error: AxiosError) => {
+            const message: string = (error.response?.data as { message?: string })?.message 
+                || "There was an error rejecting the join request.";
+            
+            toast.error("Failed to reject request", {
+                description: message,
+                duration: 5000,
+            });
+        },
+    });
+}
+
+// Get all sent join requests by the current user
+export function useSentJoinRequests() {
+    return useQuery({
+      queryKey: ["sentJoinRequests"],
+      queryFn: async () => {
+        const response = await axiosInstance.get("/servers/requests/sent");
+        return response.data;
+      }
+    });
+  }
+  
+  // Get all incoming join requests for servers where the user is admin/owner
+  export function useIncomingJoinRequests() {
+    return useQuery({
+      queryKey: ["incomingJoinRequests"],
+      queryFn: async () => {
+        const response = await axiosInstance.get("/servers/requests/incoming");
+        return response.data;
+      }
+    });
+  }

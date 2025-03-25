@@ -314,3 +314,61 @@ export async function rejectJoinRequestById(requestId: string): Promise<{userId:
         throw error;
     }
 }
+
+export async function getJoinRequetsById(userId:string) {
+    try{
+        const { rows } = await query(`
+            SELECT r.id, r.server_id, r.status, r.created_at,
+            s.name as server_name, s.icon_url as server_icon_url
+            FROM app.server_join_requests r
+            JOIN app.servers s ON r.server_id = s.id
+            WHERE r.user_id = $1
+            ORDER BY r.created_at DESC
+          `, [userId]);
+
+        return rows;
+    }
+    catch(error){
+        console.error('Error getting join requests:', error);
+        throw error;
+    }
+}
+
+// All server where user is admin or owner
+export async function getServersWhereUserHasElevatedRole(userId:String) {
+    try{
+        const { rows: serverRows } = await query(`
+            SELECT server_id
+            FROM app.server_members
+            WHERE user_id = $1 AND (role = 'owner' OR role = 'admin')
+          `, [userId]);
+
+        return serverRows.map(row => row.server_id);
+    }
+    catch(error){
+        console.error('Error getting servers where user has elevated role:', error);
+        throw error;
+    }
+}
+
+// Get all join requests for the servers where the user is admin/owner
+export async function getIncomingJoinRequestsByServerId(serverIds: any []) {
+    try{
+        const { rows } = await query(`
+            SELECT r.id, r.server_id, r.user_id, r.status, r.created_at,
+                   s.name as server_name, s.icon_url as server_icon_url,
+                   u.username as username, u.avatar_url as user_avatar_url
+            FROM app.server_join_requests r
+            JOIN app.servers s ON r.server_id = s.id
+            JOIN app.users u ON r.user_id = u.id
+            WHERE r.server_id = ANY($1) AND r.status = 'pending'
+            ORDER BY r.created_at DESC
+          `, [serverIds]);
+
+        return rows;
+    }
+    catch(error){
+        console.error('Error getting incoming join requests:', error);
+        throw error;
+    }
+}

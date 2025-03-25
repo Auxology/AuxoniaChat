@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createNewServer, deleteServerWithId, getAllServerMembers, getServerByServerId, getServersByUserId, isMember, joinServerWithIds, leaveServerWithIds, searchServersByName, hasPendingJoinRequest, createJoinRequest, getJoinRequestsByServerId, approveJoinRequestById, rejectJoinRequestById } from '../utils/server';
+import { createNewServer, deleteServerWithId, getAllServerMembers, getServerByServerId, getServersByUserId, isMember, joinServerWithIds, leaveServerWithIds, searchServersByName, hasPendingJoinRequest, createJoinRequest, getJoinRequestsByServerId, approveJoinRequestById, rejectJoinRequestById, getJoinRequetsById, getServersWhereUserHasElevatedRole, getIncomingJoinRequestsByServerId } from '../utils/server';
 import { ServerDataForUser, ServerMembers, UserServers } from '../types/types';
 import {uploadServerImage} from "../libs/cloudinary";
 
@@ -424,5 +424,60 @@ export const rejectJoinRequest = async (req: Request, res: Response): Promise<vo
     } catch (error) {
         console.error(`Error in rejectJoinRequest: ${error}`);
         res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+// This will retrive all reqeuqsts sent by the user
+export const getSentJoinRequests = async (req: Request, res: Response): Promise<void> => {
+    try{
+        if(!req.session.isAuthenticated) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const userId = req.session.user?.id as string;
+
+        if(!userId) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        // Get all requests sent by the user
+        const requests = await getJoinRequetsById(userId);
+
+        res.status(200).json(requests);
+    }
+    catch(error) {
+        console.error(`Error in getSentJoinRequests: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+// This will get all incoming join requests for servers where the user is admin/owner
+export const getIncomingJoinRequests = async (req: Request, res: Response): Promise<void> => {
+    try{
+        if(!req.session.isAuthenticated) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const userId = req.session.user?.id as string;
+
+        if(!userId) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        // Get all servers where the user is an admin or owner
+        const serverIds = await getServersWhereUserHasElevatedRole(userId);
+
+        // Get all join requests for these servers
+        const requests = await getIncomingJoinRequestsByServerId(serverIds);
+
+        res.status(200).json(requests);
+    }
+    catch(error) {
+        console.error(`Error in getIncomingJoinRequests: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
     }
 }

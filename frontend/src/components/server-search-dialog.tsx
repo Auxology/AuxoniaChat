@@ -7,9 +7,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useSearchServers } from "@/query/useServerActions";
+import { useSearchServers, useRequestJoinServer } from "@/query/useServerActions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useJoinServer } from "@/query/useServerActions";
 import { Button } from "@/components/ui/button";
 import { Search, Loader2 } from "lucide-react";
 import { DialogDescription } from "@radix-ui/react-dialog";
@@ -22,7 +21,7 @@ interface ServerSearchDialogProps {
 export function ServerSearchDialog({ open, onOpenChange }: ServerSearchDialogProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const { data: servers = [], isLoading, isFetching } = useSearchServers(searchTerm);
-  const joinServerMutation = useJoinServer();
+  const requestJoinMutation = useRequestJoinServer();
 
   // Clear search when dialog closes
   useEffect(() => {
@@ -31,11 +30,11 @@ export function ServerSearchDialog({ open, onOpenChange }: ServerSearchDialogPro
     }
   }, [open]);
 
-  // Handle join server
-  const handleJoinServer = (serverId: string) => {
-    joinServerMutation.mutate(serverId, {
+  // Handle request to join server
+  const handleRequestJoin = (serverId: string) => {
+    requestJoinMutation.mutate(serverId, {
       onSuccess: () => {
-        // Close the dialog after successful join
+        // Close the dialog after successful request
         onOpenChange(false);
       }
     });
@@ -46,7 +45,9 @@ export function ServerSearchDialog({ open, onOpenChange }: ServerSearchDialogPro
       <DialogContent className="sm:max-w-md bg-card border-muted/30">
         <DialogHeader>
           <DialogTitle className="text-headline">Find Servers</DialogTitle>
-          <DialogDescription className="text-muted-foreground">Keep in mind that servers that you are member of are excluded.</DialogDescription>
+          <DialogDescription className="text-muted-foreground">
+            You can request to join servers. Owners will need to approve your request.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="flex items-center bg-card border border-muted/30 rounded-md px-3 py-2 mb-4">
@@ -99,14 +100,14 @@ export function ServerSearchDialog({ open, onOpenChange }: ServerSearchDialogPro
                     <Button 
                       variant="outline" 
                       size="sm"
-                      onClick={() => handleJoinServer(server.id)}
-                      disabled={joinServerMutation.isPending}
+                      onClick={() => handleRequestJoin(server.id)}
+                      disabled={requestJoinMutation.isPending}
                       className="bg-button text-headline border-muted/30 hover:bg-button/80 hover:text-paragraph"
                     >
-                      {joinServerMutation.isPending && joinServerMutation.variables === server.id ? (
+                      {requestJoinMutation.isPending && requestJoinMutation.variables === server.id ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       ) : null}
-                      Join
+                      Request Join
                     </Button>
                   </div>
                 </div>

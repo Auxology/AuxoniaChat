@@ -11,7 +11,9 @@ import {
   rejectJoinRequest,
   getServerJoinRequests,
   leaveServer, 
-  searchServers 
+  searchServers, 
+  getSentJoinRequests,
+  getIncomingJoinRequests
 } from "../controllers/serverController";
 import { upload } from "../middlewares/multer";
 
@@ -30,6 +32,10 @@ serverRoute.post('/servers/request-join', isAuthenticated, requestJoinServer);
 serverRoute.post('/servers/approve-join', isAuthenticated, approveJoinRequest);
 // This will reject a join request (new route)
 serverRoute.post('/servers/reject-join', isAuthenticated, rejectJoinRequest);
+// Get all join requests sent by the current user
+serverRoute.get('/servers/requests/sent', isAuthenticated, getSentJoinRequests);
+// Get all incoming join requests for servers where the user is admin/owner 
+serverRoute.get('/servers/requests/incoming', isAuthenticated, getIncomingJoinRequests);
 // This will get join requests for a server (new route)
 serverRoute.get('/servers/:serverId/join-requests', isAuthenticated, getServerJoinRequests);
 // This will leave server
