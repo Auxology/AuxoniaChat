@@ -29,8 +29,9 @@ import {
 } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import { requireAuth } from "@/utils/routeGuards"
+import { useSocket } from '@/hooks/useSocket'
 
-export const Route = createFileRoute('/server/requests')({
+export const Route = createFileRoute('/chat/servers/requests')({
   beforeLoad: async () => {
     return await requireAuth();
   },
@@ -43,6 +44,7 @@ function RouteComponent() {
   const { data: incomingRequests, isLoading: incomingLoading } = useIncomingJoinRequests()
   const approveRequest = useApproveJoinRequest()
   const rejectRequest = useRejectJoinRequest()
+  useSocket()
 
   const handleApprove = (requestId: string, serverId: string) => {
     approveRequest.mutate({ requestId, serverId })
@@ -85,7 +87,7 @@ function RouteComponent() {
   }
 
   return (
-    <main className="min-h-[92.8vh] flex items-center justify-center px-4 py-8">
+    <main className="min-h-[92.8vh] flex items-center justify-center px-3 py-6 sm:px-4 sm:py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -96,12 +98,12 @@ function RouteComponent() {
         <div className="absolute -inset-[2px] bg-gradient-to-r from-button via-headline to-button rounded-2xl blur-sm" />
 
         {/* Card Content */}
-        <Card className="relative bg-background rounded-2xl shadow-lg">
-          <CardHeader className="pb-4">
-            <div className="flex justify-between items-center">
-              <CardTitle className="font-ogg text-headline text-2xl sm:text-3xl flex items-center gap-3">
-                <span className="bg-button/20 p-2 rounded-lg">
-                  <Bell className="h-6 w-6 text-button" />
+        <Card className="relative bg-background rounded-2xl shadow-lg overflow-hidden">
+          <CardHeader className="pb-3 sm:pb-4">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0">
+              <CardTitle className="font-ogg text-headline text-xl sm:text-2xl md:text-3xl flex items-center gap-2 sm:gap-3">
+                <span className="bg-button/20 p-1.5 sm:p-2 rounded-lg">
+                  <Bell className="h-5 w-5 sm:h-6 sm:w-6 text-button" />
                 </span>
                 Server Requests
               </CardTitle>
@@ -109,10 +111,10 @@ function RouteComponent() {
                 to="/chat" 
                 className="group flex items-center gap-2 font-pitch-sans-medium text-paragraph hover:text-headline transition-colors duration-200"
               >
-                <span className="bg-button/10 p-2 rounded-lg group-hover:bg-button/20 transition-colors duration-200">
+                <span className="bg-button/10 p-1.5 sm:p-2 rounded-lg group-hover:bg-button/20 transition-colors duration-200">
                   <ArrowLeft className="h-4 w-4 text-button" />
                 </span>
-                <span className="hidden sm:inline">Return to Chat</span>
+                <span>Return to Chat</span>
               </Link>
             </div>
             <CardDescription className="font-freight-text-pro-black text-paragraph">
@@ -122,22 +124,22 @@ function RouteComponent() {
           
           <CardContent>
             <Tabs defaultValue="sent" className="w-full" onValueChange={(value) => setActiveTab(value as "sent" | "incoming")}>
-              <TabsList className="grid grid-cols-2 mb-6">
+              <TabsList className="grid grid-cols-2 mb-6 bg-card/50 p-1 rounded-lg border border-button/10">
                 <TabsTrigger 
                   value="sent" 
-                  className={`font-pitch-sans-medium ${activeTab === "sent" ? "text-headline" : "text-paragraph"}`}
+                  className="font-pitch-sans-medium data-[state=active]:bg-button data-[state=active]:text-white data-[state=inactive]:text-paragraph data-[state=inactive]:hover:text-headline transition-colors"
                 >
                   <User className="h-4 w-4 mr-2" />
                   Sent Requests
                 </TabsTrigger>
                 <TabsTrigger 
                   value="incoming" 
-                  className={`font-pitch-sans-medium ${activeTab === "incoming" ? "text-headline" : "text-paragraph"}`}
+                  className="font-pitch-sans-medium data-[state=active]:bg-button data-[state=active]:text-white data-[state=inactive]:text-paragraph data-[state=inactive]:hover:text-headline transition-colors"
                 >
                   <Users className="h-4 w-4 mr-2" />
                   Incoming Requests
                   {incomingRequests?.length > 0 && (
-                    <Badge variant="destructive" className="ml-2 bg-rose-500 text-white">
+                    <Badge className="ml-2 bg-rose-500/90 hover:bg-rose-500 text-white border-transparent">
                       {incomingRequests.length}
                     </Badge>
                   )}

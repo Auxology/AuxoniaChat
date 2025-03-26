@@ -371,4 +371,35 @@ export async function getIncomingJoinRequestsByServerId(serverIds: any []) {
         console.error('Error getting incoming join requests:', error);
         throw error;
     }
+
+}
+
+export async function getServerAdmins(serverId: string): Promise<string[]> {
+    const { rows } = await query(`
+        SELECT user_id 
+        FROM app.server_members 
+        WHERE server_id = $1 AND (role = 'owner' OR role = 'admin')
+    `, [serverId]);
+    
+    return rows.map(row => row.user_id);
+}
+
+export async function getUsernameById(userId: string): Promise<string> {
+    const { rows } = await query(`
+        SELECT username 
+        FROM app.users 
+        WHERE id = $1
+    `, [userId]);
+    
+    return rows.length > 0 ? rows[0].username : 'Unknown User';
+}
+
+export async function getServerBasicDetails(serverId: string) {
+    const { rows } = await query(`
+        SELECT id, name, icon_url as "iconUrl"
+        FROM app.servers
+        WHERE id = $1
+    `, [serverId]);
+    
+    return rows.length > 0 ? rows[0] : null;
 }

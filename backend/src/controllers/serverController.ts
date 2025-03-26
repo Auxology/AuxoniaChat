@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
-import { createNewServer, deleteServerWithId, getAllServerMembers, getServerByServerId, getServersByUserId, isMember, joinServerWithIds, leaveServerWithIds, searchServersByName, hasPendingJoinRequest, createJoinRequest, getJoinRequestsByServerId, approveJoinRequestById, rejectJoinRequestById, getJoinRequetsById, getServersWhereUserHasElevatedRole, getIncomingJoinRequestsByServerId } from '../utils/server';
+import { createNewServer, deleteServerWithId, getAllServerMembers, getServerByServerId, getServersByUserId, isMember, joinServerWithIds, leaveServerWithIds, searchServersByName, hasPendingJoinRequest, createJoinRequest, getJoinRequestsByServerId, approveJoinRequestById, rejectJoinRequestById, getJoinRequetsById, getServersWhereUserHasElevatedRole, getIncomingJoinRequestsByServerId, getServerBasicDetails, getServerAdmins } from '../utils/server';
 import { ServerDataForUser, ServerMembers, UserServers } from '../types/types';
 import {uploadServerImage} from "../libs/cloudinary";
+import { getSocketIO } from '../libs/socket';
 
 // This will retrive servers that user is in
 export const getUserServers = async (req: Request, res: Response):Promise<void> => {
@@ -299,6 +300,24 @@ export const requestJoinServer = async (req:Request, res:Response):Promise<void>
         // Create join request
         await createJoinRequest(userId, serverId);
 
+        // Server details
+        const serverDetails = await getServerBasicDetails(serverId);
+
+        // Get all admin/owner of the server
+        const admins = await getServerAdmins(serverId);
+
+        // Emit ithe event to all admins
+        const io = getSocketIO();
+        admins.forEach(adminId => {
+            io.to(`user:${adminId}`).emit('server:joinRequest', {
+                requestId: /* generate or retrieve the request ID */
+                userId,
+                serverId,
+                serverName: serverDetails.name,
+                username: req.session.user?.username
+            });
+        });
+
         res.status(200).json({message: 'Request sent'});
     }
     catch(error) {
@@ -377,6 +396,26 @@ export const approveJoinRequest = async (req:Request, res:Response):Promise<void
             return;
         }
 
+        // Get server details
+        const serverDetails = await getServerBasicDetails(serverId);
+
+        const io = getSocketIO();
+
+        // Notifiy the user
+        io.to(`user:${result.userId}`).emit('server:joinApproved', {
+            serverId,
+            serverDetails
+        });
+
+        // Notify admins
+        const admins = await getServerAdmins(serverId);
+        admins.forEach(adminId => {
+            io.to(`user:${adminId}`).emit('server:joinApproved', {
+                serverId,
+                serverDetails
+            });
+        });
+        
         res.status(200).json({message: 'Request approved'});
     }
     catch(error) {
@@ -420,6 +459,26 @@ export const rejectJoinRequest = async (req: Request, res: Response): Promise<vo
             return;
         }
 
+        // Get server details
+        const serverDetails = await getServerBasicDetails(serverId);
+
+        const io = getSocketIO();
+
+        // Notify the user
+        io.to(`user:${result.userId}`).emit('server:joinRequestRejected', {
+            serverId,
+            serverDetails
+        });
+
+        // Notify admins
+        const admins = await getServerAdmins(serverId);
+        admins.forEach(adminId => {
+            io.to(`user:${adminId}`).emit('server:joinRequestRejected', {
+                serverId,
+                serverDetails
+            });
+        });
+        
         res.status(200).json({ message: 'Request rejected' });
     } catch (error) {
         console.error(`Error in rejectJoinRequest: ${error}`);

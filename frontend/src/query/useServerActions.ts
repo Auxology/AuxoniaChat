@@ -221,8 +221,9 @@ export function useRequestJoinServer() {
             });
         },
     });
+    
 }
-
+// Get join requests for a server
 export function useServerJoinRequests(serverId: string) {
     return useQuery({
         queryKey: ["serverJoinRequests", serverId],

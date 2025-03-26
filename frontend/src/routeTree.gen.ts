@@ -24,7 +24,6 @@ import { Route as ChatIndexImport } from './routes/chat/index'
 import { Route as SignUpVerifyImport } from './routes/sign-up/verify'
 import { Route as SignUpFinishImport } from './routes/sign-up/finish'
 import { Route as SettingsSecurityImport } from './routes/settings/security'
-import { Route as ServerRequestsImport } from './routes/server/requests'
 import { Route as SecurityTermsImport } from './routes/security/terms'
 import { Route as SecurityPrivacyImport } from './routes/security/privacy'
 import { Route as SecurityCookiesImport } from './routes/security/cookies'
@@ -35,6 +34,7 @@ import { Route as LoginVerifyImport } from './routes/login/verify'
 import { Route as ForgotPasswordVerifyImport } from './routes/forgot-password/verify'
 import { Route as ForgotPasswordFinishImport } from './routes/forgot-password/finish'
 import { Route as Errors429Import } from './routes/errors/429'
+import { Route as ChatServersRequestsImport } from './routes/chat/servers/requests'
 import { Route as ChatServersServerIdImport } from './routes/chat/servers/$serverId'
 
 // Create Virtual Routes
@@ -131,12 +131,6 @@ const SettingsSecurityRoute = SettingsSecurityImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const ServerRequestsRoute = ServerRequestsImport.update({
-  id: '/server/requests',
-  path: '/server/requests',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const SecurityTermsRoute = SecurityTermsImport.update({
   id: '/security/terms',
   path: '/security/terms',
@@ -194,6 +188,12 @@ const ForgotPasswordFinishRoute = ForgotPasswordFinishImport.update({
 const Errors429Route = Errors429Import.update({
   id: '/errors/429',
   path: '/errors/429',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ChatServersRequestsRoute = ChatServersRequestsImport.update({
+  id: '/chat/servers/requests',
+  path: '/chat/servers/requests',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -282,13 +282,6 @@ declare module '@tanstack/react-router' {
       path: '/security/terms'
       fullPath: '/security/terms'
       preLoaderRoute: typeof SecurityTermsImport
-      parentRoute: typeof rootRoute
-    }
-    '/server/requests': {
-      id: '/server/requests'
-      path: '/server/requests'
-      fullPath: '/server/requests'
-      preLoaderRoute: typeof ServerRequestsImport
       parentRoute: typeof rootRoute
     }
     '/settings/security': {
@@ -389,6 +382,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatServersServerIdImport
       parentRoute: typeof rootRoute
     }
+    '/chat/servers/requests': {
+      id: '/chat/servers/requests'
+      path: '/chat/servers/requests'
+      fullPath: '/chat/servers/requests'
+      preLoaderRoute: typeof ChatServersRequestsImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -406,7 +406,6 @@ export interface FileRoutesByFullPath {
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
-  '/server/requests': typeof ServerRequestsRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
@@ -421,6 +420,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactIndexLazyRoute
   '/security': typeof SecurityIndexLazyRoute
   '/chat/servers/$serverId': typeof ChatServersServerIdRoute
+  '/chat/servers/requests': typeof ChatServersRequestsRoute
 }
 
 export interface FileRoutesByTo {
@@ -435,7 +435,6 @@ export interface FileRoutesByTo {
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
-  '/server/requests': typeof ServerRequestsRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
@@ -450,6 +449,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactIndexLazyRoute
   '/security': typeof SecurityIndexLazyRoute
   '/chat/servers/$serverId': typeof ChatServersServerIdRoute
+  '/chat/servers/requests': typeof ChatServersRequestsRoute
 }
 
 export interface FileRoutesById {
@@ -465,7 +465,6 @@ export interface FileRoutesById {
   '/security/cookies': typeof SecurityCookiesRoute
   '/security/privacy': typeof SecurityPrivacyRoute
   '/security/terms': typeof SecurityTermsRoute
-  '/server/requests': typeof ServerRequestsRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/sign-up/finish': typeof SignUpFinishRoute
   '/sign-up/verify': typeof SignUpVerifyRoute
@@ -480,6 +479,7 @@ export interface FileRoutesById {
   '/contact/': typeof ContactIndexLazyRoute
   '/security/': typeof SecurityIndexLazyRoute
   '/chat/servers/$serverId': typeof ChatServersServerIdRoute
+  '/chat/servers/requests': typeof ChatServersRequestsRoute
 }
 
 export interface FileRouteTypes {
@@ -496,7 +496,6 @@ export interface FileRouteTypes {
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
-    | '/server/requests'
     | '/settings/security'
     | '/sign-up/finish'
     | '/sign-up/verify'
@@ -511,6 +510,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/security'
     | '/chat/servers/$serverId'
+    | '/chat/servers/requests'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -524,7 +524,6 @@ export interface FileRouteTypes {
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
-    | '/server/requests'
     | '/settings/security'
     | '/sign-up/finish'
     | '/sign-up/verify'
@@ -539,6 +538,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/security'
     | '/chat/servers/$serverId'
+    | '/chat/servers/requests'
   id:
     | '__root__'
     | '/'
@@ -552,7 +552,6 @@ export interface FileRouteTypes {
     | '/security/cookies'
     | '/security/privacy'
     | '/security/terms'
-    | '/server/requests'
     | '/settings/security'
     | '/sign-up/finish'
     | '/sign-up/verify'
@@ -567,6 +566,7 @@ export interface FileRouteTypes {
     | '/contact/'
     | '/security/'
     | '/chat/servers/$serverId'
+    | '/chat/servers/requests'
   fileRoutesById: FileRoutesById
 }
 
@@ -582,7 +582,6 @@ export interface RootRouteChildren {
   SecurityCookiesRoute: typeof SecurityCookiesRoute
   SecurityPrivacyRoute: typeof SecurityPrivacyRoute
   SecurityTermsRoute: typeof SecurityTermsRoute
-  ServerRequestsRoute: typeof ServerRequestsRoute
   SettingsSecurityRoute: typeof SettingsSecurityRoute
   SignUpFinishRoute: typeof SignUpFinishRoute
   SignUpVerifyRoute: typeof SignUpVerifyRoute
@@ -597,6 +596,7 @@ export interface RootRouteChildren {
   ContactIndexLazyRoute: typeof ContactIndexLazyRoute
   SecurityIndexLazyRoute: typeof SecurityIndexLazyRoute
   ChatServersServerIdRoute: typeof ChatServersServerIdRoute
+  ChatServersRequestsRoute: typeof ChatServersRequestsRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -611,7 +611,6 @@ const rootRouteChildren: RootRouteChildren = {
   SecurityCookiesRoute: SecurityCookiesRoute,
   SecurityPrivacyRoute: SecurityPrivacyRoute,
   SecurityTermsRoute: SecurityTermsRoute,
-  ServerRequestsRoute: ServerRequestsRoute,
   SettingsSecurityRoute: SettingsSecurityRoute,
   SignUpFinishRoute: SignUpFinishRoute,
   SignUpVerifyRoute: SignUpVerifyRoute,
@@ -626,6 +625,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactIndexLazyRoute: ContactIndexLazyRoute,
   SecurityIndexLazyRoute: SecurityIndexLazyRoute,
   ChatServersServerIdRoute: ChatServersServerIdRoute,
+  ChatServersRequestsRoute: ChatServersRequestsRoute,
 }
 
 export const routeTree = rootRoute
@@ -649,7 +649,6 @@ export const routeTree = rootRoute
         "/security/cookies",
         "/security/privacy",
         "/security/terms",
-        "/server/requests",
         "/settings/security",
         "/sign-up/finish",
         "/sign-up/verify",
@@ -663,7 +662,8 @@ export const routeTree = rootRoute
         "/about/",
         "/contact/",
         "/security/",
-        "/chat/servers/$serverId"
+        "/chat/servers/$serverId",
+        "/chat/servers/requests"
       ]
     },
     "/": {
@@ -698,9 +698,6 @@ export const routeTree = rootRoute
     },
     "/security/terms": {
       "filePath": "security/terms.tsx"
-    },
-    "/server/requests": {
-      "filePath": "server/requests.tsx"
     },
     "/settings/security": {
       "filePath": "settings/security.tsx"
@@ -743,6 +740,9 @@ export const routeTree = rootRoute
     },
     "/chat/servers/$serverId": {
       "filePath": "chat/servers/$serverId.tsx"
+    },
+    "/chat/servers/requests": {
+      "filePath": "chat/servers/requests.tsx"
     }
   }
 }
