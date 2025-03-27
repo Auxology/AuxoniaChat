@@ -79,132 +79,106 @@ export function Sidebar() {
 
   return (
     <div className="flex flex-col bg-sidebar h-full border-r border-muted/20">
-      {/* Main scrollable area */}
-      <div className="flex-1 overflow-hidden flex flex-col">
-        <ScrollArea className="flex-1">
-          <div className="flex flex-col items-center space-y-4 py-2 px-1">
-            {/* Top Navigation Icons */}
-            <TooltipProvider>
-              <Tooltip delayDuration={300}>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="rounded-full bg-button text-headline hover:bg-button/80"
-                    onClick={() => setSearchOpen(true)}
-                  >
-                    <Search className="h-5 w-5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p>Search Servers</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+      {/* Fixed Top Navigation */}
+      <div className="shrink-0 py-2 flex flex-col items-center space-y-4">
+        <TooltipProvider>
+          <Tooltip delayDuration={300}>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="rounded-full bg-button text-headline hover:bg-button/80"
+                onClick={() => setSearchOpen(true)}
+              >
+                <Search className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>Search Servers</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
-            <TooltipProvider>
-              <Tooltip delayDuration={300}>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full bg-button text-headline hover:bg-button/80">
-                    <MessageSquare className="h-5 w-5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p>Direct Messages</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+        <TooltipProvider>
+          <Tooltip delayDuration={300}>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full bg-button text-headline hover:bg-button/80">
+                <MessageSquare className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>Direct Messages</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
-            {/* Server Divider */}
-            <div className="w-8 h-0.5 bg-muted/20 rounded-full my-2"></div>
+        {/* Server Divider */}
+        <div className="w-8 h-0.5 bg-muted/20 rounded-full"></div>
+      </div>
 
-            {/* Server List */}
-            {isLoadingServers ? (
-              // Loading placeholders
-              Array.from({ length: 3 }).map((_, i) => (
-                <div 
-                  key={`loading-server-${i}`}
-                  className="w-12 h-12 rounded-full bg-muted/20 animate-pulse"
-                ></div>
-              ))
-            ) : isError ? (
-              // Error state
-              <div className="text-xs text-red-500 text-center px-2">
-                Failed to load servers
-              </div>
-            ) : servers.length > 0 ? (  
-              // Actual server list
-              servers.map((server) => (
-                <ServerIcon key={server.id} server={server} />
-              ))
-            ) : (
-              // Empty state
-              <div className="text-xs text-muted-foreground text-center px-2">
-                No servers yet
-              </div>
-            )}
+      {/* Scrollable Middle Section */}
+      <div className="flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
+          <div className="flex flex-col h-full min-h-[calc(100vh-140px)] justify-between">
+            {/* Server List - This will scroll */}
+            <div className="flex flex-col items-center space-y-4 py-2 px-1">
+              {isLoadingServers ? (
+                // Loading placeholders
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div 
+                    key={`loading-server-${i}`}
+                    className="w-12 h-12 rounded-full bg-muted/20 animate-pulse"
+                  ></div>
+                ))
+              ) : isError ? (
+                // Error state
+                <div className="text-xs text-red-500 text-center px-2">
+                  Failed to load servers
+                </div>
+              ) : servers.length > 0 ? (  
+                // Actual server list
+                servers.map((server) => (
+                  <ServerIcon key={server.id} server={server} />
+                ))
+              ) : (
+                // Empty state
+                <div className="text-xs text-muted-foreground text-center px-2">
+                  No servers yet
+                </div>
+              )}
+            </div>
 
-            {/* Footer Icons */}
-            <div className="w-8 h-0.5 bg-muted/20 rounded-full my-2"></div>
+            {/* Action Buttons - Will stick to bottom of scrollable area */}
+            <div className="flex flex-col items-center space-y-4 py-4 px-1 mt-auto">
+              {/* Action Button Divider */}
+              <div className="w-8 h-0.5 bg-muted/20 rounded-full"></div>
 
-            <TooltipProvider>
-              <Tooltip delayDuration={300}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full bg-card text-emerald-500 hover:bg-emerald-500 hover:text-headline"
-                    onClick={() => setCreateServerOpen(true)}
-                  >
-                    <Plus className="h-5 w-5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p>Create a Server</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              {/* Join server button */}
-              <Tooltip delayDuration={300}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-full bg-card text-blue-500 hover:bg-blue-500 hover:text-headline"
-                    onClick={() => setJoinServerOpen(true)}
-                  >
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      className="h-5 w-5"
-                    >
-                      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                      <polyline points="10 17 15 12 10 7" />
-                      <line x1="15" y1="12" x2="3" y2="12" />
-                    </svg>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p>Join a Server</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip delayDuration={300}>
-                <TooltipTrigger asChild>
-                  <Link to="/chat/servers/requests">
+              <TooltipProvider>
+                <Tooltip delayDuration={300}>
+                  <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="rounded-full bg-card text-amber-500 hover:bg-amber-500 hover:text-headline"
+                      className="rounded-full bg-card text-emerald-500 hover:bg-emerald-500 hover:text-headline"
+                      onClick={() => setCreateServerOpen(true)}
+                    >
+                      <Plus className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p>Create a Server</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip delayDuration={300}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full bg-card text-blue-500 hover:bg-blue-500 hover:text-headline"
+                      onClick={() => setJoinServerOpen(true)}
                     >
                       <svg 
                         xmlns="http://www.w3.org/2000/svg" 
@@ -216,17 +190,49 @@ export function Sidebar() {
                         strokeLinejoin="round" 
                         className="h-5 w-5"
                       >
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                        <polyline points="10 17 15 12 10 7" />
+                        <line x1="15" y1="12" x2="3" y2="12" />
                       </svg>
                     </Button>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p>Server Requests</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p>Join a Server</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip delayDuration={300}>
+                  <TooltipTrigger asChild>
+                    <Link to="/chat/servers/requests">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full bg-card text-amber-500 hover:bg-amber-500 hover:text-headline"
+                      >
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          className="h-5 w-5"
+                        >
+                          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg>
+                      </Button>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p>Server Requests</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
         </ScrollArea>
       </div>

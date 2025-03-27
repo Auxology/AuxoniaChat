@@ -30,6 +30,22 @@
   --chart-4: hsl(43 74% 66%);
   --chart-5: hsl(27 87% 67%);
   --radius: 0.6rem;
+  
+  /* Custom spacing variables */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  
+  /* Custom breakpoints in CSS variables for reference */
+  --screen-sm: 640px;
+  --screen-md: 768px;
+  --screen-lg: 1024px;
+  --screen-xl: 1280px;
 }
 
 .dark {
@@ -129,4 +145,28 @@
   --color-button: #7f5af0;
   --color-sidebar: #1E2022;
   --color-chat: #242629;
+}
+
+/* Additional global styles */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhance focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Add responsive font sizes */
+h1, .h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+h2, .h2 {
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+h3, .h3 {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
 }
