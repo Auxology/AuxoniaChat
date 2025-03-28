@@ -38,6 +38,7 @@ export interface UserServers {
     name: string;
     iconUrl: string;
     role: string;
+    ownerId: string;
 }
 
 // This is very specific to the isMember function in the userController.ts file

@@ -5,7 +5,7 @@ import { UserServers, ServerData, ServerDataForUser, ServerMembers } from '../ty
 export async function getServersByUserId(userId: string):Promise<UserServers[]>{
     try {
         const { rows } = await query(`
-            SELECT s.id, s.name, s.icon_url as "iconUrl", sm.role
+            SELECT s.id, s.name, s.icon_url as "iconUrl", sm.role, s.owner_id as "ownerId"
             FROM app.servers s
             JOIN app.server_members sm ON s.id = sm.server_id
             WHERE sm.user_id = $1

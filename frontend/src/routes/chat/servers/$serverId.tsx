@@ -390,7 +390,7 @@ function RouteComponent() {
               </div>
 
               {/* Members List */}
-              <ScrollArea className="flex-1 p-3">
+              <ScrollArea className="flex-1 p-3 max-h-[calc(100vh-240px)]">
                 {isLoadingMembers ? (
                   // Loading skeleton
                   <div className="space-y-4">

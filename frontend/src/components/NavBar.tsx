@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button.tsx";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function NavBar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,7 +12,7 @@ export default function NavBar() {
     };
 
     return (
-        <nav className="relative z-50 bg-background sticky top-0 border-b border-muted/20">
+        <nav className="z-50 bg-background sticky top-0 border-b border-muted/20">
             <div className="container mx-auto px-4 py-4">
                 <div className="flex items-center justify-between">
                     {/* Logo */}

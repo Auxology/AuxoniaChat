@@ -20,6 +20,13 @@ import { JoinServerDialog } from "./join-server";
 import { ServerSearchDialog } from "./server-search-dialog";
 import { Server, useUserServers } from "@/query/useServerActions";
 import { toast } from "sonner";
+import { 
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { useQueryClient } from "@tanstack/react-query";
 
 // User data interface
 interface UserData {
@@ -321,46 +328,106 @@ export function Sidebar() {
 
 // Server Icon Component
 function ServerIcon({ server }: { server: Server }) {
+  const queryClient = useQueryClient();
+  const { data: userData } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: fetchUserProfile,
+    staleTime: 1000 * 60 * 5,
+  });
+  
+  // Check if the current user is the server owner
+  const isServerOwner = userData?.id === server.ownerId;
+
+  // Handle leaving server
+  const handleLeaveServer = async () => {
+    try {
+      await axiosInstance.post(`/servers/${server.id}/leave`);
+      toast.success(`Left ${server.name}`);
+      // Refresh the server list
+      queryClient.invalidateQueries({ queryKey: ["userServers"] });
+    } catch (error) {
+      toast.error("Failed to leave server", {
+        description: "Please try again"
+      });
+    }
+  };
+
   return (
     <TooltipProvider>
-      <Tooltip delayDuration={300}>
-        <TooltipTrigger asChild>
-          <Link 
-            to="/chat/servers/$serverId"
-            params={{ serverId: server.id }}
-            className="block"
-          >
-            {({ isActive }) => (
-              <div className={cn(
-                "relative group",
-                isActive && "before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:h-10 before:w-1 before:bg-button before:rounded-r-md"
-              )}>
-                <Avatar 
-                  className={cn(
-                    "h-12 w-12 rounded-full transition-all hover:rounded-2xl",
-                    isActive ? "rounded-2xl" : "rounded-full"
-                  )}
-                >
-                  {server.iconUrl ? (
-                    <AvatarImage
-                      src={server.iconUrl}
-                      alt={server.name}
-                      className="object-cover"
-                    />
-                  ) : (
-                    <AvatarFallback className="bg-card text-paragraph">
-                      {server.name.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-              </div>
-            )}
-          </Link>
-        </TooltipTrigger>
-        <TooltipContent side="right">
-          <p>{server.name}</p>
-        </TooltipContent>
-      </Tooltip>
+      <ContextMenu>
+        <ContextMenuTrigger>
+          <Tooltip delayDuration={300}>
+            <TooltipTrigger asChild>
+              <Link 
+                to="/chat/servers/$serverId"
+                params={{ serverId: server.id }}
+                className="block"
+              >
+                {({ isActive }) => (
+                  <div className={cn(
+                    "relative group",
+                    isActive && "before:absolute before:-left-2 before:top-1/2 before:-translate-y-1/2 before:h-10 before:w-1 before:bg-button before:rounded-r-md"
+                  )}>
+                    <Avatar 
+                      className={cn(
+                        "h-12 w-12 rounded-full transition-all hover:rounded-2xl",
+                        isActive ? "rounded-2xl" : "rounded-full"
+                      )}
+                    >
+                      {server.iconUrl ? (
+                        <AvatarImage
+                          src={server.iconUrl}
+                          alt={server.name}
+                          className="object-cover"
+                        />
+                      ) : (
+                        <AvatarFallback className="bg-card text-paragraph">
+                          {server.name.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                  </div>
+                )}
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>{server.name}</p>
+            </TooltipContent>
+          </Tooltip>
+        </ContextMenuTrigger>
+        <ContextMenuContent className="w-56 bg-card border border-muted/20">
+          {isServerOwner ? (
+            <Link to="/chat/servers/$serverId/settings" params={{ serverId: server.id }}>
+              <ContextMenuItem className="cursor-pointer text-paragraph hover:text-headline flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                <span>Server Settings</span>
+              </ContextMenuItem>
+            </Link>
+          ) : (
+            <ContextMenuItem 
+              className="cursor-pointer text-red-400 hover:text-red-300 hover:bg-red-900/20 flex items-center gap-2"
+              onClick={handleLeaveServer}
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="16" 
+                height="16" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1-2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              <span>Leave Server</span>
+            </ContextMenuItem>
+          )}
+        </ContextMenuContent>
+      </ContextMenu>
     </TooltipProvider>
   );
 }
