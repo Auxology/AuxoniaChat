@@ -332,7 +332,7 @@ function RouteComponent() {
                             <FormItem>
                               <FormControl>
                                 <Input 
-                                  placeholder="Enter verification code"
+                                  placeholder="Code"
                                   maxLength={8}
                                   {...field}
                                   className="font-pitch-sans-medium text-paragraph bg-background border-button/20 focus-within:border-button focus:bg-background/80 transition-all duration-300"
@@ -569,7 +569,7 @@ function RouteComponent() {
                             <FormItem>
                               <FormControl>
                                 <Input 
-                                  placeholder="Enter verification code"
+                                  placeholder="Code"
                                   maxLength={8}
                                   {...field}
                                   className="font-pitch-sans-medium text-paragraph bg-background border-button/20 focus-within:border-button focus:bg-background/80 transition-all duration-300"

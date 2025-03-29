@@ -2,23 +2,17 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useEffect, } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Menu, Users, X, Plus, Hash, LogOut, Trash2 } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Sidebar } from "@/components/sidebar.tsx";
+import { Users, Plus} from "lucide-react";
+import { Sidebar } from "@/components/sidebars/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
 import { requireAuth } from '@/utils/routeGuards';
 import { axiosInstance } from "@/lib/axios";
 import { toast } from "sonner";
-import { useSocket } from '@/hooks/useSocket';
-import { useServerChannels } from "@/query/useChannel";
+import { MembersSidebar } from "@/components/sidebars/MembersSidebar";
 import { CreateChannelDialog } from "@/components/create-channel";
-import { useLeaveServer, useDeleteServer } from "@/query/useServerActions";
-import { ConfirmDialog } from "@/components/confirm-dialog";
-
-
+import { MobileSidebar } from "@/components/sidebars/mobile-sidebar";
 
 // Types
 interface Server {
@@ -84,11 +78,6 @@ function RouteComponent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [membersOpen, setMembersOpen] = useState(true); // Members sidebar is open by default on desktop
   const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
-  const { data: channels, isLoading: isLoadingChannels } = useServerChannels(serverId);
-  const leaveServerMutation = useLeaveServer();
-  const deleteServerMutation = useDeleteServer();
-  const [confirmLeaveOpen, setConfirmLeaveOpen] = useState(false);
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   // Fetch server details using custom hook
   const {
@@ -115,7 +104,7 @@ function RouteComponent() {
 
   const [currentUser, setCurrentUser] = useState<{id: string} | null>(null);
 
-  // Add this useEffect to fetch the current user
+  // Fetch the current user data
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
@@ -130,16 +119,11 @@ function RouteComponent() {
   }, []);
 
   // Determine if current user is the server owner
-  const isCurrentUserOwner = Array.isArray(members) && currentUser &&
+  const isCurrentUserOwner = !!(Array.isArray(members) && currentUser &&
     members.some(member => 
       member.role === 'owner' && 
       member.id === currentUser.id
-    );
-
-  // Group members by role - safely handle potentially undefined members
-  const ownerMembers = Array.isArray(members) ? members.filter(member => member.role === 'owner') : [];
-  const adminMembers = Array.isArray(members) ? members.filter(member => member.role === 'admin') : [];
-  const regularMembers = Array.isArray(members) ? members.filter(member => member.role === 'member') : [];
+    ));
 
   // Get server initial safely
   const getServerInitial = () => {
@@ -150,7 +134,6 @@ function RouteComponent() {
   // Handle send message
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    // Message sending logic will go here
     const form = e.target as HTMLFormElement;
     const input = form.elements.namedItem('message') as HTMLInputElement;
     const message = input.value.trim();
@@ -162,17 +145,6 @@ function RouteComponent() {
     }
   };
 
-  // Add this function to handle server leaving
-  const handleLeaveServer = () => {
-    setConfirmLeaveOpen(true);
-  };
-
-  // Add this function to handle server deletion
-  const handleDeleteServer = () => {
-    setConfirmDeleteOpen(true);
-  };
-
-  // Rest of your component remains unchanged
   return (
     <div className="flex h-screen bg-chat text-headline">
       {/* Desktop Sidebar */}
@@ -187,17 +159,8 @@ function RouteComponent() {
           {/* Header */}
           <div className="h-12 border-b border-muted/20 flex items-center px-4">
             {/* Mobile Sidebar Toggle */}
-            <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden mr-2">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="p-0 w-[72px] bg-sidebar">
-                <Sidebar />
-              </SheetContent>
-            </Sheet>
-
+            <MobileSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
+            
             {/* Server name and icon */}
             <div className="flex items-center">
               {isLoadingServer ? (
@@ -316,255 +279,24 @@ function RouteComponent() {
           </div>
         </div>
 
-        {/* Members Sidebar */}
-        <div 
-          className={cn(
-            "bg-sidebar border-l border-muted/20 overflow-hidden transition-all",
-            membersOpen ? "w-60" : "w-0"
-          )}
-        >
-          {membersOpen && (
-            <div className="h-full flex flex-col">
-              {/* Members Header */}
-              <div className="h-12 border-b border-muted/20 flex items-center px-4 justify-between">
-                <h2 className="font-pitch-sans-medium text-headline">Members</h2>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setMembersOpen(false)}
-                  className="md:hidden"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-
-              {/* Channels sidebar section */}
-              <div className="px-3 mt-6">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xs font-pitch-sans-medium text-paragraph uppercase">Channels</h3>
-                  {isCurrentUserOwner && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setIsCreateChannelOpen(true)}
-                      className="h-6 w-6 p-0"
-                      title="Create Channel"
-                    >
-                      <Plus className="h-3 w-3" />
-                    </Button>
-                  )}
-                </div>
-                
-                {isLoadingChannels ? (
-                  // Loading skeleton
-                  <div className="space-y-2">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="flex items-center space-x-2 h-8 px-2">
-                        <div className="w-4 h-4 rounded bg-muted/20 animate-pulse"></div>
-                        <div className="h-4 w-24 bg-muted/20 animate-pulse rounded"></div>
-                      </div>
-                    ))}
-                  </div>
-                ) : channels && channels.length > 0 ? (
-                  <div className="space-y-1">
-                    {channels.map((channel) => (
-                      <Button
-                        key={channel.id}
-                        variant="ghost"
-                        size="sm"
-                        className="w-full justify-start font-pitch-sans-medium text-paragraph"
-                        title={channel.description || channel.name}
-                      >
-                        <Hash className="h-4 w-4 mr-2" />
-                        {channel.name}
-                      </Button>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-xs text-paragraph py-2 px-2">
-                    {isCurrentUserOwner 
-                      ? "Click the + to create a channel" 
-                      : "No channels yet"}
-                  </div>
-                )}
-              </div>
-
-              {/* Members List */}
-              <ScrollArea className="flex-1 p-3 max-h-[calc(100vh-240px)]">
-                {isLoadingMembers ? (
-                  // Loading skeleton
-                  <div className="space-y-4">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <div key={i} className="flex items-center space-x-2">
-                        <div className="w-8 h-8 rounded-full bg-muted/20 animate-pulse"></div>
-                        <div className="h-4 w-24 bg-muted/20 animate-pulse rounded"></div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {/* Owner Section */}
-                    {ownerMembers.length > 0 && (
-                      <div>
-                        <h3 className="text-xs font-pitch-sans-medium text-paragraph mb-2">OWNER</h3>
-                        <div className="space-y-2">
-                          {ownerMembers.map((member) => (
-                            <MemberItem key={member.id} member={member} />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Admins Section */}
-                    {adminMembers.length > 0 && (
-                      <div>
-                        <h3 className="text-xs font-pitch-sans-medium text-paragraph mb-2">ADMINS</h3>
-                        <div className="space-y-2">
-                          {adminMembers.map((member) => (
-                            <MemberItem key={member.id} member={member} />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Members Section */}
-                    {regularMembers.length > 0 && (
-                      <div>
-                        <h3 className="text-xs font-pitch-sans-medium text-paragraph mb-2">MEMBERS</h3>
-                        <div className="space-y-2">
-                          {regularMembers.map((member) => (
-                            <MemberItem key={member.id} member={member} />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </ScrollArea>
-              {/* Server Actions Section */}
-              <div className="p-3 border-t border-muted/20 mt-auto">
-                {isCurrentUserOwner ? (
-                  // Delete Server button for owners
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    className="w-full justify-start font-pitch-sans-medium text-destructive-foreground group"
-                    onClick={() => setConfirmDeleteOpen(true)}
-                    disabled={deleteServerMutation.isPending}
-                  >
-                    {deleteServerMutation.isPending ? (
-                      <>
-                        <span className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
-                        Deleting...
-                      </>
-                    ) : (
-                      <>
-                        <Trash2 className="h-4 w-4 mr-2 transition-transform group-hover:scale-110" />
-                        Delete Server
-                      </>
-                    )}
-                  </Button>
-                ) : (
-                  // Leave Server button for regular members
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full justify-start font-pitch-sans-medium text-paragraph border-muted/30 hover:text-destructive hover:border-destructive group"
-                    onClick={() => setConfirmLeaveOpen(true)}
-                    disabled={leaveServerMutation.isPending}
-                  >
-                    {leaveServerMutation.isPending ? (
-                      <>
-                        <span className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
-                        Leaving...
-                      </>
-                    ) : (
-                      <>
-                        <LogOut className="h-4 w-4 mr-2 transition-transform group-hover:scale-110" />
-                        Leave Server
-                      </>
-                    )}
-                  </Button>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Members Sidebar Component */}
+        <MembersSidebar 
+          serverId={serverId}
+          server={server}
+          members={members}
+          isLoadingMembers={isLoadingMembers}
+          membersOpen={membersOpen}
+          setMembersOpen={setMembersOpen}
+          isCurrentUserOwner={isCurrentUserOwner}
+          currentUserId={currentUser?.id}
+        />
       </div>
-      <ConfirmDialog
-        open={confirmLeaveOpen}
-        onOpenChange={setConfirmLeaveOpen}
-        title="Leave Server"
-        description={`Are you sure you want to leave "${server?.name || 'this server'}"? You can rejoin with an invite later.`}
-        confirmText="Leave Server"
-        onConfirm={() => {
-          leaveServerMutation.mutate(serverId);
-          setConfirmLeaveOpen(false);
-        }}
-      />
-
-      <ConfirmDialog
-        open={confirmDeleteOpen}
-        onOpenChange={setConfirmDeleteOpen}
-        title="Delete Server"
-        description={`Are you sure you want to DELETE "${server?.name || 'this server'}"? This action cannot be undone and will remove the server for all members.`}
-        confirmText="Delete Server"
-        onConfirm={() => {
-          deleteServerMutation.mutate(serverId);
-          setConfirmDeleteOpen(false);
-        }}
-        variant="destructive"
-      />
 
       <CreateChannelDialog 
         serverId={serverId}
         open={isCreateChannelOpen}
         onOpenChange={setIsCreateChannelOpen}
       />
-    </div>
-  );
-}
-
-// Member Item Component
-function MemberItem({ member }: { member: Member }) {
-  const { isOnline } = useSocket();
-  const isUserOnline = isOnline(member.id);
-
-  // Status indicator color based on online status from socket
-  const statusColor = isUserOnline 
-    ? "bg-emerald-500" // User is online
-    : "bg-gray-500";   // User is offline
-
-  // Safe username initial
-  const getUserInitial = () => {
-    if (!member || !member.username) return "?";
-    return member.username.charAt(0).toUpperCase();
-  };
-
-  return (
-    <div className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-card/30 group transition-colors">
-      <div className="relative">
-        <Avatar className="h-8 w-8">
-          {member.avatar_url ? (
-            <AvatarImage src={member.avatar_url} alt={member.username || "Member"} />
-          ) : (
-            <AvatarFallback className="bg-card text-paragraph">
-              {getUserInitial()}
-            </AvatarFallback>
-          )}
-        </Avatar>
-        <span 
-          className={cn(
-            "absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-sidebar",
-            statusColor
-          )}
-        />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-pitch-sans-medium text-headline truncate">
-          {member.username || "Unknown User"}
-        </p>
-      </div>
     </div>
   );
 }

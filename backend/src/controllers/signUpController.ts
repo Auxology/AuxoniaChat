@@ -9,7 +9,7 @@ import {
     createTemporarySession,
     deleteEmailVerificationCode,
     deleteTemporarySession,
-    lockoutUser,
+    lockoutUser, removeLockout,
     storeEmailVerificationCode,
     verifyEmailVerificationCode
 } from "../libs/redis";
@@ -201,6 +201,9 @@ export const signUpFinish = async (req: Request, res: Response):Promise<void> =>
         //8. Clear the cookies
         clearCookieWithEmail(res);
         clearTemporaryJWT(res);
+
+        //9. Remove Lock
+        await removeLockout(email);
 
         res.status(200).json({ recoveryCodes: recoveryCodes });
     }

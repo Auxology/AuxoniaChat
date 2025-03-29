@@ -145,10 +145,10 @@ function RouteComponent() {
                       <FormLabel className="font-pitch-sans-medium text-headline">Verification Code</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter 8-character code"
+                          placeholder="Code"
                           maxLength={8}
                           {...field}
-                          className="font-pitch-sans-medium text-center text-lg tracking-widest focus:bg-white"
+                          className="font-pitch-sans-medium text-center text-sm lg:text-md tracking-widest focus:bg-white"
                         />
                       </FormControl>
                       <FormMessage />

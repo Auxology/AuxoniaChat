@@ -376,6 +376,10 @@ export async function checkIfUserIsLocked(email: string):Promise<boolean> {
     return Boolean(exists);
 }
 
+export async function removeLockout(email: string):Promise<void> {
+    await redisClient.del('lock_email_verification_code:' + email);
+}
+
 // This function should expect array of session ids and should delete all of them
 export async function deleteSessions(sessionIds: string[] | string | null | undefined): Promise<void> {
     // If sessionIds is null, undefined, or empty array, return early
@@ -411,4 +415,3 @@ export async function checkIfUserIsLockedById(userId: string):Promise<boolean> {
 
     return Boolean(exists);
 }
-

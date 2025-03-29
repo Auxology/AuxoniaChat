@@ -1,3 +1,4 @@
+// This does not mobilefy the sidebar, it is a desktop version only.
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,9 +16,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CreateServerDialog } from "./create-server";
-import { JoinServerDialog } from "./join-server";
-import { ServerSearchDialog } from "./server-search-dialog";
+import { CreateServerDialog } from "../create-server";
+import { JoinServerDialog } from "../join-server";
+import { ServerSearchDialog } from "../server-search-dialog";
 import { Server, useUserServers } from "@/query/useServerActions";
 import { toast } from "sonner";
 import { 
@@ -85,7 +86,7 @@ export function Sidebar() {
   };
 
   return (
-    <div className="flex flex-col bg-sidebar h-full border-r border-muted/20">
+    <div className="flex flex-col bg-sidebar h-full border-r-0">
       {/* Fixed Top Navigation */}
       <div className="shrink-0 py-2 flex flex-col items-center space-y-4">
         <TooltipProvider>
@@ -125,7 +126,7 @@ export function Sidebar() {
 
       {/* Scrollable Middle Section */}
       <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full">
+        <ScrollArea className="h-full border-none">
           <div className="flex flex-col h-full min-h-[calc(100vh-140px)] justify-between">
             {/* Server List - This will scroll */}
             <div className="flex flex-col items-center space-y-4 py-2 px-1">
@@ -150,7 +151,7 @@ export function Sidebar() {
               ) : (
                 // Empty state
                 <div className="text-xs text-muted-foreground text-center px-2">
-                  No servers yet
+                  
                 </div>
               )}
             </div>
@@ -226,7 +227,7 @@ export function Sidebar() {
                           strokeWidth="2" 
                           strokeLinecap="round" 
                           strokeLinejoin="round" 
-                          className="h-5 w-5"
+                          className="h-5 w-5 "
                         >
                           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
@@ -318,10 +319,19 @@ export function Sidebar() {
         </DropdownMenu>
       </div>
 
-      {/* Dialogs remain unchanged */}
-      <CreateServerDialog open={createServerOpen} onOpenChange={setCreateServerOpen} />
-      <JoinServerDialog open={joinServerOpen} onOpenChange={setJoinServerOpen} />
-      <ServerSearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
+      {/* Modified dialogs with improved close button styling */}
+      <CreateServerDialog 
+        open={createServerOpen} 
+        onOpenChange={setCreateServerOpen} 
+      />
+      <JoinServerDialog 
+        open={joinServerOpen} 
+        onOpenChange={setJoinServerOpen} 
+      />
+      <ServerSearchDialog 
+        open={searchOpen} 
+        onOpenChange={setSearchOpen} 
+      />
     </div>
   );
 }
