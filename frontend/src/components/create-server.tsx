@@ -9,7 +9,9 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
+  DialogPortal,
+  DialogOverlay
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -23,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { X } from "lucide-react";
 import { useCreateServer } from "@/query/useServerActions";
-import {toast} from "sonner";
+import { toast } from "sonner";
 
 // Updated schema to make iconUrl optional
 const serverSchema = z.object({
@@ -97,94 +99,97 @@ export function CreateServerDialog({ open, onOpenChange }: CreateServerDialogPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-card border border-muted/20 text-headline">
-        <DialogHeader>
-          <DialogTitle className="font-ogg text-headline text-2xl">Create a Server</DialogTitle>
-          <DialogDescription className="text-paragraph">
-            Give your server a name and an optional icon.
-          </DialogDescription>
-        </DialogHeader>
-        
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="flex flex-col items-center mb-6">
-              <div className="relative">
-                <Avatar className="w-24 h-24 border-2 border-muted/20">
-                  {previewUrl ? (
-                    <AvatarImage src={previewUrl} alt="Server icon" />
-                  ) : (
-                    <AvatarFallback className="bg-button text-headline text-xl">
-                      {form.watch("name") ? form.watch("name").charAt(0).toUpperCase() : "S"}
-                    </AvatarFallback>
+      <DialogPortal>
+        <DialogOverlay className="bg-background/80 backdrop-blur-sm fixed inset-0 z-[9999]" />
+        <DialogContent className="sm:max-w-[425px] bg-card border border-muted/20 text-headline fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[10000] shadow-xl">
+          <DialogHeader>
+            <DialogTitle className="font-ogg text-headline text-2xl">Create a Server</DialogTitle>
+            <DialogDescription className="text-paragraph">
+              Give your server a name and an optional icon.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="flex flex-col items-center mb-6">
+                <div className="relative">
+                  <Avatar className="w-24 h-24 border-2 border-muted/20">
+                    {previewUrl ? (
+                      <AvatarImage src={previewUrl} alt="Server icon" />
+                    ) : (
+                      <AvatarFallback className="bg-button text-headline text-xl">
+                        {form.watch("name") ? form.watch("name").charAt(0).toUpperCase() : "S"}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  {previewUrl && (
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="icon" 
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-white"
+                      onClick={clearPreview}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   )}
-                </Avatar>
-                {previewUrl && (
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    size="icon" 
-                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-white"
-                    onClick={clearPreview}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
+                </div>
+                <Input
+                  id="serverIcon"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => document.getElementById("serverIcon")?.click()}
+                >
+                  {previewUrl ? "Change Icon" : "Upload Icon"}
+                </Button>
               </div>
-              <Input
-                id="serverIcon"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageUpload}
+              
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="font-pitch-sans-medium text-headline">Server Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter a server name"
+                        {...field}
+                        className="font-pitch-sans-medium text-paragraph focus:bg-white focus:text-black"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <Button
-                type="button"
-                variant="outline"
-                className="mt-4"
-                onClick={() => document.getElementById("serverIcon")?.click()}
-              >
-                {previewUrl ? "Change Icon" : "Upload Icon"}
-              </Button>
-            </div>
-            
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-pitch-sans-medium text-headline">Server Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter a server name"
-                      {...field}
-                      className="font-pitch-sans-medium text-paragraph focus:bg-white focus:text-black"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                className="font-pitch-sans-medium"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="bg-button hover:bg-button/80 text-headline font-pitch-sans-medium"
-                disabled={createServerMutation.isPending}
-              >
-                {createServerMutation.isPending ? "Creating..." : "Create Server"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
+              
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  className="font-pitch-sans-medium"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-button hover:bg-button/80 text-headline font-pitch-sans-medium"
+                  disabled={createServerMutation.isPending}
+                >
+                  {createServerMutation.isPending ? "Creating..." : "Create Server"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </DialogPortal>
     </Dialog>
   );
 }

@@ -17,7 +17,6 @@ function RouteComponent() {
     const [open, setOpen] = useState(false);
   
   const handleOpenChange = (newState: boolean) => {
-    console.log("Mobile sidebar state changing to:", newState);
     setOpen(newState);
     };
 

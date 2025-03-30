@@ -23,7 +23,6 @@ export function MobileSidebar({
 }: MobileSidebarProps) {
   // Debug logging
   useEffect(() => {
-    console.log("Rendering mobile sidebar with open state:", open);
   }, [open]);
 
   return (

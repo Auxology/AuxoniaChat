@@ -15,6 +15,7 @@ import { createServer } from 'http'; // Add this import
 import { initSocketManager } from './libs/socket'; // Add this import
 import channelRoute from './routes/channel';
 import serverRoute from './routes/serverRoute';
+import compression from 'compression';
 
 // App Config
 dotenv.config();
@@ -29,6 +30,7 @@ const server = createServer(app);
 // Initialize Socket.IO
 const io = initSocketManager(server);
 
+app.use(compression());
 // Middlewares
 app.use(cors(
     {

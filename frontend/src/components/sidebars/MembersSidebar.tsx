@@ -43,13 +43,17 @@ export function MembersSidebar({
   const regularMembers = members.filter(member => member.role === 'member');
 
   if (!membersOpen) {
-    return (
-      <div className="w-0 bg-sidebar border-l border-muted/20 overflow-hidden transition-all" />
-    );
+    return null; // Don't render anything when closed
   }
 
   return (
-    <div className="w-60 bg-sidebar border-l border-muted/20 overflow-hidden transition-all">
+    <div className={cn(
+      "bg-sidebar border-l border-muted/20 overflow-hidden transition-all",
+      // Full width and fixed position on mobile
+      "md:w-60 md:static md:block",
+      // Fixed position on mobile devices for overlay appearance
+      "fixed top-12 bottom-0 right-0 w-full max-w-[250px] z-40",
+    )}>
       <div className="h-full flex flex-col">
         {/* Members Header */}
         <div className="h-12 border-b border-muted/20 flex items-center px-4 justify-between">
@@ -58,7 +62,6 @@ export function MembersSidebar({
             variant="ghost"
             size="sm"
             onClick={() => setMembersOpen(false)}
-            className="md:hidden"
           >
             <X className="h-4 w-4" />
           </Button>

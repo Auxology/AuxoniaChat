@@ -1,6 +1,7 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { Toaster } from "sonner";
+import { useSocket } from "@/hooks/useSocket";
 
 const queryClient = new QueryClient();
 
@@ -9,6 +10,7 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
+  useSocket();
     
   return (
     <QueryClientProvider client={queryClient}>

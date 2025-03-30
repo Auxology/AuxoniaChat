@@ -153,7 +153,7 @@ function RouteComponent() {
       </div>
 
       {/* Main content area */}
-      <div className="flex-1 flex">
+      <div className="flex-1 flex flex-col md:flex-row relative">
         {/* Server Content */}
         <div className="flex-1 flex flex-col max-w-full">
           {/* Header */}
@@ -194,21 +194,11 @@ function RouteComponent() {
             </div>
 
             <div className="ml-auto flex items-center">
-              {/* Mobile Members Toggle */}
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="md:hidden"
-                onClick={() => setMembersOpen(!membersOpen)}
-              >
-                <Users className="h-5 w-5" />
-              </Button>
-              
-              {/* Desktop Members Toggle */}
+              {/* Members Toggle Button */}
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="hidden md:flex items-center gap-1"
+                className="flex items-center gap-1"
                 onClick={() => setMembersOpen(!membersOpen)}
               >
                 <Users className="h-4 w-4" />
@@ -278,6 +268,14 @@ function RouteComponent() {
             </div>
           </div>
         </div>
+
+        {/* Add a modal backdrop for mobile */}
+        {membersOpen && (
+          <div 
+            className="fixed inset-0 bg-black/20 z-30 md:hidden" 
+            onClick={() => setMembersOpen(false)}
+          />
+        )}
 
         {/* Members Sidebar Component */}
         <MembersSidebar 

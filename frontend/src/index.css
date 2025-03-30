@@ -114,23 +114,36 @@
 
 @font-face {
   font-family: "Ogg TRIAL";
-  src: url('./fonts/OGG/Ogg-Bold-BF646c18fc530f4.ttf');
+  src: url('./fonts/OGG/Ogg-Bold-BF646c18fc530f4.ttf') format('truetype');
+  font-weight: bold;
+  font-display: swap; /* This ensures text remains visible during font loading */
+  font-style: normal;
 }
 
 @font-face {
   font-family: "Ogg Extra Bold";
-  src: url('./fonts/OGG/OggText-Extrabold-BF646c18fc4bcfe.ttf');
+  src: url('./fonts/OGG/OggText-Extrabold-BF646c18fc4bcfe.ttf') format('truetype');
+  font-weight: 800;
+  font-display: swap;
+  font-style: normal;
 }
 
 @font-face {
   font-family: "Pitch Sans Medium";
-  src: url('./fonts/Pitch/PitchSans-Medium.ttf');
+  src: url('./fonts/Pitch/PitchSans-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
 }
 
 @font-face {
   font-family: FreightTextProBlack-Regular;
-  src: url("./fonts/Freight/FreightTextProBlack-Regular.ttf");
+  src: url("./fonts/Freight/FreightTextProBlack-Regular.ttf") format('truetype');
+  font-weight: normal;
+  font-display: swap;
+  font-style: normal;
 }
+
 
 @theme {
   --font-ogg: Ogg TRIAL, serif;
