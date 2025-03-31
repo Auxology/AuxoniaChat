@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useSocket } from '@/hooks/useSocket';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 
 // Types
 interface Server {
@@ -126,7 +126,7 @@ export function MembersSidebar({
 
 // Member Item Component
 function MemberItem({ member }: { member: Member }) {
-  const { isOnline } = useSocket();
+  const { isOnline } = useOnlineStatus(); // Using the simplified hook
   const isUserOnline = isOnline(member.id);
 
   // Status indicator based on online status

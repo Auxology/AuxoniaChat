@@ -2,7 +2,6 @@ import {createFileRoute} from '@tanstack/react-router'
 import { useState } from "react"
 import { Sidebar } from "@/components/sidebars/sidebar";
 import { requireAuth } from '@/utils/routeGuards';
-import { useSocket } from '@/hooks/useSocket'
 import { MobileSidebar } from "@/components/sidebars/mobile-sidebar";
 
 export const Route = createFileRoute('/chat/')({
@@ -13,7 +12,6 @@ export const Route = createFileRoute('/chat/')({
 })
 
 function RouteComponent() {
-    useSocket()
     const [open, setOpen] = useState(false);
   
   const handleOpenChange = (newState: boolean) => {

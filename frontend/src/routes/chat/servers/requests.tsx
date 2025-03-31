@@ -29,7 +29,6 @@ import {
 } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import { requireAuth } from "@/utils/routeGuards"
-import { useSocket } from '@/hooks/useSocket'
 
 export const Route = createFileRoute('/chat/servers/requests')({
   beforeLoad: async () => {
@@ -44,8 +43,6 @@ function RouteComponent() {
   const { data: incomingRequests, isLoading: incomingLoading } = useIncomingJoinRequests()
   const approveRequest = useApproveJoinRequest()
   const rejectRequest = useRejectJoinRequest()
-  useSocket()
-
   const handleApprove = (requestId: string, serverId: string) => {
     approveRequest.mutate({ requestId, serverId })
   }

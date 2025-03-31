@@ -118,7 +118,10 @@ export function useLeaveServer() {
 
     return useMutation({
         mutationFn: async (serverId: string) => {
-            const response = await axiosInstance.post("/servers/leave", { serverId });
+            // Send server id to body
+            const response = await axiosInstance.post("/servers/leave", { 
+                serverId // Make sure serverId is properly passed in the body
+            });
             return response.data;
         },
         onSuccess: () => {

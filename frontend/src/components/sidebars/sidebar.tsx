@@ -351,7 +351,7 @@ function ServerIcon({ server }: { server: Server }) {
   // Handle leaving server
   const handleLeaveServer = async () => {
     try {
-      await axiosInstance.post(`/servers/${server.id}/leave`);
+      await axiosInstance.post("/servers/leave", { serverId: server.id });
       toast.success(`Left ${server.name}`);
       // Refresh the server list
       queryClient.invalidateQueries({ queryKey: ["userServers"] });
