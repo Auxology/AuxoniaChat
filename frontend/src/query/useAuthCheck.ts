@@ -7,7 +7,6 @@ export const useAuthCheck = () => {
     queryFn: async () => {
       try {
         const response = await axiosInstance.get('/login/isAuthenticated')
-        console.log(response.data)
         return response.data;
       } catch (error) {
         return false;

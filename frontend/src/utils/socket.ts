@@ -28,13 +28,11 @@ const setupSocketListeners = (userId: string) => {
   if (!socket) return;
 
   socket.on('connect', () => {
-    console.log('Connected to socket server');
     addOnlineUser(userId);
   });
 
   socket.on('disconnect', () => {
-    console.log('Disconnected from socket server');
-  });
+    removeOnlineUser(userId);});
 
   socket.on('user:online', (userId: string) => {
     addOnlineUser(userId);

@@ -1,18 +1,19 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useEffect, } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query"; // Add useQueryClient
 import { Button } from "@/components/ui/button";
 import { Users, Plus} from "lucide-react";
 import { Sidebar } from "@/components/sidebars/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { requireAuth } from '@/utils/routeGuards';
 import { axiosInstance } from "@/lib/axios";
 import { toast } from "sonner";
 import { MembersSidebar } from "@/components/sidebars/MembersSidebar";
 import { CreateChannelDialog } from "@/components/create-channel";
 import { MobileSidebar } from "@/components/sidebars/mobile-sidebar";
+import { useGetMessages } from '@/query/useMessages';
+import { MessagesList } from '@/components/messages/MessagesList';
+import { MessageInput } from '@/components/messages/MessageInput'; // Import new component
 
 // Types
 interface Server {
@@ -75,6 +76,7 @@ export const Route = createFileRoute('/chat/servers/$serverId')({
 function RouteComponent() {
   const { serverId } = Route.useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient(); // Add this for query invalidation
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [membersOpen, setMembersOpen] = useState(true); // Members sidebar is open by default on desktop
   const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
@@ -85,6 +87,13 @@ function RouteComponent() {
     isLoading: isLoadingServer,
     error: serverError
   } = useServerDetails(serverId);
+
+  // Handle gettings messages
+  const {
+    data: messages,
+    isLoading: isLoadingMessages,
+    error: messagesError,
+  } = useGetMessages(serverId);
 
   // Handle server error
   useEffect(() => {
@@ -132,16 +141,21 @@ function RouteComponent() {
   };
 
   // Handle send message
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    const form = e.target as HTMLFormElement;
-    const input = form.elements.namedItem('message') as HTMLInputElement;
-    const message = input.value.trim();
-
-    if (message) {
-      // Here you'll integrate with your WebSocket/chat service
-      console.log("Sending message:", message);
-      input.value = '';
+  const handleSendMessage = async (messageContent: string) => {
+    try {
+      // Here you would normally send via API
+      await axiosInstance.post(`/messages/${serverId}`, {
+        content: messageContent,
+      });
+      
+      // Invalidate and refetch messages
+      queryClient.invalidateQueries({ queryKey: ['messages', serverId] });
+      
+      // Optional: show success toast
+      // toast.success("Message sent");
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      toast.error("Failed to send message");
     }
   };
 
@@ -210,62 +224,17 @@ function RouteComponent() {
           {/* Chat content area with messages */}
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Messages area */}
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
-                {/* Welcome message */}
-                <div className="flex flex-col items-center justify-center p-6 text-center">
-                  {isLoadingServer ? (
-                    <div className="w-16 h-16 rounded-full bg-muted/20 animate-pulse mb-4"></div>
-                  ) : server?.iconUrl ? (
-                    <Avatar className="h-16 w-16 mb-4">
-                      <AvatarImage src={server.iconUrl} alt={server.name || "Server"} />
-                      <AvatarFallback className="bg-button text-headline">
-                        {getServerInitial()}
-                      </AvatarFallback>
-                    </Avatar>
-                  ) : (
-                    <div className="h-16 w-16 rounded-full bg-button flex items-center justify-center text-headline text-2xl mb-4">
-                      {getServerInitial()}
-                    </div>
-                  )}
-                  <h2 className="font-ogg text-headline text-2xl mb-2">
-                    Welcome to {isLoadingServer ? '...' : server?.name || 'the server'}
-                  </h2>
-                  <p className="text-paragraph text-sm max-w-md">
-                    This is the start of the conversation. Messages you send here will be seen by everyone in this server.
-                  </p>
-                </div>
-              </div>
-            </ScrollArea>
+            <MessagesList 
+              messages={messages}
+              isLoading={isLoadingMessages}
+              error={messagesError as Error | null}
+            />
 
             {/* Message input */}
-            <div className="p-4 border-t border-muted/20">
-              <form onSubmit={handleSendMessage} className="relative">
-                <Input
-                  name="message"
-                  placeholder="Send a message..."
-                  className="bg-card pr-10 font-pitch-sans-medium text-paragraph focus:bg-card/80"
-                />
-                <Button 
-                  type="submit" 
-                  size="sm" 
-                  className="absolute right-1 top-1/2 -translate-y-1/2 bg-transparent hover:bg-button/10 p-1"
-                >
-                  <svg 
-                    viewBox="0 0 24 24" 
-                    className="w-5 h-5 text-button rotate-90" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round"
-                  >
-                    <path d="M12 19V5M5 12l7-7 7 7" />
-                  </svg>
-                  <span className="sr-only">Send</span>
-                </Button>
-              </form>
-            </div>
+            <MessageInput 
+              onSendMessage={handleSendMessage} 
+              disabled={isLoadingMessages} 
+            />
           </div>
         </div>
 

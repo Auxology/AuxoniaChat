@@ -31,10 +31,8 @@ type VerifyFormData = z.infer<typeof verifySchema>
 export const Route = createFileRoute('/login/verify')({
   beforeLoad: async () => {
     try {
-      console.log("Checking 2FA session...")
       // Check if user has valid 2FA session
       await axiosInstance.post('/login/verify/check')
-      console.log("2FA session valid, checking auth...")
       return await requireNonAuth();
     } catch (error) {
       console.error("Verify page error:", error)
