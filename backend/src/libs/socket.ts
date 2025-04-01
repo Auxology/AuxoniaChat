@@ -24,8 +24,6 @@ export function initSocketManager(server: HttpServer) {
             return;
         }
 
-        console.log('User connected', userId);
-
         onlineUsers.set(userId, socket.id);
 
         // Join user to their personal room for targeted events
@@ -46,8 +44,13 @@ export function initSocketManager(server: HttpServer) {
             }
         });
 
+        // Handle sending the messages, through the server room
+        socket.on('message', (data) => {
+            const { serverId, message } = data;
+            socket.to(`server:${serverId}`).emit('message', message);
+        });
+
         socket.on('disconnect', () => {
-            console.log('User disconnected', userId);
             onlineUsers.delete(userId);
             userServers.delete(userId);
 

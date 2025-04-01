@@ -16,8 +16,6 @@ export async function protectRecovery(req: Request, res: Response, next: Functio
     //2. Decode jwt token
     const decoded = decodeJWT(token) as {userId: string, sessionToken:string};
 
-    console.log(decoded);
-
     if (!decoded) {
         res.status(401).json({error: 'Unauthorized'});
         return;
@@ -27,7 +25,6 @@ export async function protectRecovery(req: Request, res: Response, next: Functio
     const isValid:boolean = await checkRecoverySession(decoded.userId, decoded.sessionToken);
 
     if (!isValid) {
-        console.log(`${decoded.userId} is invalid`);
         res.status(401).json({error: 'Unauthorized'});
         return;
     }

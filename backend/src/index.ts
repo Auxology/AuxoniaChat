@@ -16,6 +16,7 @@ import { initSocketManager } from './libs/socket'; // Add this import
 import channelRoute from './routes/channel';
 import serverRoute from './routes/serverRoute';
 import compression from 'compression';
+import messageRoute from "./routes/messageRoute";
 
 // App Config
 dotenv.config();
@@ -55,6 +56,7 @@ app.use('/api', recoveryRoute);
 app.use('/api', userRoute);
 app.use('/api', serverRoute);
 app.use('/api', channelRoute);
+app.use('/api', messageRoute)
 
 // Server - Use the HTTP server instead of app to listen
 server.listen(port, async () => {

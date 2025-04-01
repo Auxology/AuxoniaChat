@@ -74,7 +74,6 @@ export const getChannels = async (req: Request, res: Response): Promise<void> =>
         const isMemberOfServer:boolean = await checkIfUserIsMember(userId, serverId);
 
         if(!isMemberOfServer){
-            console.log('User is not a member of server');
             res.status(403).send('Forbidden');
             return;
         }
