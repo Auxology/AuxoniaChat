@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { motion } from "motion/react"
 import { ArrowLeft } from "lucide-react"
 import { axiosInstance } from "@/lib/axios.ts"
-import { useRecoveryNewEmail } from "@/query/useRecoveryNewEmail.ts"
+import { useRecoveryNewEmail } from "@/actions/useRecoveryActions"
 import { EmailFormData, emailSchema } from "@/lib/zod.ts"
 
 export const Route = createFileRoute('/recover-account/new-email')({

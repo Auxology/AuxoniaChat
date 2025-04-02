@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { motion } from "motion/react"
 import { useState } from "react"
-import { useForgotPasswordFinish } from "@/query/useForgotPasswordFinish.ts"
+import { useForgotPasswordFinish } from "@/actions/useForgotPasswordActions"
 import { passwordSchema } from "@/lib/zod.ts"
 import { CheckCircle, AlertCircle } from "lucide-react"
 

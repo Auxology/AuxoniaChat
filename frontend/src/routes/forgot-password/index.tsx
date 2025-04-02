@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
-import { useForgotPassword } from "@/query/useForgotPassword";
+import { useForgotPassword } from "@/actions/useForgotPasswordActions";
 import { requireNonAuth } from '@/utils/routeGuards';
 
 // Form validation schema

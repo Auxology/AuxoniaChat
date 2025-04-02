@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createNewChannel, getServerChannels, getServerRole } from '../utils/channel';
+import { createNewChannel, getChannelDetailsById, getServerChannels, getServerRole } from '../utils/channel';
 import { randomUUID } from 'crypto';
 import { checkIfUserIsMember } from '../utils/server';
 
@@ -85,5 +85,29 @@ export const getChannels = async (req: Request, res: Response): Promise<void> =>
     catch(error){
         console.error('Error getting channels:', error);
         res.status(500).send('Error getting channels');
+    }
+}
+
+export const getChannelDetails = async (req: Request, res: Response): Promise<void> => {
+    try {
+        if(!req.session.isAuthenticated) {
+            res.status(401).send('Unauthorized');
+            return;
+        }
+
+        const channelId:string = req.params.channelId;
+
+        const details = await getChannelDetailsById(channelId);
+
+        if (!details) {
+            res.status(404).send('Channel not found');
+            return;
+        }
+
+        res.status(200).json(details);
+    }
+    catch(error) {
+        console.error('Error getting channel details:', error);
+        res.status(500).send('Error getting channel details');
     }
 }

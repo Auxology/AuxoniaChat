@@ -16,8 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { motion } from "motion/react"
 import { useState, useEffect } from "react"
-import { useSignUpVerify } from "@/query/useSignUpVerify.ts"
-import { useStartSignUp } from "@/query/useSignUp.ts"
+import { useStartSignUp, useSignUpVerify } from "@/actions/useSignUpActions"
 
 const verifySchema = z.object({
   code: z.string().min(8, "Verification code must be 8 characters").max(8, "Verification code must be 8 characters"),

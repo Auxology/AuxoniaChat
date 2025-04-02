@@ -17,8 +17,8 @@ import { motion } from "motion/react"
 import { ArrowLeft, Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { axiosInstance } from "@/lib/axios"
-import { useLoginVerify } from "@/query/useLoginVerify"
-import { useResendCode } from "@/query/useResendCode"
+import { useLoginVerify } from "@/actions/useLoginActions"
+import { useResendCode } from "@/actions/useLoginActions"
 import { requireNonAuth } from '@/utils/routeGuards'
 
 // Form validation schema

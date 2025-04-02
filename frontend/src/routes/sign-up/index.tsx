@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { motion } from "motion/react"
-import {useStartSignUp} from "@/query/useSignUp.ts";
+import {useStartSignUp} from "@/actions/useSignUpActions";
 import {EmailFormData, emailSchema} from "@/lib/zod.ts";
 import {requireNonAuth} from "@/utils/routeGuards";
 

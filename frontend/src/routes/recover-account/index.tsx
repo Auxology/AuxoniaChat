@@ -16,7 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator"
 import { motion } from "motion/react"
 import { ArrowLeft } from "lucide-react"
-import { useRecovery } from "@/query/useRecovery.ts"
+import { useRecovery } from "@/actions/useRecoveryActions"
 import { requireNonAuth } from '@/utils/routeGuards'
 
 // Form validation schema - updated for 20 character format

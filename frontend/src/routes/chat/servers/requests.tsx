@@ -2,7 +2,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from "react"
 import { motion } from "motion/react"
 import { Link } from "@tanstack/react-router"
-import { useSentJoinRequests, useIncomingJoinRequests, useApproveJoinRequest, useRejectJoinRequest } from "@/query/useServerActions"
+import { useApproveJoinRequest, useRejectJoinRequest } from "@/actions/useServerActions"
+import { useSentJoinRequests, useIncomingJoinRequests,  } from '@/queries/ServerQueries'
 import { 
   Card, 
   CardContent,

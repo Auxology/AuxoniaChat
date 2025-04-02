@@ -24,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { X } from "lucide-react";
-import { useCreateServer } from "@/query/useServerActions";
+import { useCreateServer } from "@/actions/useServerActions";
 import { toast } from "sonner";
 
 // Updated schema to make iconUrl optional

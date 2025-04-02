@@ -1,5 +1,6 @@
 import { query } from "../db/pg";
 
+// This function creates a new channel in the database
 export async function createNewChannel(channelData: {
     id: string,
     serverId: string,
@@ -32,6 +33,7 @@ export async function getServerRole(userId: string, serverId: string): Promise<s
     }
 }
 
+// This gets all channels for a server
 export async function getServerChannels(serverId: string): Promise<any[]> {
     try {
         const { rows } = await query(`
@@ -44,6 +46,22 @@ export async function getServerChannels(serverId: string): Promise<any[]> {
         return rows;
     } catch (error) {
         console.error('Error getting server channels:', error);
+        throw error;
+    }
+}
+
+// This will get specific channel details
+export async function getChannelDetailsById(channelId: string): Promise<any> {
+    try {
+        const { rows } = await query(`
+            SELECT id, name, description
+            FROM app.channels
+            WHERE id = $1
+        `, [channelId]);
+        
+        return rows.length > 0 ? rows[0] : null;
+    } catch (error) {
+        console.error('Error getting channel details:', error);
         throw error;
     }
 }

@@ -36,6 +36,7 @@ import { Route as ForgotPasswordFinishImport } from './routes/forgot-password/fi
 import { Route as Errors429Import } from './routes/errors/429'
 import { Route as ChatServersRequestsImport } from './routes/chat/servers/requests'
 import { Route as ChatServersServerIdImport } from './routes/chat/servers/$serverId'
+import { Route as ChatServersServerIdChannelsChannelIdImport } from './routes/chat/servers/$serverId/channels/$channelId'
 
 // Create Virtual Routes
 
@@ -202,6 +203,13 @@ const ChatServersServerIdRoute = ChatServersServerIdImport.update({
   path: '/chat/servers/$serverId',
   getParentRoute: () => rootRoute,
 } as any)
+
+const ChatServersServerIdChannelsChannelIdRoute =
+  ChatServersServerIdChannelsChannelIdImport.update({
+    id: '/channels/$channelId',
+    path: '/channels/$channelId',
+    getParentRoute: () => ChatServersServerIdRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -389,10 +397,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatServersRequestsImport
       parentRoute: typeof rootRoute
     }
+    '/chat/servers/$serverId/channels/$channelId': {
+      id: '/chat/servers/$serverId/channels/$channelId'
+      path: '/channels/$channelId'
+      fullPath: '/chat/servers/$serverId/channels/$channelId'
+      preLoaderRoute: typeof ChatServersServerIdChannelsChannelIdImport
+      parentRoute: typeof ChatServersServerIdImport
+    }
   }
 }
 
 // Create and export the route tree
+
+interface ChatServersServerIdRouteChildren {
+  ChatServersServerIdChannelsChannelIdRoute: typeof ChatServersServerIdChannelsChannelIdRoute
+}
+
+const ChatServersServerIdRouteChildren: ChatServersServerIdRouteChildren = {
+  ChatServersServerIdChannelsChannelIdRoute:
+    ChatServersServerIdChannelsChannelIdRoute,
+}
+
+const ChatServersServerIdRouteWithChildren =
+  ChatServersServerIdRoute._addFileChildren(ChatServersServerIdRouteChildren)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -419,8 +446,9 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutIndexLazyRoute
   '/contact': typeof ContactIndexLazyRoute
   '/security': typeof SecurityIndexLazyRoute
-  '/chat/servers/$serverId': typeof ChatServersServerIdRoute
+  '/chat/servers/$serverId': typeof ChatServersServerIdRouteWithChildren
   '/chat/servers/requests': typeof ChatServersRequestsRoute
+  '/chat/servers/$serverId/channels/$channelId': typeof ChatServersServerIdChannelsChannelIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -448,8 +476,9 @@ export interface FileRoutesByTo {
   '/about': typeof AboutIndexLazyRoute
   '/contact': typeof ContactIndexLazyRoute
   '/security': typeof SecurityIndexLazyRoute
-  '/chat/servers/$serverId': typeof ChatServersServerIdRoute
+  '/chat/servers/$serverId': typeof ChatServersServerIdRouteWithChildren
   '/chat/servers/requests': typeof ChatServersRequestsRoute
+  '/chat/servers/$serverId/channels/$channelId': typeof ChatServersServerIdChannelsChannelIdRoute
 }
 
 export interface FileRoutesById {
@@ -478,8 +507,9 @@ export interface FileRoutesById {
   '/about/': typeof AboutIndexLazyRoute
   '/contact/': typeof ContactIndexLazyRoute
   '/security/': typeof SecurityIndexLazyRoute
-  '/chat/servers/$serverId': typeof ChatServersServerIdRoute
+  '/chat/servers/$serverId': typeof ChatServersServerIdRouteWithChildren
   '/chat/servers/requests': typeof ChatServersRequestsRoute
+  '/chat/servers/$serverId/channels/$channelId': typeof ChatServersServerIdChannelsChannelIdRoute
 }
 
 export interface FileRouteTypes {
@@ -511,6 +541,7 @@ export interface FileRouteTypes {
     | '/security'
     | '/chat/servers/$serverId'
     | '/chat/servers/requests'
+    | '/chat/servers/$serverId/channels/$channelId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -539,6 +570,7 @@ export interface FileRouteTypes {
     | '/security'
     | '/chat/servers/$serverId'
     | '/chat/servers/requests'
+    | '/chat/servers/$serverId/channels/$channelId'
   id:
     | '__root__'
     | '/'
@@ -567,6 +599,7 @@ export interface FileRouteTypes {
     | '/security/'
     | '/chat/servers/$serverId'
     | '/chat/servers/requests'
+    | '/chat/servers/$serverId/channels/$channelId'
   fileRoutesById: FileRoutesById
 }
 
@@ -595,7 +628,7 @@ export interface RootRouteChildren {
   AboutIndexLazyRoute: typeof AboutIndexLazyRoute
   ContactIndexLazyRoute: typeof ContactIndexLazyRoute
   SecurityIndexLazyRoute: typeof SecurityIndexLazyRoute
-  ChatServersServerIdRoute: typeof ChatServersServerIdRoute
+  ChatServersServerIdRoute: typeof ChatServersServerIdRouteWithChildren
   ChatServersRequestsRoute: typeof ChatServersRequestsRoute
 }
 
@@ -624,7 +657,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutIndexLazyRoute: AboutIndexLazyRoute,
   ContactIndexLazyRoute: ContactIndexLazyRoute,
   SecurityIndexLazyRoute: SecurityIndexLazyRoute,
-  ChatServersServerIdRoute: ChatServersServerIdRoute,
+  ChatServersServerIdRoute: ChatServersServerIdRouteWithChildren,
   ChatServersRequestsRoute: ChatServersRequestsRoute,
 }
 
@@ -739,10 +772,17 @@ export const routeTree = rootRoute
       "filePath": "security/index.lazy.tsx"
     },
     "/chat/servers/$serverId": {
-      "filePath": "chat/servers/$serverId.tsx"
+      "filePath": "chat/servers/$serverId.tsx",
+      "children": [
+        "/chat/servers/$serverId/channels/$channelId"
+      ]
     },
     "/chat/servers/requests": {
       "filePath": "chat/servers/requests.tsx"
+    },
+    "/chat/servers/$serverId/channels/$channelId": {
+      "filePath": "chat/servers/$serverId/channels/$channelId.tsx",
+      "parent": "/chat/servers/$serverId"
     }
   }
 }

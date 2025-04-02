@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { motion } from "motion/react"
 import { useState } from "react"
-import { useFinishSignUp } from "@/query/useSignUpFinish.ts"
+import { useFinishSignUp } from "@/actions/useSignUpActions"
 import { passwordSchema, usernameSchema } from "@/lib/zod.ts"
 import { CheckCircle, AlertCircle, Copy, Check } from "lucide-react"
 

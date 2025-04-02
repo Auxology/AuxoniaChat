@@ -1,4 +1,4 @@
-import {QueryClient, useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {QueryClient, useMutation, useQueryClient} from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/axios";
 import { toast } from "sonner";
 import {AxiosError} from "axios";
@@ -9,6 +9,7 @@ export interface Server {
     id: string;
     name: string;
     iconUrl: string | null;
+    ownerId: string;
 }
 
 interface CreateServerRequest {
@@ -62,23 +63,6 @@ export function useCreateServer() {
             });
             console.error("Server creation error:", error);
         },
-    });
-}
-
-// Get user servers query
-export function useUserServers() {
-    return useQuery({
-        queryKey: ["userServers"],
-        queryFn: async () => {
-            try {
-                const response = await axiosInstance.get("/servers/get");
-                return Array.isArray(response.data) ? response.data : [];
-            } catch (error) {
-                console.error("Failed to fetch servers:", error);
-                return [];
-            }
-        },
-        staleTime: 1000 * 60 * 2, // 2 minutes
     });
 }
 
@@ -183,25 +167,6 @@ export function useDeleteServer() {
     });
 }
 
-export function useSearchServers(searchTerm: string) {
-    return useQuery({
-        queryKey: ["searchServers", searchTerm],
-        queryFn: async () => {
-            try {
-                const response = await axiosInstance.get("/servers/search", {
-                    params: { q: searchTerm }
-                });
-                return Array.isArray(response.data) ? response.data : [];
-            } catch (error) {
-                console.error("Failed to search servers:", error);
-                return [];
-            }
-        },
-        enabled: Boolean(searchTerm) && searchTerm.length > 2,
-        staleTime: 1000 * 30, // 30 seconds, to keep the data fresh
-    });
-}
-
 export function useRequestJoinServer() {
     return useMutation({
         mutationFn: async (serverId: string) => {
@@ -225,17 +190,6 @@ export function useRequestJoinServer() {
         },
     });
     
-}
-// Get join requests for a server
-export function useServerJoinRequests(serverId: string) {
-    return useQuery({
-        queryKey: ["serverJoinRequests", serverId],
-        queryFn: async () => {
-            const response = await axiosInstance.get(`/servers/${serverId}/join-requests`);
-            return response.data;
-        },
-        enabled: Boolean(serverId)
-    });
 }
 
 export function useApproveJoinRequest() {
@@ -294,25 +248,3 @@ export function useRejectJoinRequest() {
         },
     });
 }
-
-// Get all sent join requests by the current user
-export function useSentJoinRequests() {
-    return useQuery({
-      queryKey: ["sentJoinRequests"],
-      queryFn: async () => {
-        const response = await axiosInstance.get("/servers/requests/sent");
-        return response.data;
-      }
-    });
-  }
-  
-  // Get all incoming join requests for servers where the user is admin/owner
-  export function useIncomingJoinRequests() {
-    return useQuery({
-      queryKey: ["incomingJoinRequests"],
-      queryFn: async () => {
-        const response = await axiosInstance.get("/servers/requests/incoming");
-        return response.data;
-      }
-    });
-  }

@@ -19,7 +19,7 @@ import {
 import { CreateServerDialog } from "../create-server";
 import { JoinServerDialog } from "../join-server";
 import { ServerSearchDialog } from "../server-search-dialog";
-import { Server, useUserServers } from "@/query/useServerActions";
+import { Server } from "@/actions/useServerActions";
 import { toast } from "sonner";
 import { 
   ContextMenu,
@@ -28,6 +28,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { useQueryClient } from "@tanstack/react-query";
+import { useUserServers } from "@/queries/ServerQueries";
 
 // User data interface
 interface UserData {

@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { motion } from "motion/react"
 import { Separator } from "@/components/ui/separator"
-import { useLogin } from "@/query/useLogin.ts"
+import { useLogin } from "@/actions/useLoginActions"
 import { requireNonAuth } from '@/utils/routeGuards'
 
 // Form validation schema

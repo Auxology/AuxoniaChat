@@ -7,7 +7,7 @@ const getMessagesForServer = async (serverId: string) => {
 }
 
 // This function will return the messages for a server
-export const useGetMessages = (serverId: string) => {
+export const useServerMessages = (serverId: string) => {
     return useQuery({
         queryKey: ['messages', serverId],
         queryFn: () => getMessagesForServer(serverId),

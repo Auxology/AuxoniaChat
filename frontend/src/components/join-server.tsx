@@ -20,7 +20,7 @@ import {
   FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useRequestJoinServer } from "@/query/useServerActions";
+import { useRequestJoinServer } from "@/actions/useServerActions";
 
 // Schema for server join form
 const joinServerSchema = z.object({

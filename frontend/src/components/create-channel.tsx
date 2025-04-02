@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useCreateChannel } from "@/query/useChannel";
+import { useCreateChannel } from "@/actions/useChannelActions";
 import { Hash } from "lucide-react";
 
 const channelSchema = z.object({

@@ -7,7 +7,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useSearchServers, useRequestJoinServer } from "@/query/useServerActions";
+import { useRequestJoinServer } from "@/actions/useServerActions";
+import { useServerSearch } from "@/queries/ServerQueries";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Search, Loader2 } from "lucide-react";
@@ -20,7 +21,7 @@ interface ServerSearchDialogProps {
 
 export function ServerSearchDialog({ open, onOpenChange }: ServerSearchDialogProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: servers = [], isLoading, isFetching } = useSearchServers(searchTerm);
+  const { data: servers = [], isLoading, isFetching } = useServerSearch(searchTerm);
   const requestJoinMutation = useRequestJoinServer();
 
   // Clear search when dialog closes

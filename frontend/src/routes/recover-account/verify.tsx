@@ -16,8 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { motion } from "motion/react"
 import { ArrowLeft } from "lucide-react"
 import { axiosInstance } from "@/lib/axios.ts"
-import { useRecoveryVerify } from "@/query/useRecoveryVerify.ts"
-import { useRecoveryNewEmail } from "@/query/useRecoveryNewEmail.ts"
+import { useRecoveryVerify, useRecoveryNewEmail } from "@/actions/useRecoveryActions"
 import { useState, useEffect } from "react"
 
 // Form validation schema

@@ -16,7 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { motion } from "motion/react"
 import { Check, X, ArrowLeft } from "lucide-react"
 import { axiosInstance } from "@/lib/axios.ts"
-import { useRecoveryFinish } from "@/query/useRecoveryFinish.ts"
+import { useRecoveryFinish } from "@/actions/useRecoveryActions"
 import { useState, useEffect } from "react"
 
 // Password validation schema with specific requirements

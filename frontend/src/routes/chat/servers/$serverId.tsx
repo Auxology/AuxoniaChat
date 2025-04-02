@@ -1,8 +1,8 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, useNavigate, Outlet, useMatches } from '@tanstack/react-router';
 import { useState, useEffect, } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query"; // Add useQueryClient
+import { useQuery } from "@tanstack/react-query"; 
 import { Button } from "@/components/ui/button";
-import { Users, Plus} from "lucide-react";
+import { Users } from "lucide-react";
 import { Sidebar } from "@/components/sidebars/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { requireAuth } from '@/utils/routeGuards';
@@ -11,9 +11,8 @@ import { toast } from "sonner";
 import { MembersSidebar } from "@/components/sidebars/MembersSidebar";
 import { CreateChannelDialog } from "@/components/create-channel";
 import { MobileSidebar } from "@/components/sidebars/mobile-sidebar";
-import { useGetMessages } from '@/query/useMessages';
-import { MessagesList } from '@/components/messages/MessagesList';
-import { MessageInput } from '@/components/messages/MessageInput'; // Import new component
+import { ServerChannelsSidebar } from '@/components/sidebars/ServerChannelsSidebar';
+import { MobileChannelsSidebar } from '@/components/sidebars/mobile-channels-sidebar';
 
 // Types
 interface Server {
@@ -76,10 +75,16 @@ export const Route = createFileRoute('/chat/servers/$serverId')({
 function RouteComponent() {
   const { serverId } = Route.useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient(); // Add this for query invalidation
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [membersOpen, setMembersOpen] = useState(true); // Members sidebar is open by default on desktop
+  const [membersOpen, setMembersOpen] = useState(true);
   const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
+  const [channelSidebarOpen, setChannelSidebarOpen] = useState(false);
+  
+  // Check if we're at a channel route
+  const matches = useMatches();
+  const isChannelRoute = matches.some(match => 
+    match.routeId.includes('/chat/servers/$serverId/channels/$channelId')
+  );
 
   // Fetch server details using custom hook
   const {
@@ -87,13 +92,6 @@ function RouteComponent() {
     isLoading: isLoadingServer,
     error: serverError
   } = useServerDetails(serverId);
-
-  // Handle gettings messages
-  const {
-    data: messages,
-    isLoading: isLoadingMessages,
-    error: messagesError,
-  } = useGetMessages(serverId);
 
   // Handle server error
   useEffect(() => {
@@ -140,25 +138,6 @@ function RouteComponent() {
     return server.name.charAt(0).toUpperCase();
   };
 
-  // Handle send message
-  const handleSendMessage = async (messageContent: string) => {
-    try {
-      // Here you would normally send via API
-      await axiosInstance.post(`/messages/${serverId}`, {
-        content: messageContent,
-      });
-      
-      // Invalidate and refetch messages
-      queryClient.invalidateQueries({ queryKey: ['messages', serverId] });
-      
-      // Optional: show success toast
-      // toast.success("Message sent");
-    } catch (error) {
-      console.error("Failed to send message:", error);
-      toast.error("Failed to send message");
-    }
-  };
-
   return (
     <div className="flex h-screen bg-chat text-headline">
       {/* Desktop Sidebar */}
@@ -168,12 +147,30 @@ function RouteComponent() {
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col md:flex-row relative">
+        {/* Server Channels Sidebar - Hidden on mobile unless toggled */}
+        <div className="hidden md:block h-full">
+          <ServerChannelsSidebar 
+            serverId={serverId}
+            isCurrentUserOwner={isCurrentUserOwner}
+            onCreateChannel={() => setIsCreateChannelOpen(true)}
+          />
+        </div>
+
         {/* Server Content */}
         <div className="flex-1 flex flex-col max-w-full">
           {/* Header */}
           <div className="h-12 border-b border-muted/20 flex items-center px-4">
             {/* Mobile Sidebar Toggle */}
             <MobileSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
+            
+            {/* Channels Sidebar Toggle - Mobile only */}
+            <MobileChannelsSidebar
+              serverId={serverId}
+              isCurrentUserOwner={isCurrentUserOwner}
+              onCreateChannel={() => setIsCreateChannelOpen(true)}
+              open={channelSidebarOpen}
+              onOpenChange={setChannelSidebarOpen}
+            />
             
             {/* Server name and icon */}
             <div className="flex items-center">
@@ -194,17 +191,6 @@ function RouteComponent() {
               <h1 className="font-pitch-sans-medium text-headline">
                 {isLoadingServer ? 'Loading...' : server?.name || 'Server'}
               </h1>
-              {isCurrentUserOwner && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsCreateChannelOpen(true)}
-                  className="ml-2 p-0 h-7 w-7"
-                  title="Create Channel"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              )}
             </div>
 
             <div className="ml-auto flex items-center">
@@ -221,21 +207,17 @@ function RouteComponent() {
             </div>
           </div>
 
-          {/* Chat content area with messages */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Messages area */}
-            <MessagesList 
-              messages={messages}
-              isLoading={isLoadingMessages}
-              error={messagesError as Error | null}
-            />
-
-            {/* Message input */}
-            <MessageInput 
-              onSendMessage={handleSendMessage} 
-              disabled={isLoadingMessages} 
-            />
-          </div>
+          {/* Either show "No channel selected" or render the channel content */}
+          {isChannelRoute ? (
+            <Outlet />
+          ) : (
+            <div className="flex-1 flex items-center justify-center flex-col p-4">
+              <div className="text-center max-w-md">
+                <h2 className="text-xl font-semibold mb-2">Welcome to {server?.name || 'the server'}</h2>
+                <p className="text-muted-foreground mb-4">Select a channel from the sidebar to start chatting</p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Add a modal backdrop for mobile */}
