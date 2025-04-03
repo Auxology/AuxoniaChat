@@ -70,3 +70,16 @@ export function useServerJoinRequests(serverId: string) {
         enabled: Boolean(serverId)
     });
 }
+
+// This is function to get the server details by ID
+export function useServerDetails(serverId: string) {
+    return useQuery({
+        queryKey: ["server", serverId],
+        queryFn: async () => {
+            const response = await axiosInstance.get(`/servers/${serverId}`);
+            return response.data;
+        },
+        enabled: Boolean(serverId),
+        staleTime: 1000 * 60 * 2, // 2 minutes
+    });
+}

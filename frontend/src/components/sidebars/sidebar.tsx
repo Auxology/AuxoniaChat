@@ -408,7 +408,7 @@ function ServerIcon({ server }: { server: Server }) {
         </ContextMenuTrigger>
         <ContextMenuContent className="w-56 bg-card border border-muted/20">
           {isServerOwner ? (
-            <Link to="/chat/servers/$serverId/settings" params={{ serverId: server.id }}>
+              <Link to="/settings/server/$serverId" params={{ serverId: server.id }}>
               <ContextMenuItem className="cursor-pointer text-paragraph hover:text-headline flex items-center gap-2">
                 <Settings className="h-4 w-4" />
                 <span>Server Settings</span>

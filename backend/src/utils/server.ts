@@ -152,6 +152,28 @@ export async function deleteServerWithId(serverId: string): Promise<void> {
                 DELETE FROM app.server_members
                 WHERE server_id = $1
             `, [serverId]);
+
+            // Delete all server related data
+            await query(`
+                DELETE FROM app.server_join_requests
+                WHERE server_id = $1
+            `, [serverId]);
+
+            // Delete server channels
+            await query(`
+                DELETE FROM app.channels
+                WHERE server_id = $1
+            `, [serverId]);
+
+            // Delete server messages
+            await query(`
+                DELETE FROM app.messages
+                WHERE channel_id IN (
+                    SELECT id
+                    FROM app.channels
+                    WHERE server_id = $1
+                )
+            `, [serverId]);
     
             // Delete server
             await query(`
@@ -402,4 +424,32 @@ export async function getServerBasicDetails(serverId: string) {
     `, [serverId]);
     
     return rows.length > 0 ? rows[0] : null;
+}
+
+// This will update server name
+export async function updateServerNameById(serverId: string, newName: string): Promise<void> {
+    try {
+        await query(`
+            UPDATE app.servers
+            SET name = $1
+            WHERE id = $2
+        `, [newName, serverId]);
+    } catch (error) {
+        console.error('Error updating server name:', error);
+        throw error;
+    }
+}
+
+// This will update server icon
+export async function updateServerIconById(serverId: string, iconUrl: string): Promise<void> {
+    try {
+        await query(`
+            UPDATE app.servers
+            SET icon_url = $1
+            WHERE id = $2
+        `, [iconUrl, serverId]);
+    } catch (error) {
+        console.error('Error updating server icon:', error);
+        throw error;
+    }
 }

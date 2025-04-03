@@ -27,7 +27,7 @@ export function ServerChannelsSidebar({
   } = useServerChannels(serverId);
 
   return (
-    <div className={`h-full w-60 bg-sidebar border-r border-muted/20 flex flex-col ${className}`}>
+    <div className={`h-full w-60 bg-sidebar/50 border-r border-muted/20 flex flex-col ${className}`}>
       <div className="p-4 border-b border-muted/20">
         <div className="flex justify-between items-center">
           <h2 className="font-semibold text-sm">Channels</h2>

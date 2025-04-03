@@ -1,19 +1,19 @@
 import { Router } from "express";
 import { isAuthenticated } from "../middlewares/authMiddleware";
-import { 
-  createServer, 
-  deleteServer, 
-  getServerById, 
-  getServerMembers, 
-  getUserServers, 
-  requestJoinServer, 
+import {
+  createServer,
+  deleteServer,
+  getServerById,
+  getServerMembers,
+  getUserServers,
+  requestJoinServer,
   approveJoinRequest,
   rejectJoinRequest,
   getServerJoinRequests,
-  leaveServer, 
-  searchServers, 
+  leaveServer,
+  searchServers,
   getSentJoinRequests,
-  getIncomingJoinRequests
+  getIncomingJoinRequests, updateServerName, updateServerIcon
 } from "../controllers/serverController";
 import { upload } from "../middlewares/multer";
 
@@ -41,7 +41,11 @@ serverRoute.get('/servers/:serverId/join-requests', isAuthenticated, getServerJo
 // This will leave server
 serverRoute.post('/servers/leave', isAuthenticated, leaveServer);
 // With this owner will able to delete server
-serverRoute.post('/servers/delete', isAuthenticated, deleteServer)
+serverRoute.delete('/servers/delete', isAuthenticated, deleteServer)
+// With this owner will update(patch) servers name
+serverRoute.patch('/servers/name/update', isAuthenticated, updateServerName)
+// With this owner will update(patch) servers image
+serverRoute.patch('/servers/icon/update', isAuthenticated, upload.single('server'), updateServerIcon)
 
 // DYNAMIC PARAMETER ROUTES LAST
 // This will get server by id

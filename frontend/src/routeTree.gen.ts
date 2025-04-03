@@ -34,8 +34,11 @@ import { Route as LoginVerifyImport } from './routes/login/verify'
 import { Route as ForgotPasswordVerifyImport } from './routes/forgot-password/verify'
 import { Route as ForgotPasswordFinishImport } from './routes/forgot-password/finish'
 import { Route as Errors429Import } from './routes/errors/429'
+import { Route as SettingsServerServerIdImport } from './routes/settings/server/$serverId'
 import { Route as ChatServersRequestsImport } from './routes/chat/servers/requests'
 import { Route as ChatServersServerIdImport } from './routes/chat/servers/$serverId'
+import { Route as SettingsServerServerIdGeneralImport } from './routes/settings/server/$serverId/general'
+import { Route as SettingsServerServerIdDangerImport } from './routes/settings/server/$serverId/danger'
 import { Route as ChatServersServerIdChannelsChannelIdImport } from './routes/chat/servers/$serverId/channels/$channelId'
 
 // Create Virtual Routes
@@ -192,6 +195,12 @@ const Errors429Route = Errors429Import.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const SettingsServerServerIdRoute = SettingsServerServerIdImport.update({
+  id: '/settings/server/$serverId',
+  path: '/settings/server/$serverId',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const ChatServersRequestsRoute = ChatServersRequestsImport.update({
   id: '/chat/servers/requests',
   path: '/chat/servers/requests',
@@ -203,6 +212,20 @@ const ChatServersServerIdRoute = ChatServersServerIdImport.update({
   path: '/chat/servers/$serverId',
   getParentRoute: () => rootRoute,
 } as any)
+
+const SettingsServerServerIdGeneralRoute =
+  SettingsServerServerIdGeneralImport.update({
+    id: '/general',
+    path: '/general',
+    getParentRoute: () => SettingsServerServerIdRoute,
+  } as any)
+
+const SettingsServerServerIdDangerRoute =
+  SettingsServerServerIdDangerImport.update({
+    id: '/danger',
+    path: '/danger',
+    getParentRoute: () => SettingsServerServerIdRoute,
+  } as any)
 
 const ChatServersServerIdChannelsChannelIdRoute =
   ChatServersServerIdChannelsChannelIdImport.update({
@@ -397,6 +420,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatServersRequestsImport
       parentRoute: typeof rootRoute
     }
+    '/settings/server/$serverId': {
+      id: '/settings/server/$serverId'
+      path: '/settings/server/$serverId'
+      fullPath: '/settings/server/$serverId'
+      preLoaderRoute: typeof SettingsServerServerIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/settings/server/$serverId/danger': {
+      id: '/settings/server/$serverId/danger'
+      path: '/danger'
+      fullPath: '/settings/server/$serverId/danger'
+      preLoaderRoute: typeof SettingsServerServerIdDangerImport
+      parentRoute: typeof SettingsServerServerIdImport
+    }
+    '/settings/server/$serverId/general': {
+      id: '/settings/server/$serverId/general'
+      path: '/general'
+      fullPath: '/settings/server/$serverId/general'
+      preLoaderRoute: typeof SettingsServerServerIdGeneralImport
+      parentRoute: typeof SettingsServerServerIdImport
+    }
     '/chat/servers/$serverId/channels/$channelId': {
       id: '/chat/servers/$serverId/channels/$channelId'
       path: '/channels/$channelId'
@@ -420,6 +464,22 @@ const ChatServersServerIdRouteChildren: ChatServersServerIdRouteChildren = {
 
 const ChatServersServerIdRouteWithChildren =
   ChatServersServerIdRoute._addFileChildren(ChatServersServerIdRouteChildren)
+
+interface SettingsServerServerIdRouteChildren {
+  SettingsServerServerIdDangerRoute: typeof SettingsServerServerIdDangerRoute
+  SettingsServerServerIdGeneralRoute: typeof SettingsServerServerIdGeneralRoute
+}
+
+const SettingsServerServerIdRouteChildren: SettingsServerServerIdRouteChildren =
+  {
+    SettingsServerServerIdDangerRoute: SettingsServerServerIdDangerRoute,
+    SettingsServerServerIdGeneralRoute: SettingsServerServerIdGeneralRoute,
+  }
+
+const SettingsServerServerIdRouteWithChildren =
+  SettingsServerServerIdRoute._addFileChildren(
+    SettingsServerServerIdRouteChildren,
+  )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -448,6 +508,9 @@ export interface FileRoutesByFullPath {
   '/security': typeof SecurityIndexLazyRoute
   '/chat/servers/$serverId': typeof ChatServersServerIdRouteWithChildren
   '/chat/servers/requests': typeof ChatServersRequestsRoute
+  '/settings/server/$serverId': typeof SettingsServerServerIdRouteWithChildren
+  '/settings/server/$serverId/danger': typeof SettingsServerServerIdDangerRoute
+  '/settings/server/$serverId/general': typeof SettingsServerServerIdGeneralRoute
   '/chat/servers/$serverId/channels/$channelId': typeof ChatServersServerIdChannelsChannelIdRoute
 }
 
@@ -478,6 +541,9 @@ export interface FileRoutesByTo {
   '/security': typeof SecurityIndexLazyRoute
   '/chat/servers/$serverId': typeof ChatServersServerIdRouteWithChildren
   '/chat/servers/requests': typeof ChatServersRequestsRoute
+  '/settings/server/$serverId': typeof SettingsServerServerIdRouteWithChildren
+  '/settings/server/$serverId/danger': typeof SettingsServerServerIdDangerRoute
+  '/settings/server/$serverId/general': typeof SettingsServerServerIdGeneralRoute
   '/chat/servers/$serverId/channels/$channelId': typeof ChatServersServerIdChannelsChannelIdRoute
 }
 
@@ -509,6 +575,9 @@ export interface FileRoutesById {
   '/security/': typeof SecurityIndexLazyRoute
   '/chat/servers/$serverId': typeof ChatServersServerIdRouteWithChildren
   '/chat/servers/requests': typeof ChatServersRequestsRoute
+  '/settings/server/$serverId': typeof SettingsServerServerIdRouteWithChildren
+  '/settings/server/$serverId/danger': typeof SettingsServerServerIdDangerRoute
+  '/settings/server/$serverId/general': typeof SettingsServerServerIdGeneralRoute
   '/chat/servers/$serverId/channels/$channelId': typeof ChatServersServerIdChannelsChannelIdRoute
 }
 
@@ -541,6 +610,9 @@ export interface FileRouteTypes {
     | '/security'
     | '/chat/servers/$serverId'
     | '/chat/servers/requests'
+    | '/settings/server/$serverId'
+    | '/settings/server/$serverId/danger'
+    | '/settings/server/$serverId/general'
     | '/chat/servers/$serverId/channels/$channelId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -570,6 +642,9 @@ export interface FileRouteTypes {
     | '/security'
     | '/chat/servers/$serverId'
     | '/chat/servers/requests'
+    | '/settings/server/$serverId'
+    | '/settings/server/$serverId/danger'
+    | '/settings/server/$serverId/general'
     | '/chat/servers/$serverId/channels/$channelId'
   id:
     | '__root__'
@@ -599,6 +674,9 @@ export interface FileRouteTypes {
     | '/security/'
     | '/chat/servers/$serverId'
     | '/chat/servers/requests'
+    | '/settings/server/$serverId'
+    | '/settings/server/$serverId/danger'
+    | '/settings/server/$serverId/general'
     | '/chat/servers/$serverId/channels/$channelId'
   fileRoutesById: FileRoutesById
 }
@@ -630,6 +708,7 @@ export interface RootRouteChildren {
   SecurityIndexLazyRoute: typeof SecurityIndexLazyRoute
   ChatServersServerIdRoute: typeof ChatServersServerIdRouteWithChildren
   ChatServersRequestsRoute: typeof ChatServersRequestsRoute
+  SettingsServerServerIdRoute: typeof SettingsServerServerIdRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -659,6 +738,7 @@ const rootRouteChildren: RootRouteChildren = {
   SecurityIndexLazyRoute: SecurityIndexLazyRoute,
   ChatServersServerIdRoute: ChatServersServerIdRouteWithChildren,
   ChatServersRequestsRoute: ChatServersRequestsRoute,
+  SettingsServerServerIdRoute: SettingsServerServerIdRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -696,7 +776,8 @@ export const routeTree = rootRoute
         "/contact/",
         "/security/",
         "/chat/servers/$serverId",
-        "/chat/servers/requests"
+        "/chat/servers/requests",
+        "/settings/server/$serverId"
       ]
     },
     "/": {
@@ -779,6 +860,21 @@ export const routeTree = rootRoute
     },
     "/chat/servers/requests": {
       "filePath": "chat/servers/requests.tsx"
+    },
+    "/settings/server/$serverId": {
+      "filePath": "settings/server/$serverId.tsx",
+      "children": [
+        "/settings/server/$serverId/danger",
+        "/settings/server/$serverId/general"
+      ]
+    },
+    "/settings/server/$serverId/danger": {
+      "filePath": "settings/server/$serverId/danger.tsx",
+      "parent": "/settings/server/$serverId"
+    },
+    "/settings/server/$serverId/general": {
+      "filePath": "settings/server/$serverId/general.tsx",
+      "parent": "/settings/server/$serverId"
     },
     "/chat/servers/$serverId/channels/$channelId": {
       "filePath": "chat/servers/$serverId/channels/$channelId.tsx",

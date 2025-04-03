@@ -74,7 +74,23 @@ const setupSocketListeners = (userId: string) => {
       description: `Your request to join ${data.serverName} was rejected.`,
     });
   });
-};
+
+  socket.on('server:nameUpdated', () => {
+    queryClient?.invalidateQueries({ queryKey: ["userServers"] });
+    queryClient?.invalidateQueries({ queryKey: ["server"] });
+
+  });
+
+  socket.on('server:iconUpdated', () => {
+    queryClient?.invalidateQueries({ queryKey: ["userServers"] });
+    queryClient?.invalidateQueries({ queryKey: ["server"] });
+  });
+
+    socket.on('server:deleted', () => {
+        queryClient?.invalidateQueries({ queryKey: ["userServers"] });
+        queryClient?.invalidateQueries({ queryKey: ["server"] });
+    });
+}
 
 const addOnlineUser = (userId: string) => {
   if (!userId) return;

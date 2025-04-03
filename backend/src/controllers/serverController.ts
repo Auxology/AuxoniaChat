@@ -1,5 +1,25 @@
 import { Request, Response } from 'express';
-import { createNewServer, deleteServerWithId, getAllServerMembers, getServerByServerId, getServersByUserId, isMember, joinServerWithIds, leaveServerWithIds, searchServersByName, hasPendingJoinRequest, createJoinRequest, getJoinRequestsByServerId, approveJoinRequestById, rejectJoinRequestById, getJoinRequetsById, getServersWhereUserHasElevatedRole, getIncomingJoinRequestsByServerId, getServerBasicDetails, getServerAdmins } from '../utils/server';
+import {
+    createNewServer,
+    deleteServerWithId,
+    getAllServerMembers,
+    getServerByServerId,
+    getServersByUserId,
+    isMember,
+    leaveServerWithIds,
+    searchServersByName,
+    hasPendingJoinRequest,
+    createJoinRequest,
+    getJoinRequestsByServerId,
+    approveJoinRequestById,
+    rejectJoinRequestById,
+    getJoinRequetsById,
+    getServersWhereUserHasElevatedRole,
+    getIncomingJoinRequestsByServerId,
+    getServerBasicDetails,
+    getServerAdmins,
+    updateServerNameById, updateServerIconById
+} from '../utils/server';
 import { ServerDataForUser, ServerMembers, UserServers } from '../types/types';
 import {uploadServerImage} from "../libs/cloudinary";
 import { getSocketIO } from '../libs/socket';
@@ -119,48 +139,6 @@ export const getServerMembers = async (req:Request, res:Response):Promise<void> 
     }
 }
 
-
-export const joinServer = async (req:Request, res:Response):Promise<void> => {
-    try{
-        const userId:string = req.session.user?.id as string;
-        const {serverId} = req.body;
-
-        if(!userId) {
-            res.status(401).json({message: 'Unauthorized'});
-            return;
-        }
-
-        if(!serverId) {
-            res.status(400).json({message: 'Server id is required'});
-            return;
-        }
-        // Check if server exists
-        const serverExists:boolean = await getServerByServerId(serverId);
-
-        if(!serverExists) {
-            res.status(404).json({message: 'Server not found'});
-            return;
-        }
-
-        // Check if user is already a member of this server
-        const rows:ServerDataForUser | null = await isMember(serverId, userId);
-
-        if(rows) {
-            res.status(400).json({message: 'User already a member of this server'});
-            return;
-        }
-
-        // Now make the user join the server
-        await joinServerWithIds(userId, serverId);
-
-        res.status(200).json({message: 'Joined server'});
-    }
-    catch (error) {
-        console.error(`Error in joinServer: ${error}`);
-        res.status(500).json({message: 'Internal server error'});
-    }
-}
-
 export const leaveServer = async (req:Request, res:Response):Promise<void> => {
     try{
         if(!req.session.isAuthenticated) {
@@ -220,10 +198,18 @@ export const deleteServer = async (req:Request, res:Response):Promise<void> => {
             res.status(403).json({message: 'Forbidden'});
             return;
         }
-        
 
         // Now delete the server
         await deleteServerWithId(serverId);
+
+        const io = getSocketIO();
+
+        // Notify all members of the server
+        members.forEach(member => {
+            io.to(`user:${member.id}`).emit('server:deleted', {
+                serverId
+            });
+        });
 
         res.status(200).json({message: 'Server deleted'});
     }
@@ -537,6 +523,121 @@ export const getIncomingJoinRequests = async (req: Request, res: Response): Prom
     }
     catch(error) {
         console.error(`Error in getIncomingJoinRequests: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+// This function will patch the server(Updating Name in this case)
+export const updateServerName = async (req:Request, res:Response):Promise<void> => {
+    try {
+        if(!req.session.isAuthenticated) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const serverId = req.body.serverId;
+
+        if(!serverId) {
+            res.status(400).json({message: 'Server id is required'});
+            return;
+        }
+
+        const userId = req.session.user?.id as string;
+
+        // Check if user is an owner of this server
+        const serverMembers:ServerMembers[] = await getAllServerMembers(serverId);
+
+        const isOwner:ServerMembers|undefined = serverMembers.find(member => member.id === userId && member.role === 'owner');
+
+        if(!isOwner) {
+            res.status(403).json({message: 'Forbidden'});
+        }
+
+        // Update server name
+        const newName = req.body.name;
+
+        if(!newName || newName.trim() === '') {
+            res.status(400).json({message: 'Server name is required'});
+            return;
+        }
+
+        // Check if the new name is different from the old name
+        const serverDetails = await getServerBasicDetails(serverId);
+
+        if(serverDetails.name === newName) {
+            res.status(400).json({message: 'Server name is the same'});
+            return;
+        }
+
+        await updateServerNameById(serverId, newName);
+
+        // Emit the event to all members of the server
+        const io = getSocketIO();
+        serverMembers.forEach(member => {
+            io.to(`user:${member.id}`).emit('server:nameUpdated', {
+                serverId,
+                newName
+            });
+        });
+
+        res.status(200).json({message: 'Server name updated successfully'});
+    }
+    catch(error) {
+        console.error(`Error in updateServerName: ${error}`);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+export const updateServerIcon = async (req:Request, res:Response):Promise<void> => {
+    try {
+        if(!req.session.isAuthenticated) {
+            res.status(401).json({message: 'Unauthorized'});
+            return;
+        }
+
+        const serverId = req.body.serverId;
+
+        if(!serverId) {
+            res.status(400).json({message: 'Server id is required'});
+            return;
+        }
+
+        const userId = req.session.user?.id as string;
+
+        // Check if user is an owner of this server
+        const serverMembers:ServerMembers[] = await getAllServerMembers(serverId);
+
+        const isOwner:ServerMembers|undefined = serverMembers.find(member => member.id === userId && member.role === 'owner');
+
+        if(!isOwner) {
+            res.status(403).json({message: 'Forbidden'});
+        }
+
+        // Check if file is provided
+        if(!req.file) {
+            res.status(400).json({message: 'File is required'});
+            return;
+        }
+
+        // Upload the new icon
+        const iconUrl:string = await uploadServerImage(req.file);
+
+        // Update server icon
+        await updateServerIconById(serverId, iconUrl);
+
+        const io = getSocketIO();
+
+        serverMembers.forEach(member => {
+            io.to(`user:${member.id}`).emit('server:iconUpdated', {
+                serverId,
+                iconUrl
+            });
+        })
+
+        res.status(200).json({message: 'Server icon updated successfully'});
+    }
+    catch(error) {
+        console.error(`Error in updateServerIcon: ${error}`);
         res.status(500).json({message: 'Internal server error'});
     }
 }
