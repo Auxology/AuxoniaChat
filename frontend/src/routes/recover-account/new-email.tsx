@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
@@ -14,21 +14,13 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { motion } from "motion/react"
 import { ArrowLeft } from "lucide-react"
-import { axiosInstance } from "@/lib/axios.ts"
 import { useRecoveryNewEmail } from "@/actions/useRecoveryActions"
 import { EmailFormData, emailSchema } from "@/lib/zod.ts"
+import { requireRecoveryProtection } from '@/utils/routeGuards'
 
 export const Route = createFileRoute('/recover-account/new-email')({
-  loader: async () => {
-    try {
-      await axiosInstance.post('/recovery/new-email/check');
-      return {};
-    } catch {
-      throw redirect({
-        to: '/recover-account',
-        replace: true
-      });
-    }
+  beforeLoad: async () => {
+    return await requireRecoveryProtection()
   },
   component: RouteComponent,
 })

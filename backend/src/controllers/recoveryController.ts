@@ -286,7 +286,8 @@ export const checkAdvancedRecoveryProtection = async (req: Request, res: Respons
             return;
         }
 
-        res.status(200).json({message: 'Authorized'});
+        // Return boolean value
+        res.status(200).json({ hasAdvancedRecoverySession: true });
     }
     catch (error) {
         console.error(error);

@@ -14,8 +14,8 @@ const recoveryRoute:Router = Router();
 recoveryRoute.post('/recovery/start', startRecovery)
 recoveryRoute.post('/recovery/new-email', protectRecovery, recoveryNewEmail)
 recoveryRoute.post('/recovery/new-email/verify', protectRecovery, verifyNewEmail)
-recoveryRoute.post('/recovery/new-email/check', protectRecovery, checkRecoveryProtection)
+recoveryRoute.get('/recovery/new-email/check', protectRecovery, checkRecoveryProtection)
 recoveryRoute.post('/recovery/finish', advancedRecoveryProtection, finishRecovery)
-recoveryRoute.post('/recovery/finish/check', advancedRecoveryProtection, checkAdvancedRecoveryProtection)
+recoveryRoute.get('/recovery/finish/check', advancedRecoveryProtection, checkAdvancedRecoveryProtection)
 
 export default recoveryRoute;

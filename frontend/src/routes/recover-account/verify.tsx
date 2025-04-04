@@ -1,7 +1,6 @@
 import { createFileRoute, redirect, Link } from '@tanstack/react-router'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -15,39 +14,42 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { motion } from "motion/react"
 import { ArrowLeft } from "lucide-react"
-import { axiosInstance } from "@/lib/axios.ts"
 import { useRecoveryVerify, useRecoveryNewEmail } from "@/actions/useRecoveryActions"
 import { useState, useEffect } from "react"
+import { requireRecoveryProtection } from '@/utils/routeGuards'
+import { verificationCodeSchema, VerificationCodeData } from "@/lib/zod"
 
-// Form validation schema
-const verifySchema = z.object({
-  code: z.string().min(8, "Verification code must be 8 characters").max(8, "Verification code must be 8 characters"),
-})
-
-type VerifyFormData = z.infer<typeof verifySchema>
+// Define the loader data type explicitly
+interface RecoveryVerifyLoaderData {
+  email: string;
+}
 
 export const Route = createFileRoute('/recover-account/verify')({
-  loader: async () => {
-    try {
-      const response = await axiosInstance.post('/recovery/new-email/check');
-      return { email: response.data.email };
-    } catch {
+  loader: async (): Promise<RecoveryVerifyLoaderData> => {
+    // Get the recovery data and ensure it has an email property
+    const data = await requireRecoveryProtection();
+    
+    // If email is missing, redirect to the recovery start page
+    if (!data || !data.email) {
       throw redirect({
         to: '/recover-account',
         replace: true
       });
     }
+    
+    return data as RecoveryVerifyLoaderData;
   },
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  // TypeScript now knows this object has an email property
   const { email } = Route.useLoaderData();
   const [resendSuccess, setResendSuccess] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   
-  const form = useForm<VerifyFormData>({
-    resolver: zodResolver(verifySchema),
+  const form = useForm<VerificationCodeData>({
+    resolver: zodResolver(verificationCodeSchema),
     defaultValues: {
       code: "",
     },
@@ -64,7 +66,7 @@ function RouteComponent() {
     isPending: isResending
   } = useRecoveryNewEmail();
 
-  function onSubmit(values: VerifyFormData) {
+  function onSubmit(values: VerificationCodeData) {
     verifyCode(values.code);
   }
 

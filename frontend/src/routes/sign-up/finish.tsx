@@ -1,8 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { axiosInstance } from "@/lib/axios.ts";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -17,29 +15,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { motion } from "motion/react"
 import { useState } from "react"
 import { useFinishSignUp } from "@/actions/useSignUpActions"
-import { passwordSchema, usernameSchema } from "@/lib/zod.ts"
+import { finishSignUpSchema, FinishSignUpData } from "@/lib/zod.ts"
 import { CheckCircle, AlertCircle, Copy, Check } from "lucide-react"
+import { requireTemporarySession } from '@/utils/routeGuards';
 
-// Form schema combining username and password
-const finishSignUpSchema = z.object({
-    username: usernameSchema,
-    password: passwordSchema
-});
-
-type LoaderData = {
-    email: string;
-};
-
-type FinishSignUpFormData = z.infer<typeof finishSignUpSchema>;
+// Define the loader data type for type safety
+interface SessionData {
+  email: string;
+}
 
 export const Route = createFileRoute('/sign-up/finish')({
-    loader: async (): Promise<LoaderData> => {
+    loader: async (): Promise<SessionData> => {
         try {
-            const response = await axiosInstance.post('/signup/finish/check')
-            return { email: response.data.email };
-        }
-        catch (err) {
-            console.error('Failed to load finish page', err)
+            const data = await requireTemporarySession();
+            
+            if (!data || !data.email) {
+                throw redirect({
+                    to: '/sign-up',
+                    replace: true
+                });
+            }
+            
+            return data as SessionData;
+        } catch (error) {
             throw redirect({
                 to: '/sign-up',
                 replace: true
@@ -50,9 +48,7 @@ export const Route = createFileRoute('/sign-up/finish')({
 })
 
 function RouteComponent() {
-    // Use the correct hook to access the loader data
-    const data = Route.useLoaderData();
-    const email = data?.email || 'your email';
+    const { email } = Route.useLoaderData();
     const [passwordValue, setPasswordValue] = useState("");
     const [isFinished, setIsFinished] = useState(false);
     const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
@@ -74,7 +70,7 @@ function RouteComponent() {
                                hasSpecial && 
                                hasNoWhitespace;
     
-    const form = useForm<FinishSignUpFormData>({
+    const form = useForm<FinishSignUpData>({
         resolver: zodResolver(finishSignUpSchema),
         defaultValues: {
             username: "",
@@ -85,7 +81,7 @@ function RouteComponent() {
 
     const { mutate, isPending, isError, error } = useFinishSignUp();
 
-    function onSubmit(values: FinishSignUpFormData) {
+    function onSubmit(values: FinishSignUpData) {
         // Additional check before submission
         if (!allRequirementsMet) {
             return;
@@ -300,7 +296,7 @@ function RouteComponent() {
 
                                             {isError && (
                                                 <div className="text-red-500 text-sm font-pitch-sans-medium text-center">
-                                                    {error?.response?.data?.error || "An error occurred"}
+                                                    {error?.message || "An error occurred"}
                                                 </div>
                                             )}
                                         </div>

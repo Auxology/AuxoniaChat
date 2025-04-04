@@ -18,9 +18,6 @@ import {useStartSignUp} from "@/actions/useSignUpActions";
 import {EmailFormData, emailSchema} from "@/lib/zod.ts";
 import {requireNonAuth} from "@/utils/routeGuards";
 
-// Form validation schema
-
-
 export const Route = createFileRoute('/sign-up/')({
   beforeLoad: async () => {
     return await requireNonAuth();

@@ -17,12 +17,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { motion } from "motion/react"
 import { useState } from "react"
 import { useForgotPasswordFinish } from "@/actions/useForgotPasswordActions"
-import { passwordSchema } from "@/lib/zod.ts"
+import { passwordFieldSchema } from "@/lib/zod.ts"
 import { CheckCircle, AlertCircle } from "lucide-react"
 
-// Form schema for password reset
 const resetPasswordSchema = z.object({
-  password: passwordSchema
+  password: passwordFieldSchema
 });
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;

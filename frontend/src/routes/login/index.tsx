@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -17,16 +16,7 @@ import { motion } from "motion/react"
 import { Separator } from "@/components/ui/separator"
 import { useLogin } from "@/actions/useLoginActions"
 import { requireNonAuth } from '@/utils/routeGuards'
-
-// Form validation schema
-const formSchema = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters.",
-  }),
-})
+import { loginFormSchema, LoginFormData } from '@/lib/zod'
 
 export const Route = createFileRoute('/login/')({
   beforeLoad: async () => {
@@ -36,8 +26,8 @@ export const Route = createFileRoute('/login/')({
 })
 
 function RouteComponent() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginFormSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -46,7 +36,7 @@ function RouteComponent() {
 
   const { mutate, isPending, isError, error } = useLogin();
 
-  function onSubmit(values: z.infer<typeof formSchema>):void {
+  function onSubmit(values: LoginFormData):void {
     mutate({
       email: values.email,
       password: values.password

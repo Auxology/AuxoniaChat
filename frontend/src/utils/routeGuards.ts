@@ -51,3 +51,47 @@ export async function requireNonAuth() {
     return { authenticated: false };
   }
 }
+
+export async function requireTemporarySession() {
+  try {
+    const response = await axiosInstance.post('/signup/finish/check')
+    return { email: response.data.email };
+  }
+  catch (error) {
+    if (error) {
+      throw error;
+    }
+    
+    // Otherwise, redirect to signup
+    throw redirect({
+      to: '/sign-up',
+      replace: true,
+    });
+  }
+}
+
+export async function requireRecoveryProtection() {
+  try {
+    const response = await axiosInstance.get('/recovery/new-email/check');
+    
+    return response.data || {};
+  } catch (error) {    
+    throw redirect({
+      to: '/recover-account',
+      replace: true,
+    });
+  }
+}
+
+export async function requireAdvancedRecoverySession() {
+  try {
+    const response = await axiosInstance.get('/recovery/finish/check');
+    
+    return response.data || {};
+  } catch (error) {    
+    throw redirect({
+      to: '/recover-account',
+      replace: true,
+    });
+  }
+}

@@ -1,7 +1,6 @@
-import { createFileRoute, redirect, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -15,48 +14,14 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { motion } from "motion/react"
 import { Check, X, ArrowLeft } from "lucide-react"
-import { axiosInstance } from "@/lib/axios.ts"
 import { useRecoveryFinish } from "@/actions/useRecoveryActions"
 import { useState, useEffect } from "react"
-
-// Password validation schema with specific requirements
-const passwordSchema = z.object({
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(100, "Password cannot exceed 100 characters")
-    .refine((value) => /[A-Z]/.test(value), {
-      message: "Password must contain at least one uppercase letter",
-    })
-    .refine((value) => /[a-z]/.test(value), {
-      message: "Password must contain at least one lowercase letter",
-    })
-    .refine((value) => /[0-9]/.test(value), {
-      message: "Password must contain at least one number",
-    })
-    .refine((value) => /[^A-Za-z0-9]/.test(value), {
-      message: "Password must contain at least one special character",
-    }),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
-
-type PasswordFormData = z.infer<typeof passwordSchema>;
+import { passwordWithConfirmSchema, PasswordWithConfirmData } from '@/lib/zod'
+import { requireAdvancedRecoverySession } from '@/utils/routeGuards'
 
 export const Route = createFileRoute('/recover-account/finish')({
-  loader: async () => {
-    try {
-      // Check if user has valid advanced recovery session
-      await axiosInstance.post('/recovery/finish/check');
-      return {};
-    } catch {
-      throw redirect({
-        to: '/recover-account',
-        replace: true
-      });
-    }
+  beforeLoad: async () => {
+    return await requireAdvancedRecoverySession()
   },
   component: RouteComponent,
 })
@@ -71,8 +36,8 @@ function RouteComponent() {
     hasSpecial: false,
   });
 
-  const form = useForm<PasswordFormData>({
-    resolver: zodResolver(passwordSchema),
+  const form = useForm<PasswordWithConfirmData>({
+    resolver: zodResolver(passwordWithConfirmSchema),
     defaultValues: {
       password: "",
       confirmPassword: "",
@@ -90,15 +55,15 @@ function RouteComponent() {
   
   useEffect(() => {
     setPasswordStrength({
-      hasMinLength: password.length >= 8,
+      hasMinLength: password.length >= 12,
       hasUppercase: /[A-Z]/.test(password),
       hasLowercase: /[a-z]/.test(password),
       hasNumber: /[0-9]/.test(password),
-      hasSpecial: /[^A-Za-z0-9]/.test(password),
+      hasSpecial: /[^A-Za-z0-9\s]/.test(password),
     });
   }, [password]);
 
-  function onSubmit(values: PasswordFormData) {
+  function onSubmit(values: PasswordWithConfirmData) {
     finishRecovery(values.password);
   }
 
@@ -174,7 +139,7 @@ function RouteComponent() {
                   <ul className="space-y-1 pl-1">
                     <PasswordRequirement 
                       met={passwordStrength.hasMinLength}
-                      text="At least 8 characters" 
+                      text="At least 12 characters" 
                     />
                     <PasswordRequirement 
                       met={passwordStrength.hasUppercase}

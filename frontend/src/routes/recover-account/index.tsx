@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -18,16 +17,7 @@ import { motion } from "motion/react"
 import { ArrowLeft } from "lucide-react"
 import { useRecovery } from "@/actions/useRecoveryActions"
 import { requireNonAuth } from '@/utils/routeGuards'
-
-// Form validation schema - updated for 20 character format
-const recoveryCodeSchema = z.object({
-  code: z.string()
-    .min(20, "Recovery code must be 20 characters")
-    .max(20, "Recovery code must be 20 characters")
-    .regex(/^[A-Z0-9]+$/, "Recovery code must only contain uppercase letters and numbers"),
-})
-
-type RecoveryFormData = z.infer<typeof recoveryCodeSchema>
+import { recoveryCodeSchema, RecoveryCodeData } from '@/lib/zod'
 
 export const Route = createFileRoute('/recover-account/')({
   beforeLoad: async () => {
@@ -37,7 +27,7 @@ export const Route = createFileRoute('/recover-account/')({
 })
 
 function RouteComponent() {
-  const form = useForm<RecoveryFormData>({
+  const form = useForm<RecoveryCodeData>({
     resolver: zodResolver(recoveryCodeSchema),
     defaultValues: {
       code: "",
@@ -47,7 +37,7 @@ function RouteComponent() {
   // Use the recovery mutation hook
   const { mutate, isPending: isSubmitting, error } = useRecovery()
 
-  function onSubmit(values: RecoveryFormData) {
+  function onSubmit(values: RecoveryCodeData) {
     mutate(values.code)
   }
 

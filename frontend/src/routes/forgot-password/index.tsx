@@ -2,7 +2,6 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { motion } from "motion/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -17,15 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ArrowLeft } from "lucide-react";
 import { useForgotPassword } from "@/actions/useForgotPasswordActions";
 import { requireNonAuth } from '@/utils/routeGuards';
-
-// Form validation schema
-const forgotPasswordSchema = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-});
-
-type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
+import { emailSchema, EmailFormData } from '@/lib/zod';
 
 export const Route = createFileRoute('/forgot-password/')({
   beforeLoad: async () => {
@@ -35,8 +26,8 @@ export const Route = createFileRoute('/forgot-password/')({
 });
 
 function RouteComponent() {
-  const form = useForm<ForgotPasswordFormData>({
-    resolver: zodResolver(forgotPasswordSchema),
+  const form = useForm<EmailFormData>({
+    resolver: zodResolver(emailSchema),
     defaultValues: {
       email: "",
     },
@@ -44,7 +35,7 @@ function RouteComponent() {
 
   const { mutate, isPending, isError, error } = useForgotPassword();
 
-  function onSubmit(values: ForgotPasswordFormData) {
+  function onSubmit(values: EmailFormData) {
     mutate(values.email);
   }
 

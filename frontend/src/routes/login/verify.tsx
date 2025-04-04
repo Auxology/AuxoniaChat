@@ -1,7 +1,6 @@
 import { createFileRoute, redirect, Link } from '@tanstack/react-router'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -20,13 +19,7 @@ import { axiosInstance } from "@/lib/axios"
 import { useLoginVerify } from "@/actions/useLoginActions"
 import { useResendCode } from "@/actions/useLoginActions"
 import { requireNonAuth } from '@/utils/routeGuards'
-
-// Form validation schema
-const verifySchema = z.object({
-  code: z.string().length(8, "Verification code must be 8 characters"),
-})
-
-type VerifyFormData = z.infer<typeof verifySchema>
+import { verificationCodeSchema, VerificationCodeData } from "@/lib/zod"
 
 export const Route = createFileRoute('/login/verify')({
   beforeLoad: async () => {
@@ -49,8 +42,8 @@ function RouteComponent() {
   const [resendSuccess, setResendSuccess] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   
-  const form = useForm<VerifyFormData>({
-    resolver: zodResolver(verifySchema),
+  const form = useForm<VerificationCodeData>({
+    resolver: zodResolver(verificationCodeSchema),
     defaultValues: {
       code: "",
     },
@@ -67,7 +60,7 @@ function RouteComponent() {
     isPending: isResending
   } = useResendCode();
 
-  function onSubmit(values: VerifyFormData) {
+  function onSubmit(values: VerificationCodeData) {
     verifyCode(values.code);
   }
 

@@ -2,7 +2,6 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { axiosInstance } from "@/lib/axios.ts";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -19,12 +18,7 @@ import { useState, useEffect } from "react"
 import { useForgotPassword, useForgotPasswordVerify } from "@/actions/useForgotPasswordActions"
 import { ArrowLeft } from "lucide-react"
 import { Link } from "@tanstack/react-router"
-
-const verifySchema = z.object({
-  code: z.string().min(8, "Verification code must be 8 characters").max(8, "Verification code must be 8 characters"),
-})
-
-type VerifyFormData = z.infer<typeof verifySchema>
+import { verificationCodeSchema, VerificationCodeData } from "@/lib/zod"
 
 type LoaderData = {
   email: string;
@@ -55,8 +49,8 @@ function RouteComponent() {
   const [resendSuccess, setResendSuccess] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   
-  const form = useForm<VerifyFormData>({
-    resolver: zodResolver(verifySchema),
+  const form = useForm<VerificationCodeData>({
+    resolver: zodResolver(verificationCodeSchema),
     defaultValues: {
       code: "",
     },
@@ -73,7 +67,7 @@ function RouteComponent() {
     isPending: isResending
   } = useForgotPassword();
 
-  function onSubmit(values: VerifyFormData) {
+  function onSubmit(values: VerificationCodeData) {
     verifyCode(values.code);
   }
 
