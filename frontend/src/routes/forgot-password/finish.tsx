@@ -30,7 +30,7 @@ export const Route = createFileRoute('/forgot-password/finish')({
   loader: async () => {
     try {
       // Verify that the user has completed the previous step
-      await axiosInstance.post('/forgotPassword/finish/check');
+      await axiosInstance.get('/forgotPassword/finish/check');
       return {};
     }
     catch (err) {

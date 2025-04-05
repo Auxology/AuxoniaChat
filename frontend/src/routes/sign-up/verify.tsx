@@ -25,7 +25,7 @@ type LoaderData = {
 export const Route = createFileRoute('/sign-up/verify')({
   loader: async (): Promise<LoaderData> => {
     try {
-      const response = await axiosInstance.post('signup/verify/check')
+      const response = await axiosInstance.get('signup/verify/check')
 
       return { email: response.data.email };
     }

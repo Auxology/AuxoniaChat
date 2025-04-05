@@ -54,7 +54,7 @@ export async function requireNonAuth() {
 
 export async function requireTemporarySession() {
   try {
-    const response = await axiosInstance.post('/signup/finish/check')
+    const response = await axiosInstance.get('/signup/finish/check')
     return { email: response.data.email };
   }
   catch (error) {

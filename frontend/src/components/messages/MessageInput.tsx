@@ -1,45 +1,38 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { axiosInstance } from "@/lib/axios";
 import { toast } from "sonner";
+import { useSendMessageInChannel } from "@/actions/useMessageActions";
 
 interface MessageInputProps {
   serverId: string;
-  channelId?: string;
+  channelId: string;
 }
 
 export function MessageInput({ serverId, channelId }: MessageInputProps) {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
-
-  const handleSendMessage = async (e: React.FormEvent) => {
+  const sendMessage = useSendMessageInChannel();
+  
+  const handleSendMessage = async(e: React.FormEvent)  => {
     e.preventDefault();
-    
-    if (!message.trim()) return;
-    
-    setIsSending(true);
-    
     try {
-      // If channelId is provided, send to specific channel
-      // Otherwise send to server general chat
-      const endpoint = channelId 
-        ? `/messages/channel/${channelId}`
-        : `/messages/${serverId}`;
-        
-      await axiosInstance.post(endpoint, { 
-        content: message.trim() 
+      await sendMessage.mutateAsync({
+        serverId,
+        channelId: channelId as string,
+        message: message
+      })
+    }
+    catch (error) {
+      toast.error("Failed to send message", {
+        description: "Please try again later."
       });
-      
-      setMessage("");
-    } catch (error) {
-      console.error("Failed to send message:", error);
-      toast.error("Failed to send message");
     } finally {
       setIsSending(false);
+      setMessage("");
     }
-  };
-
+}
+    
   return (
     <div className="p-4 border-t border-muted/20">
       <form onSubmit={handleSendMessage} className="relative">

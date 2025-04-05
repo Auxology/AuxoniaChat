@@ -18,6 +18,8 @@ function RootComponent() {
       const response = await axiosInstance.get('/user/profile');
       return response.data;
     },
+    retry: false,
+    refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 

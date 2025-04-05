@@ -86,10 +86,16 @@ const setupSocketListeners = (userId: string) => {
     queryClient?.invalidateQueries({ queryKey: ["server"] });
   });
 
-    socket.on('server:deleted', () => {
+  // Query key is actually ["messages", serverId]
+  socket.on('server:messageSent', (data) => {
+        // Invalidate messages for the server
+        queryClient?.invalidateQueries({ queryKey: ["messages", data.channelId] });
+  });
+
+  socket.on('server:deleted', () => {
         queryClient?.invalidateQueries({ queryKey: ["userServers"] });
         queryClient?.invalidateQueries({ queryKey: ["server"] });
-    });
+  });
 }
 
 const addOnlineUser = (userId: string) => {

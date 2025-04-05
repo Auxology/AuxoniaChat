@@ -12,6 +12,6 @@ const forgotPasswordRoute:Router = Router();
 forgotPasswordRoute.post('/forgotPassword/start', forgotPassword);
 forgotPasswordRoute.post('/forgotPassword/verify', verifyForgotPassword);
 forgotPasswordRoute.post('/forgotPassword/finish', forgotPasswordProtection, finishForgotPassword);
-forgotPasswordRoute.post('/forgotPassword/finish/check', forgotPasswordProtection, checkForgotPassword);
+forgotPasswordRoute.get('/forgotPassword/finish/check', forgotPasswordProtection, checkForgotPassword);
 
 export default forgotPasswordRoute;

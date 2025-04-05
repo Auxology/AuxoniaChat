@@ -232,6 +232,7 @@ export const finishRecovery = async (req: Request, res: Response):Promise<void> 
 export const checkRecoveryProtection = async (req: Request, res: Response):Promise<void> => {
     try{
         const token = req.cookies['recovery-session'];
+        const email = req.cookies['user_email']
 
         if(!token) {
             res.status(401).json({message: 'Unauthorized'});
@@ -252,7 +253,7 @@ export const checkRecoveryProtection = async (req: Request, res: Response):Promi
             return;
         }
 
-        res.status(200).json({message: 'Authorized'});
+        res.status(200).json({email:email});
     }
     catch (error) {
         console.error(error);
