@@ -28,6 +28,8 @@ export const getMessagesForServer = async (req: Request, res: Response):Promise<
     }
 }
 
+// This functions should be limited for performance reasons
+// This will also use cursor to limit
 export const getMessagesForChannel = async (req: Request, res: Response):Promise<void> => {
     try {
         if(!req.session.isAuthenticated) {
@@ -35,11 +37,13 @@ export const getMessagesForChannel = async (req: Request, res: Response):Promise
             return;
         }
 
+        // Get the channel id from the request
         const channelId:string = req.params.channelId;
 
         // Get the messages for the channel
-        const messages = await getMessagesForChannelById(channelId);
+        const {cursor, limit = 15} = req.query;
 
+        const messages = await getMessagesForChannelById(channelId, cursor as string | null, Number(limit));
 
         res.status(200).json(messages);
     }

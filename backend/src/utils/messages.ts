@@ -43,31 +43,52 @@ export async function getMessagesForServerById(serverId: string) {
 }
 
 // This function will get all messages for a specific channel
-export async function getMessagesForChannelById(channelId: string) {
-    // Get messages for the specified channel
+// This function will use a cursor to limit the amount of messages
+// Give me messages for this channel, optionally filtering by those older than a given timestamp(type shit)
+// No i did not write this, yes it was written by copilot
+export async function getMessagesForChannelById(
+    channelId: string,
+    cursor: string | null = null,
+    limit: number = 20
+) {
+    // Check if the channel exists
+    const channelCheck = await query(
+        `SELECT id FROM app.channels WHERE id = $1`,
+        [channelId]
+    );
+
+    if (channelCheck.rows.length === 0) {
+        throw new Error("Channel not found");
+    }
+
+    // Use a conditional clause for the cursor.
+    // If cursor is null, the condition ($2::timestamp IS NULL OR ...) will always be true.
     const messages = await query(
         `
-        SELECT 
-            m.id, 
-            m.content AS message, 
-            m.created_at,
-            m.sender_id,
-            u.username,
-            u.avatar_url
-        FROM 
-            app.messages m
-        JOIN 
-            app.users u ON m.sender_id = u.id
-        WHERE 
-            m.channel_id = $1
-        ORDER BY 
-            m.created_at ASC
+            SELECT
+                m.id,
+                m.content AS message,
+                m.created_at,
+                m.sender_id,
+                u.username,
+                u.avatar_url
+            FROM
+                app.messages m
+                    JOIN
+                app.users u ON m.sender_id = u.id
+            WHERE
+                m.channel_id = $1
+              AND ($2::timestamp IS NULL OR m.created_at < $2)
+            ORDER BY
+                m.created_at desc
+                LIMIT $3
         `,
-        [channelId]
+        [channelId, cursor, limit]
     );
 
     return messages.rows;
 }
+
 
 // This function will send a message to a specific channel in a server
 // Message is an object that contains the message content and other metadata
