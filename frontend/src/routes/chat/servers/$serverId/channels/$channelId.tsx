@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { toast } from "sonner";
-import { useChannelMessages } from '@/queries/messageQueries';
-import { MessagesList } from '@/components/messages/MessagesList';
 import { MessageInput } from '@/components/messages/MessageInput';
 import { useChannelDetails } from '@/queries/channelQueries';
 import { useAuthCheck } from "@/queries/useAuthQuery";
 import { requireAuth } from "@/utils/routeGuards";
+import { useGetMessagesForChannel } from "@/queries/messageQueries";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { MessageList } from "@/components/messages/MessageList";
 
 export const Route = createFileRoute('/chat/servers/$serverId/channels/$channelId')({
   beforeLoad: async ({ params }) => {
@@ -51,22 +52,32 @@ function ChannelComponent() {
   }, [userError, navigate]);
 
   const {
-    data: messages,
-    isLoading: isLoadingMessages,
-    error: messagesError,
-    fetchNextPage
-  } = useChannelMessages(channelId);
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage
+  } = useGetMessagesForChannel(channelId);
 
-  // Flatten the pages to get all messages
-  const allMessages = messages?.pages.flat().reverse() || [];
 
-  if (isLoadingChannel || isLoadingMessages || isLoadingUserDetails) {
+  if (isLoadingChannel || isFetching || isLoadingUserDetails || isFetchingNextPage) {
     return (
         <div className="flex-1 flex items-center justify-center">
           <div className="loader">Loading...</div>
         </div>
     );
   }
+
+  if (error) {
+    return (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-red-500">Error loading messages</div>
+        </div>
+    );
+  }
+
+  const allMessages = data?.pages.flatMap((page) => page.messages).reverse() || [];
 
   return (
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -76,16 +87,17 @@ function ChannelComponent() {
             {isLoadingChannel && <span className="text-muted"> (Loading...)</span>}
           </h2>
         </div>
-        <MessagesList
-            messages={allMessages}
-            isLoading={isLoadingMessages}
-            error={messagesError as Error | null}
-            fetchNextPage={fetchNextPage}  // Optionally pass fetchNextPage if needed for scrolling
-        />
+          <MessageList
+              messages={allMessages}
+              isLoading={isLoadingChannel || isFetching || isLoadingUserDetails}
+              hasNextPage={!!hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
+              fetchNextPage={fetchNextPage}
+            />
         <MessageInput
-            serverId={serverId}
-            channelId={channelId}
-        />
+              serverId={serverId}
+              channelId={channelId}
+          />
       </div>
   );
 }

@@ -41,11 +41,18 @@ export const getMessagesForChannel = async (req: Request, res: Response):Promise
         const channelId:string = req.params.channelId;
 
         // Get the messages for the channel
-        const {cursor, limit = 15} = req.query;
+        const {cursor} = req.query;
+        const limit = 15
 
         const messages = await getMessagesForChannelById(channelId, cursor as string | null, Number(limit));
 
-        res.status(200).json(messages);
+        res.status(200).json(
+            {
+                messages: messages,
+                // Calculated based on the oldest message timestamp
+                nextCursor: messages.length === limit ? messages[messages.length - 1].created_at : null,
+            }
+        );
     }
     catch (error) {
         console.error(error);
