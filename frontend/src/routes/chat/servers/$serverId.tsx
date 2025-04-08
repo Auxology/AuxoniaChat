@@ -141,7 +141,7 @@ function RouteComponent() {
   return (
     <div className="flex h-screen bg-chat text-headline">
       {/* Desktop Sidebar */}
-      <div className="hidden md:block w-[72px] bg-sidebar border-r border-muted/20">
+      <div className="hidden md:block w-[72px] bg-sidebar border-r">
         <Sidebar />
       </div>
 
@@ -159,7 +159,7 @@ function RouteComponent() {
         {/* Server Content */}
         <div className="flex-1 flex flex-col max-w-full">
           {/* Header */}
-          <div className="h-12 border-b border-muted/20 flex items-center px-4">
+          <div className="h-12 border-b flex items-center px-4">
             {/* Mobile Sidebar Toggle */}
             <MobileSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
             

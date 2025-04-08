@@ -5,9 +5,7 @@ import { MessageInput } from '@/components/messages/MessageInput';
 import { useChannelDetails } from '@/queries/channelQueries';
 import { useAuthCheck } from "@/queries/useAuthQuery";
 import { requireAuth } from "@/utils/routeGuards";
-import { useGetMessagesForChannel } from "@/queries/messageQueries";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageList } from "@/components/messages/MessageList";
+import { MessagesList } from "@/components/messages/MessageList";
 
 export const Route = createFileRoute('/chat/servers/$serverId/channels/$channelId')({
   beforeLoad: async ({ params }) => {
@@ -23,7 +21,6 @@ function ChannelComponent() {
   const navigate = useNavigate();
 
   const {
-    data: channel,
     isLoading: isLoadingChannel,
     error: channelError
   } = useChannelDetails(channelId, serverId);
@@ -51,17 +48,7 @@ function ChannelComponent() {
     }
   }, [userError, navigate]);
 
-  const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage
-  } = useGetMessagesForChannel(channelId);
-
-
-  if (isLoadingChannel || isFetching || isLoadingUserDetails || isFetchingNextPage) {
+  if (isLoadingChannel  || isLoadingUserDetails) {
     return (
         <div className="flex-1 flex items-center justify-center">
           <div className="loader">Loading...</div>
@@ -69,30 +56,10 @@ function ChannelComponent() {
     );
   }
 
-  if (error) {
-    return (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-red-500">Error loading messages</div>
-        </div>
-    );
-  }
-
-  const allMessages = data?.pages.flatMap((page) => page.messages).reverse() || [];
-
   return (
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="h-12 border-b border-muted/20 flex items-center px-4">
-          <h2 className="font-medium">
-            # {channel?.name || "Loading..."}
-            {isLoadingChannel && <span className="text-muted"> (Loading...)</span>}
-          </h2>
-        </div>
-          <MessageList
-              messages={allMessages}
-              isLoading={isLoadingChannel || isFetching || isLoadingUserDetails}
-              hasNextPage={!!hasNextPage}
-              isFetchingNextPage={isFetchingNextPage}
-              fetchNextPage={fetchNextPage}
+          <MessagesList
+              channelId={channelId}
             />
         <MessageInput
               serverId={serverId}

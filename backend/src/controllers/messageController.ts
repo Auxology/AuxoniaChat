@@ -42,7 +42,9 @@ export const getMessagesForChannel = async (req: Request, res: Response):Promise
 
         // Get the messages for the channel
         const {cursor} = req.query;
-        const limit = 15
+        // This limit of 15 was forcing the client to load all the messages at once
+        // Because ref was always visible
+        const limit = 50;
 
         const messages = await getMessagesForChannelById(channelId, cursor as string | null, Number(limit));
 

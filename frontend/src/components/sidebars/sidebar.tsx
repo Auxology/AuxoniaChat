@@ -88,7 +88,13 @@ export function Sidebar() {
 
   return (
     <div className="flex flex-col bg-sidebar h-full border-r-0">
-      {/* Fixed Top Navigation */}
+    
+
+      {/* Scrollable Middle Section */}
+      <div className="flex-1 overflow-hidden">
+
+        <ScrollArea className="h-full border-t">
+          {/* Fixed Top Navigation */}
       <div className="shrink-0 py-2 flex flex-col items-center space-y-4">
         <TooltipProvider>
           <Tooltip delayDuration={300}>
@@ -120,14 +126,8 @@ export function Sidebar() {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-
-        {/* Server Divider */}
-        <div className="w-8 h-0.5 bg-muted/20 rounded-full"></div>
       </div>
 
-      {/* Scrollable Middle Section */}
-      <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full border-none">
           <div className="flex flex-col h-full min-h-[calc(100vh-140px)] justify-between">
             {/* Server List - This will scroll */}
             <div className="flex flex-col items-center space-y-4 py-2 px-1">
@@ -247,10 +247,10 @@ export function Sidebar() {
       </div>
 
       {/* User Avatar - Fixed at bottom */}
-      <div className="shrink-0 border-t border-muted/10 pt-2 pb-2 flex justify-center">
+      <div className="shrink-0 border-t pt-2 pb-2 flex justify-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Avatar className="h-12 w-12 border-2 border-muted/20 hover:border-paragraph/30 rounded-full transition-all cursor-pointer">
+            <Avatar className="h-12 w-12 border-2 border-border/20 hover:border-paragraph/30 rounded-full transition-all cursor-pointer">
               {userData?.avatar_url ? (
                 <AvatarImage
                   src={userData.avatar_url}
@@ -264,7 +264,7 @@ export function Sidebar() {
               )}
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="right" align="end" className="w-56 bg-card border border-muted/20">
+          <DropdownMenuContent side="right" align="end" className="w-56 bg-card border">
             {/* User info section */}
             <div className="flex items-center p-2 gap-3">
               <Avatar className="h-10 w-10">
@@ -406,7 +406,7 @@ function ServerIcon({ server }: { server: Server }) {
             </TooltipContent>
           </Tooltip>
         </ContextMenuTrigger>
-        <ContextMenuContent className="w-56 bg-card border border-muted/20">
+        <ContextMenuContent className="w-56 bg-card border">
           {isServerOwner ? (
               <Link to="/settings/server/$serverId" params={{ serverId: server.id }}>
               <ContextMenuItem className="cursor-pointer text-paragraph hover:text-headline flex items-center gap-2">

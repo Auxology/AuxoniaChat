@@ -7,6 +7,7 @@ export const getMessagesForChannel = async (channelId: string, { pageParam }: { 
     const response = await axiosInstance.get(`/messages/channel/${channelId}`, {
       params: pageParam ? { cursor: pageParam } : {}
     });
+    console.log(response.data);
     return response.data;
   }
 

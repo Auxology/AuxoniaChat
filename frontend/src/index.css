@@ -21,7 +21,7 @@
   --accent-foreground: #fffffe;
   --destructive: hsl(0 84.2% 60.2%);
   --destructive-foreground: #fffffe;
-  --border: #242629;
+  --border: #3d4044;
   --input: #1E2022;
   --ring: #7f5af0; /* Using button color for focus rings */
   --chart-1: hsl(12 76% 61%);
@@ -165,4 +165,24 @@
 /* Additional global styles */
 html {
   scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--primary, #7f5af0);
+  border-radius: 9999px;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary, #7f5af0) transparent;
 }

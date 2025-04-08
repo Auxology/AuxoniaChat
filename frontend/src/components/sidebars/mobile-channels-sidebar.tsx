@@ -35,16 +35,16 @@ export function MobileChannelsSidebar({
         <Button 
           variant="outline"
           size="sm"
-          className="md:hidden flex items-center justify-center gap-1 mr-2 px-2 border-muted/30 bg-sidebar/50"
+          className="md:hidden flex items-center justify-center gap-1 mr-2 px-2 bg-sidebar/50"
         >
           <Hash className="h-4 w-4 text-button" />
           <span className="text-xs font-pitch-sans-medium">Channels</span>
           <ChevronRight className="h-3 w-3 text-muted-foreground" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="p-0 w-[280px] border-r border-muted/20">
+      <SheetContent side="left" className="p-0 w-[280px] border-r ">
         <div className="flex flex-col h-full">
-          <SheetHeader className="px-4 py-3 border-b border-muted/20 flex flex-row justify-between items-center">
+          <SheetHeader className="px-4 py-3 border-b flex flex-row justify-between items-center">
             <Button
               variant="ghost"
               size="icon"
@@ -55,7 +55,7 @@ export function MobileChannelsSidebar({
           </SheetHeader>
           
           {/* Channel header with create button */}
-          <div className="p-4 border-b border-muted/20">
+          <div className="p-4 border-b">
             <div className="flex justify-between items-center">
               <h2 className="font-semibold text-sm text-headline">Channels</h2>
               {isCurrentUserOwner && (

@@ -6,6 +6,7 @@ import {
   SheetTitle, 
   SheetDescription 
 } from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Menu, X } from "lucide-react";
 import { Sidebar } from "./sidebar";
 import { useEffect } from "react";
@@ -34,7 +35,7 @@ export function MobileSidebar({
       </SheetTrigger>
       <SheetContent 
         side="left" 
-        className="p-0 w-[100px] bg-sidebar fixed inset-y-0 left-0 z-[9999] border-r border-muted/20"
+        className="p-0 w-[100px] bg-sidebar fixed inset-y-0 left-0 z-[9999] border-r border-border flex flex-col"
         forceMount
       >
         <SheetTitle className="sr-only">Navigation Sidebar</SheetTitle>
@@ -51,8 +52,10 @@ export function MobileSidebar({
           <X className="h-4 w-4 text-white" />
         </Button>
         
-        <div className="pt-9">
-          <Sidebar />
+        <div className="pt-9 flex-1">
+          <ScrollArea className="h-full">
+            <Sidebar />
+          </ScrollArea>
         </div>
       </SheetContent>
     </Sheet>

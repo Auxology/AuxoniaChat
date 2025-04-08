@@ -27,22 +27,20 @@ export function ServerChannelsSidebar({
   } = useServerChannels(serverId);
 
   return (
-    <div className={`h-full w-60 bg-sidebar/50 border-r border-muted/20 flex flex-col ${className}`}>
-      <div className="p-4 border-b border-muted/20">
-        <div className="flex justify-between items-center">
-          <h2 className="font-semibold text-sm">Channels</h2>
-          {isCurrentUserOwner && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-5 w-5"
-              onClick={onCreateChannel}
-              title="Create Channel"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
+    <div className={`h-full w-60 bg-sidebar/50 border-r flex flex-col ${className}`}>
+      <div className="h-12 flex items-center justify-between px-4 border-b">
+        <h2 className="font-semibold text-sm">Channels</h2>
+        {isCurrentUserOwner && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5"
+            onClick={onCreateChannel}
+            title="Create Channel"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       <ScrollArea className="flex-1">

@@ -48,7 +48,7 @@ export function MembersSidebar({
 
   return (
     <div className={cn(
-      "bg-sidebar border-l border-muted/20 overflow-hidden transition-all",
+      "bg-sidebar border-l verflow-hidden transition-all",
       // Full width and fixed position on mobile
       "md:w-60 md:static md:block",
       // Fixed position on mobile devices for overlay appearance
@@ -56,7 +56,7 @@ export function MembersSidebar({
     )}>
       <div className="h-full flex flex-col">
         {/* Members Header */}
-        <div className="h-12 border-b border-muted/20 flex items-center px-4 justify-between">
+        <div className="h-12 border-b flex items-center px-4 justify-between">
           <h2 className="font-pitch-sans-medium text-headline">Members</h2>
           <Button
             variant="ghost"

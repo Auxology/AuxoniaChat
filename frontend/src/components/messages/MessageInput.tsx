@@ -34,7 +34,7 @@ export function MessageInput({ serverId, channelId }: MessageInputProps) {
 }
     
   return (
-    <div className="p-4 border-t border-muted/20">
+    <div className="p-4 border-t">
       <form onSubmit={handleSendMessage} className="relative">
         <Input
           value={message}
