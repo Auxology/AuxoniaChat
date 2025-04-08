@@ -153,19 +153,13 @@ export async function deleteServerWithId(serverId: string): Promise<void> {
                 WHERE server_id = $1
             `, [serverId]);
 
-            // Delete all server related data
+            // Delete all server join requests
             await query(`
                 DELETE FROM app.server_join_requests
                 WHERE server_id = $1
             `, [serverId]);
 
-            // Delete server channels
-            await query(`
-                DELETE FROM app.channels
-                WHERE server_id = $1
-            `, [serverId]);
-
-            // Delete server messages
+            // FIRST delete messages associated with server channels
             await query(`
                 DELETE FROM app.messages
                 WHERE channel_id IN (
@@ -174,8 +168,14 @@ export async function deleteServerWithId(serverId: string): Promise<void> {
                     WHERE server_id = $1
                 )
             `, [serverId]);
+            
+            // THEN delete the channels 
+            await query(`
+                DELETE FROM app.channels
+                WHERE server_id = $1
+            `, [serverId]);
     
-            // Delete server
+            // Finally delete server
             await query(`
                 DELETE FROM app.servers
                 WHERE id = $1

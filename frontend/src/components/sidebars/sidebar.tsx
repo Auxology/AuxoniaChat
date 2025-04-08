@@ -93,7 +93,7 @@ export function Sidebar() {
       {/* Scrollable Middle Section */}
       <div className="flex-1 overflow-hidden">
 
-        <ScrollArea className="h-full border-t">
+        <ScrollArea className="h-full">
           {/* Fixed Top Navigation */}
       <div className="shrink-0 py-2 flex flex-col items-center space-y-4">
         <TooltipProvider>
