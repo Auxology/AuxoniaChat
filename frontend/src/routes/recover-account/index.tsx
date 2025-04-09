@@ -89,7 +89,7 @@ function RouteComponent() {
                           placeholder="" 
                           maxLength={20}
                           {...field}
-                          className="font-pitch-sans-medium text-center text-lg tracking-widest focus:bg-white uppercase"
+                          className="font-pitch-sans-medium text-center text-lg tracking-widest uppercase"
                         />
                       </FormControl>
                       <FormMessage />

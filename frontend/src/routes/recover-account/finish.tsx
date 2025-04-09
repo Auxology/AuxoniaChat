@@ -116,7 +116,7 @@ function RouteComponent() {
                             type={passwordVisible ? "text" : "password"}
                             placeholder="Enter your new password"
                             {...field}
-                            className="font-pitch-sans-medium pr-10 focus:bg-white"
+                            className="font-pitch-sans-medium pr-10"
                           />
                           <Button
                             type="button"
@@ -173,7 +173,7 @@ function RouteComponent() {
                           type={passwordVisible ? "text" : "password"}
                           placeholder="Confirm your password"
                           {...field}
-                          className="font-pitch-sans-medium focus:bg-white"
+                          className="font-pitch-sans-medium"
                         />
                       </FormControl>
                       <FormMessage />

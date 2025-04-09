@@ -85,7 +85,7 @@ function RouteComponent() {
   }
 
   return (
-    <main className="min-h-[92.8vh] flex items-center justify-center px-3 py-6 sm:px-4 sm:py-8">
+    <main className="min-h-[92.8vh] flex items-center justify-center px-2 py-4 sm:px-4 sm:py-6 md:py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -120,7 +120,7 @@ function RouteComponent() {
             </CardDescription>
           </CardHeader>
           
-          <CardContent>
+          <CardContent className="px-3 sm:px-6">
             <Tabs defaultValue="sent" className="w-full" onValueChange={(value) => setActiveTab(value as "sent" | "incoming")}>
               <TabsList className="grid grid-cols-2 mb-6 bg-card/50 p-1 rounded-lg border border-button/10">
                 <TabsTrigger 
@@ -137,7 +137,7 @@ function RouteComponent() {
                   <Users className="h-4 w-4 mr-2" />
                   Incoming Requests
                   {incomingRequests?.length > 0 && (
-                    <Badge className="ml-2 bg-rose-500/90 hover:bg-rose-500 text-white border-transparent">
+                    <Badge className="absolute  right-0 ml-2 bg-rose-500/90 hover:bg-rose-500 text-white border-transparent">
                       {incomingRequests.length}
                     </Badge>
                   )}
@@ -145,10 +145,10 @@ function RouteComponent() {
               </TabsList>
               
               <TabsContent value="sent" className="outline-none">
-                <div className="bg-card/30 p-4 sm:p-6 rounded-xl border border-button/10">
-                  <h3 className="font-pitch-sans-medium text-headline text-lg mb-4">Your Sent Join Requests</h3>
+                <div className="bg-card/30 p-3 sm:p-4 md:p-6 rounded-xl border border-button/10">
+                  <h3 className="font-pitch-sans-medium text-headline text-base sm:text-lg mb-3 sm:mb-4">Your Sent Join Requests</h3>
                   
-                  <ScrollArea className="h-[400px] pr-4">
+                  <ScrollArea className="h-[350px] sm:h-[400px] pr-3 sm:pr-4">
                     {sentLoading ? (
                       <div className="flex flex-col items-center justify-center h-[300px] text-paragraph">
                         <Loader2 className="h-8 w-8 animate-spin mb-4" />
@@ -159,10 +159,10 @@ function RouteComponent() {
                         {sentRequests.map((request: any) => (
                           <div 
                             key={request.id} 
-                            className="flex items-center justify-between p-4 rounded-md border border-muted/20 bg-card/50 hover:bg-card/80 transition-colors"
+                            className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-md border border-muted/20 bg-card/50 hover:bg-card/80 transition-colors"
                           >
-                            <div className="flex items-center gap-3">
-                              <Avatar className="h-10 w-10 border border-button/10">
+                            <div className="flex items-center gap-3 mb-3 sm:mb-0">
+                              <Avatar className="h-9 w-9 sm:h-10 sm:w-10 border border-button/10">
                                 {request.server_icon_url ? (
                                   <AvatarImage src={request.server_icon_url} alt={request.server_name} />
                                 ) : (
@@ -178,17 +178,19 @@ function RouteComponent() {
                                 </p>
                               </div>
                             </div>
-                            {getStatusBadge(request.status)}
+                            <div className="self-end sm:self-auto">
+                              {getStatusBadge(request.status)}
+                            </div>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center justify-center h-[300px] text-paragraph">
-                        <div className="bg-button/10 p-3 rounded-full mb-4">
-                          <Bell className="h-6 w-6 text-button" />
+                      <div className="flex flex-col items-center justify-center h-[250px] sm:h-[300px] text-paragraph px-3 sm:px-0">
+                        <div className="bg-button/10 p-3 rounded-full mb-3 sm:mb-4">
+                          <Bell className="h-5 w-5 sm:h-6 sm:w-6 text-button" />
                         </div>
-                        <p className="font-freight-text-pro-black mb-2">No requests sent</p>
-                        <p className="text-sm text-paragraph/70 text-center max-w-md">
+                        <p className="font-freight-text-pro-black mb-1 sm:mb-2">No requests sent</p>
+                        <p className="text-xs sm:text-sm text-paragraph/70 text-center max-w-md">
                           You haven't sent any server join requests yet. Browse and find servers to join.
                         </p>
                       </div>
@@ -198,10 +200,10 @@ function RouteComponent() {
               </TabsContent>
               
               <TabsContent value="incoming" className="outline-none">
-                <div className="bg-card/30 p-4 sm:p-6 rounded-xl border border-button/10">
-                  <h3 className="font-pitch-sans-medium text-headline text-lg mb-4">Server Join Requests to Review</h3>
+                <div className="bg-card/30 p-3 sm:p-4 md:p-6 rounded-xl border border-button/10">
+                  <h3 className="font-pitch-sans-medium text-headline text-base sm:text-lg mb-3 sm:mb-4">Server Join Requests to Review</h3>
                   
-                  <ScrollArea className="h-[400px] pr-4">
+                  <ScrollArea className="h-[350px] sm:h-[400px] pr-3 sm:pr-4">
                     {incomingLoading ? (
                       <div className="flex flex-col items-center justify-center h-[300px] text-paragraph">
                         <Loader2 className="h-8 w-8 animate-spin mb-4" />
@@ -212,10 +214,10 @@ function RouteComponent() {
                         {incomingRequests.map((request: any) => (
                           <div 
                             key={request.id} 
-                            className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-md border border-muted/20 bg-card/50 hover:bg-card/80 transition-colors"
+                            className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-md border border-muted/20 bg-card/50 hover:bg-card/80 transition-colors"
                           >
                             <div className="flex items-center gap-3 mb-3 sm:mb-0">
-                              <Avatar className="h-10 w-10 border border-button/10">
+                              <Avatar className="h-9 w-9 sm:h-10 sm:w-10 border border-button/10">
                                 {request.user_avatar_url ? (
                                   <AvatarImage src={request.user_avatar_url} alt={request.username} />
                                 ) : (
@@ -234,7 +236,7 @@ function RouteComponent() {
                                 </p>
                               </div>
                             </div>
-                            <div className="flex gap-2 self-end sm:self-auto">
+                            <div className="flex gap-2 self-end sm:self-auto mt-2 sm:mt-0">
                               <Button 
                                 size="sm" 
                                 variant="outline"
@@ -243,11 +245,11 @@ function RouteComponent() {
                                 disabled={approveRequest.isPending && approveRequest.variables?.requestId === request.id}
                               >
                                 {approveRequest.isPending && approveRequest.variables?.requestId === request.id ? (
-                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                  <Loader2 className="h-3 w-3 mr-1 sm:h-4 sm:w-4 animate-spin" />
                                 ) : (
-                                  <Check className="h-4 w-4 mr-1" />
+                                  <Check className="h-3 w-3 mr-1 sm:h-4 sm:w-4" />
                                 )}
-                                Accept
+                                <span className="text-xs sm:text-sm">Accept</span>
                               </Button>
                               <Button 
                                 size="sm" 
@@ -257,11 +259,11 @@ function RouteComponent() {
                                 disabled={rejectRequest.isPending && rejectRequest.variables?.requestId === request.id}
                               >
                                 {rejectRequest.isPending && rejectRequest.variables?.requestId === request.id ? (
-                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                  <Loader2 className="h-3 w-3 mr-1 sm:h-4 sm:w-4 animate-spin" />
                                 ) : (
-                                  <X className="h-4 w-4 mr-1" />
+                                  <X className="h-3 w-3 mr-1 sm:h-4 sm:w-4" />
                                 )}
-                                Reject
+                                <span className="text-xs sm:text-sm">Reject</span>
                               </Button>
                             </div>
                           </div>

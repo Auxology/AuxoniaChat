@@ -86,7 +86,7 @@ function RouteComponent() {
                           placeholder="Enter your new email address" 
                           type="email"
                           {...field}
-                          className="font-pitch-sans-medium focus:bg-white"
+                          className="font-pitch-sans-medium"
                         />
                       </FormControl>
                       <FormMessage />

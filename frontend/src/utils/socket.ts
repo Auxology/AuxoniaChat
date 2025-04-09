@@ -1,6 +1,5 @@
 import { io, Socket } from 'socket.io-client';
 import { QueryClient } from '@tanstack/react-query';
-import { toast } from "sonner";
 
 // Singleton socket instance
 let socket: Socket | null = null;
@@ -46,12 +45,8 @@ const setupSocketListeners = (userId: string) => {
     userIds.forEach(id => addOnlineUser(id));
   });
 
-  socket.on('server:joinRequest', (data) => {
+  socket.on('server:joinRequest', () => {
     queryClient?.invalidateQueries({ queryKey: ["incomingJoinRequests"] });
-    
-    toast.info("New join request", {
-      description: `${data.username} requested to join ${data.serverName}`,
-    });
   });
 
   socket.on('server:joinApproved', (data) => {
@@ -60,25 +55,16 @@ const setupSocketListeners = (userId: string) => {
     queryClient?.invalidateQueries({ queryKey: ["incomingJoinRequests"] });
 
     socket?.emit('join:serverRoom', data.serverId);
-    
-    toast.success("Join request approved", {
-      description: `You have been approved to join ${data.serverName}`,
-    });
   });
 
-  socket.on('server:joinRequestRejected', (data) => {
+  socket.on('server:joinRequestRejected', () => {
     queryClient?.invalidateQueries({ queryKey: ["sentJoinRequests"] });
     queryClient?.invalidateQueries({ queryKey: ["incomingJoinRequests"] });
-    
-    toast.error("Join request rejected", {
-      description: `Your request to join ${data.serverName} was rejected.`,
-    });
   });
 
   socket.on('server:nameUpdated', () => {
     queryClient?.invalidateQueries({ queryKey: ["userServers"] });
     queryClient?.invalidateQueries({ queryKey: ["server"] });
-
   });
 
   socket.on('server:iconUpdated', () => {
@@ -88,11 +74,15 @@ const setupSocketListeners = (userId: string) => {
 
   // Query key is actually ["messages", serverId]
   socket.on('server:messageSent', (data) => {
-        // Invalidate messages for the server
         queryClient?.invalidateQueries({ queryKey: ["messages", data.channelId] });
   });
 
   socket.on('server:deleted', () => {
+        queryClient?.invalidateQueries({ queryKey: ["userServers"] });
+        queryClient?.invalidateQueries({ queryKey: ["server"] });
+  });
+
+  socket.on('server:memberLeft', ()=> {
         queryClient?.invalidateQueries({ queryKey: ["userServers"] });
         queryClient?.invalidateQueries({ queryKey: ["server"] });
   });

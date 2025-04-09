@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import {createFileRoute, redirect} from '@tanstack/react-router';
 import { useState } from "react";
 import { requireAuth } from "@/utils/routeGuards";
 import { motion } from "motion/react";

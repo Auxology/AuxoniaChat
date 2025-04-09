@@ -145,7 +145,7 @@ function RouteComponent() {
                           placeholder="Code"
                           maxLength={8}
                           {...field}
-                          className="font-pitch-sans-medium text-center text-sm lg:text-md tracking-widest focus:bg-white"
+                          className="font-pitch-sans-medium text-center text-sm lg:text-md tracking-widest"
                         />
                       </FormControl>
                       <FormMessage />

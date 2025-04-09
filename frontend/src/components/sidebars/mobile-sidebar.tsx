@@ -35,7 +35,7 @@ export function MobileSidebar({
       </SheetTrigger>
       <SheetContent 
         side="left" 
-        className="p-0 w-[100px] bg-sidebar fixed inset-y-0 left-0 z-[9999] border-r border-border flex flex-col"
+        className="p-0 w-[80px] sm:w-[100px] bg-sidebar fixed inset-y-0 left-0 z-[9999] border-r border-border flex flex-col"
         forceMount
       >
         <SheetTitle className="sr-only">Navigation Sidebar</SheetTitle>
@@ -52,8 +52,8 @@ export function MobileSidebar({
           <X className="h-4 w-4 text-white" />
         </Button>
         
-        <div className="pt-9 flex-1">
-          <ScrollArea className="h-full">
+        <div className="pt-9 flex-1 flex flex-col h-full">
+          <ScrollArea className="h-full flex-1">
             <Sidebar />
           </ScrollArea>
         </div>

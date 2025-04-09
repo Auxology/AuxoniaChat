@@ -19,7 +19,7 @@ import {
 import { CreateServerDialog } from "../create-server";
 import { JoinServerDialog } from "../join-server";
 import { ServerSearchDialog } from "../server-search-dialog";
-import { Server } from "@/actions/useServerActions";
+import { Server, useLeaveServer } from "@/actions/useServerActions";
 import { toast } from "sonner";
 import { 
   ContextMenu,
@@ -189,14 +189,14 @@ export function Sidebar() {
                       className="rounded-full bg-card text-blue-500 hover:bg-blue-500 hover:text-headline"
                       onClick={() => setJoinServerOpen(true)}
                     >
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                         className="h-5 w-5"
                       >
                         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
@@ -247,31 +247,39 @@ export function Sidebar() {
       </div>
 
       {/* User Avatar - Fixed at bottom */}
-      <div className="shrink-0 border-t pt-2 pb-2 flex justify-center">
+      <div className="shrink-0 border-t pt-2 pb-2 flex justify-center w-full">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Avatar className="h-12 w-12 border-2 border-border/20 hover:border-paragraph/30 rounded-full transition-all cursor-pointer">
+            <Avatar className="h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 border-2 border-border/20 hover:border-paragraph/30 rounded-full transition-all cursor-pointer">
               {userData?.avatar_url ? (
                 <AvatarImage
                   src={userData.avatar_url}
                   alt={`${userData.username}'s avatar`}
-                  className="rounded-full object-cover"
+                  className="rounded-full object-cover h-full w-full"
                 />
               ) : (
                 <AvatarFallback className="bg-button text-headline">
-                  {isLoadingUser ? <User className="h-5 w-5" /> : getUserInitials()}
+                  {isLoadingUser ? <User className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" /> : getUserInitials()}
                 </AvatarFallback>
               )}
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="right" align="end" className="w-56 bg-card border">
+          <DropdownMenuContent 
+            side="right" 
+            align="end" 
+            className="w-56 bg-card border z-[99999]"
+            sideOffset={5}
+            alignOffset={5}
+            forceMount
+          >
             {/* User info section */}
             <div className="flex items-center p-2 gap-3">
-              <Avatar className="h-10 w-10">
+              <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                 {userData?.avatar_url ? (
                   <AvatarImage
                     src={userData.avatar_url}
                     alt={`${userData.username}'s avatar`}
+                    className="h-full w-full object-cover"
                   />
                 ) : (
                   <AvatarFallback className="bg-button text-headline">
@@ -325,9 +333,9 @@ export function Sidebar() {
         open={createServerOpen} 
         onOpenChange={setCreateServerOpen} 
       />
-      <JoinServerDialog 
-        open={joinServerOpen} 
-        onOpenChange={setJoinServerOpen} 
+      <JoinServerDialog
+        open={joinServerOpen}
+        onOpenChange={setJoinServerOpen}
       />
       <ServerSearchDialog 
         open={searchOpen} 
@@ -345,6 +353,7 @@ function ServerIcon({ server }: { server: Server }) {
     queryFn: fetchUserProfile,
     staleTime: 1000 * 60 * 5,
   });
+  const leaveServer = useLeaveServer();
   
   // Check if the current user is the server owner
   const isServerOwner = userData?.id === server.ownerId;
@@ -352,10 +361,7 @@ function ServerIcon({ server }: { server: Server }) {
   // Handle leaving server
   const handleLeaveServer = async () => {
     try {
-      await axiosInstance.post("/servers/leave", { serverId: server.id });
-      toast.success(`Left ${server.name}`);
-      // Refresh the server list
-      queryClient.invalidateQueries({ queryKey: ["userServers"] });
+      leaveServer.mutateAsync(server.id);
     } catch (error) {
       toast.error("Failed to leave server", {
         description: "Please try again"

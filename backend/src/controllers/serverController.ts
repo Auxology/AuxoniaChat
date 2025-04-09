@@ -164,6 +164,18 @@ export const leaveServer = async (req:Request, res:Response):Promise<void> => {
         // Now make the user leave the server
         await leaveServerWithIds(userId, serverId);
 
+        // Get all members of the server
+        const members:ServerMembers[] = await getAllServerMembers(serverId);
+
+        const io = getSocketIO();
+        // Notify all members of the server
+        members.forEach(member => {
+            io.to(`user:${member.id}`).emit('server:memberLeft', {
+                userId,
+                serverId
+            });
+        });
+
         res.status(200).json({message: 'Left server'});
     }
     catch(error) {
@@ -387,22 +399,23 @@ export const approveJoinRequest = async (req:Request, res:Response):Promise<void
 
         const io = getSocketIO();
 
-        // Notifiy the user
+        // Notify the user
         io.to(`user:${result.userId}`).emit('server:joinApproved', {
             serverId,
             serverDetails
         });
 
-        // Notify admins
-        const admins = await getServerAdmins(serverId);
-        admins.forEach(adminId => {
-            io.to(`user:${adminId}`).emit('server:joinApproved', {
+        // Notify all members of the server
+        members.forEach(member => {
+            io.to(`user:${member.id}`).emit('server:joinApproved', {
                 serverId,
                 serverDetails
             });
         });
-        
-        res.status(200).json({message: 'Request approved'});
+
+        //Send name of server from this api
+        const serverName = serverDetails.name;
+        res.status(200).json({serverName});
     }
     catch(error) {
         console.error(`Error in approveJoinRequest: ${error}`);
@@ -464,15 +477,18 @@ export const rejectJoinRequest = async (req: Request, res: Response): Promise<vo
                 serverDetails
             });
         });
-        
-        res.status(200).json({ message: 'Request rejected' });
+
+        // Send name of server from this api
+        // For usage in socket
+        const serverName = serverDetails.name;
+        res.status(200).json({serverName});
     } catch (error) {
         console.error(`Error in rejectJoinRequest: ${error}`);
         res.status(500).json({ message: 'Internal server error' });
     }
 }
 
-// This will retrive all reqeuqsts sent by the user
+// This will retrive all requests sent by the user
 export const getSentJoinRequests = async (req: Request, res: Response): Promise<void> => {
     try{
         if(!req.session.isAuthenticated) {

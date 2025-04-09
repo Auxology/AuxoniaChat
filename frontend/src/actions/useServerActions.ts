@@ -2,7 +2,7 @@ import {QueryClient, useMutation, useQueryClient} from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/axios";
 import { toast } from "sonner";
 import {AxiosError} from "axios";
-import { useNavigate } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 
 // Server types
 export interface Server {
@@ -95,7 +95,7 @@ export function useJoinServer() {
 
 export function useLeaveServer() {
     const queryClient = useQueryClient();
-    const navigate = useNavigate();
+    const router = useRouter();
 
     return useMutation({
         mutationFn: async (serverId: string) => {
@@ -107,20 +107,13 @@ export function useLeaveServer() {
         },
         onSuccess: () => {
             // Invalidate and restart servers list
-            queryClient.invalidateQueries({ queryKey: ["userServers"] }).finally(():void => {
-                // Show success notification
-                toast.success("Left server", {
-                    description: "You have successfully left the server.",
-                    duration: 5000,
-                });
-            })
-            // Navigate away from the server page to the chat home
-            navigate({ to: '/chat' }).finally()
+            queryClient.invalidateQueries({ queryKey: ["userServers"] });
 
+            router.navigate({to: "/chat"});
         },
         onError: (error: AxiosError) => {
             const message: string = (error.response?.data as { message?: string })?.message || "There was an error leaving the server.";
-            
+
             // Show error notification
             toast.error("Failed to leave server", {
                 description: message,
@@ -290,7 +283,7 @@ export function useUpdateServerIcon() {
 
 export function useDeleteServer() {
     const queryClient:QueryClient = useQueryClient();
-    const navigate = useNavigate();
+    const router = useRouter();
 
     return useMutation({
         mutationFn: async (serverId: string) => {
@@ -306,7 +299,7 @@ export function useDeleteServer() {
                     })
 
                     // Optionally, you can navigate the user away from the server page
-                    navigate({ to: '/chat' }).finally()
+                    router.navigate({to: "/chat"});
                 },);
             },);
         },

@@ -61,7 +61,7 @@ export function JoinServerDialog({ open, onOpenChange }: JoinServerDialogProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-card border border-muted/20 text-headline">
+      <DialogContent className="sm:max-w-[425px] bg-card border border-muted/20 text-headline z-[9999]">
         <DialogHeader>
           <DialogTitle className="font-ogg text-headline text-2xl">Request to Join a Server</DialogTitle>
           <DialogDescription className="text-paragraph">

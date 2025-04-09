@@ -323,10 +323,9 @@ export async function rejectJoinRequestById(requestId: string): Promise<{userId:
         
         const { user_id: userId, server_id: serverId } = rows[0];
         
-        // Update request status
+        // Delete the request
         await query(`
-            UPDATE app.server_join_requests
-            SET status = 'rejected'
+            DELETE FROM app.server_join_requests
             WHERE id = $1
         `, [requestId]);
         

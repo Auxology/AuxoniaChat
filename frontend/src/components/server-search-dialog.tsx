@@ -43,7 +43,7 @@ export function ServerSearchDialog({ open, onOpenChange }: ServerSearchDialogPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-card border-muted/30">
+      <DialogContent className="sm:max-w-md bg-card border-muted/30 z-[9999]">
         <DialogHeader>
           <DialogTitle className="text-headline">Find Servers</DialogTitle>
           <DialogDescription className="text-muted-foreground">
