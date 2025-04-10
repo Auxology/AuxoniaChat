@@ -1,7 +1,7 @@
 import {QueryClient, useMutation, useQueryClient} from "@tanstack/react-query";
 import {axiosInstance} from "@/lib/axios.ts";
 import {AxiosError} from "axios";
-
+ 
 export function useSendMessageInChannel() {
     const queryClient: QueryClient = useQueryClient();
 

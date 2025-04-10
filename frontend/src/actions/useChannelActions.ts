@@ -20,7 +20,7 @@ export function useCreateChannel() {
         },
         onSuccess: (_data, variables) => {
             // Invalidate and refetch channels list
-            queryClient.invalidateQueries({ queryKey: ['serverChannels', variables.serverId] });
+            queryClient?.invalidateQueries({ queryKey: ['serverChannels', variables.serverId] });
 
             // Show success notification
             toast.success("Channel created", {

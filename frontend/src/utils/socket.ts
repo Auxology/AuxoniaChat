@@ -86,6 +86,11 @@ const setupSocketListeners = (userId: string) => {
         queryClient?.invalidateQueries({ queryKey: ["userServers"] });
         queryClient?.invalidateQueries({ queryKey: ["server"] });
   });
+
+  socket.on('server:channelCreated', (data) => {
+    queryClient?.invalidateQueries({queryKey: ["serverChannels", data.serverId ]});
+    queryClient?.invalidateQueries({queryKey: ["channelDetails", data.channelId]});
+  })
 }
 
 const addOnlineUser = (userId: string) => {

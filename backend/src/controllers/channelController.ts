@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import { createNewChannel, getChannelDetailsById, getServerChannels, getServerRole } from '../utils/channel';
 import { randomUUID } from 'crypto';
-import { checkIfUserIsMember } from '../utils/server';
+import {checkIfUserIsMember, getAllServerMembers} from '../utils/server';
+import {ServerMembers} from "../types/types";
+import {getSocketIO} from "../libs/socket";
 
 export const createChannel = async (req: Request, res: Response): Promise<void> => {
     try{
@@ -32,6 +34,8 @@ export const createChannel = async (req: Request, res: Response): Promise<void> 
             return;
         }
 
+        const members: ServerMembers[] = await getAllServerMembers(serverId);
+
         const channelId:string = randomUUID();
 
         await createNewChannel({
@@ -39,6 +43,17 @@ export const createChannel = async (req: Request, res: Response): Promise<void> 
             serverId,
             name,
             description
+        });
+
+        // Send notification to all members of the server
+        const io = getSocketIO();
+        // Notify all members of the server
+        members.forEach(member => {
+            io.to(`user:${member.id}`).emit('server:channelCreated', {
+                userId,
+                serverId,
+                channelId,
+            });
         });
 
         res.status(201).json({ id: channelId });

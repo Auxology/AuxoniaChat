@@ -10,14 +10,14 @@ export const getMessagesForChannel = async (channelId: string, { pageParam }: { 
     return response.data;
   }
 
-  export function useGetMessagesForChannel(channelId: string) {
-    return useInfiniteQuery({
-        queryKey: ['messages', channelId],
-        queryFn: ({ pageParam }) => getMessagesForChannel(channelId, { pageParam }),
-        initialPageParam: null,
-        getNextPageParam: (lastPage) => {
-            return lastPage.nextCursor;
-        },
-        refetchOnWindowFocus: false,
-    })
+
+  export function useGetMessagesForChannel(channelId: string) {return useInfiniteQuery({
+    queryKey: ['messages', channelId],
+    queryFn: ({ pageParam }) => getMessagesForChannel(channelId, { pageParam }),
+    initialPageParam: null,
+    getNextPageParam: (lastPage) => {
+        return lastPage.nextCursor;
+    },
+    refetchOnWindowFocus: false,
+})
 }

@@ -19,6 +19,7 @@ export function ServerChannelsSidebar({
 }: ServerChannelsSidebarProps) {
   const navigate = useNavigate();
 
+
   // Use the imported hook from useChannel.ts instead of defining inline
   const {
     data: channels,

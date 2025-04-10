@@ -27,7 +27,6 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { useQueryClient } from "@tanstack/react-query";
 import { useUserServers } from "@/queries/ServerQueries";
 
 // User data interface
@@ -347,7 +346,6 @@ export function Sidebar() {
 
 // Server Icon Component
 function ServerIcon({ server }: { server: Server }) {
-  const queryClient = useQueryClient();
   const { data: userData } = useQuery({
     queryKey: ['userProfile'],
     queryFn: fetchUserProfile,
