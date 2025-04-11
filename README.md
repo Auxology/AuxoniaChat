@@ -58,11 +58,3 @@ Coming soon...
 
 ## 📝 Status
 ⚠️ **Note**: This project is currently in the planning and initial development phase.
-
-## 📋 Todo
-- Design database schema
-- Create UI components
-- Set up WebSocket server
-- Implement real-time features
-- Add proper rate limiting
-- Configure email service with Resend
