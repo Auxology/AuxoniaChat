@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { motion } from "motion/react"
 import { Button } from "@/components/ui/button"
@@ -22,6 +22,7 @@ import { toast } from "sonner"
 import { axiosInstance } from "@/lib/axios"
 import { useRef, useState } from "react"
 import { requireAuth } from "@/utils/routeGuards"
+import { useUpdateUsername } from '@/actions/useSecurityActions'
 
 // Username validation schema
 const usernameSchema = z.object({
@@ -42,20 +43,6 @@ type UserData = {
 const fetchUserProfile = async (): Promise<UserData> => {
   const response = await axiosInstance.get('/user/profile');
   return response.data;
-};
-
-const updateUsername = async (username: string): Promise<void> => {
-  await axiosInstance.post('/user/profile/username', { username });
-};
-
-const updateAvatar = async (formData: FormData): Promise<void> => {
-  const config = {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  };
-
-  await axiosInstance.post('/user/profile/avatar', formData, config);
 };
 
 export const Route = createFileRoute('/settings/')({
@@ -81,18 +68,7 @@ function RouteComponent() {
   });
 
   // Username update mutation
-  const usernameMutation = useMutation({
-    mutationFn: updateUsername,
-    onSuccess: () => {
-      toast.success("Username updated successfully");
-      queryClient.invalidateQueries({ queryKey: ['userProfile'] });
-    },
-    onError: () => {
-      toast.error("Failed to update username", {
-        description: "Please try again"
-      });
-    }
-  });
+  const usernameMutation = useUpdateUsername();
 
   // Form for username update
   const usernameForm = useForm<z.infer<typeof usernameSchema>>({
@@ -139,6 +115,16 @@ function RouteComponent() {
       setAvatarPreview(reader.result as string);
     };
     reader.readAsDataURL(file);
+  };
+
+  const updateAvatar = async (formData: FormData): Promise<void> => {
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    };
+  
+    await axiosInstance.post('/user/profile/avatar', formData, config);
   };
 
   // Handle avatar submission

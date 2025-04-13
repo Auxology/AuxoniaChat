@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { useMutation } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { motion } from "motion/react"
 import { Button } from "@/components/ui/button"
@@ -18,9 +17,15 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, KeyRound, Mail, Eye, EyeOff, Shield, AlertTriangle, Loader2, CheckCircle2 } from "lucide-react"
 import { toast } from "sonner"
-import { axiosInstance } from "@/lib/axios"
 import { useState, useEffect } from "react"
 import { requireAuth } from "@/utils/routeGuards"
+import { 
+  useRequestPasswordChange,
+  useVerifyPasswordCode,
+  useCompletePasswordChange,
+  useRequestEmailChange,
+  useVerifyEmailCode
+} from "@/actions/useSecurityActions"
 
 // Email validation schema
 const emailSchema = z.object({
@@ -45,27 +50,6 @@ const newPasswordSchema = z.object({
   message: "Passwords don't match",
   path: ["confirmPassword"],
 })
-
-// API functions
-const requestPasswordChange = async (): Promise<void> => {
-  await axiosInstance.post('/user/security/request-password-change');
-};
-
-const verifyPasswordChangeCode = async (code: string): Promise<void> => {
-  await axiosInstance.post('/user/security/verify-password-change', { code });
-};
-
-const completePasswordChange = async (password: string): Promise<void> => {
-  await axiosInstance.post('/user/security/complete-password-change', { password });
-};
-
-const requestEmailChange = async (email: string): Promise<void> => {
-  await axiosInstance.post('/user/security/request-email-change', { email });
-};
-
-const verifyEmailChangeCode = async (code: string): Promise<void> => {
-  await axiosInstance.post('/user/security/verify-email-change', { code });
-};
 
 // Password Requirement Component
 const PasswordRequirement = ({ met, text }: { met: boolean; text: string }) => (
@@ -148,76 +132,35 @@ function RouteComponent() {
     }
   }, [password]);
 
-  // Mutations
-  const requestPasswordChangeMutation = useMutation({
-    mutationFn: requestPasswordChange,
-    onSuccess: () => {
-      toast.success("Verification code sent to your email");
-      setPasswordChangeStep("verification");
-    },
-    onError: () => {
-      toast.error("Failed to request password change", {
-        description: "Please try again later"
-      });
-    }
+  // Mutations with success handlers
+  const requestPasswordChangeMutation = useRequestPasswordChange(() => {
+    toast.success("Verification code sent to your email");
+    setPasswordChangeStep("verification");
   });
 
-  const verifyPasswordCodeMutation = useMutation({
-    mutationFn: verifyPasswordChangeCode,
-    onSuccess: () => {
-      toast.success("Code verified successfully");
-      setPasswordChangeStep("newPassword");
-    },
-    onError: () => {
-      toast.error("Invalid verification code", {
-        description: "Please check your code and try again"
-      });
-    }
+  const verifyPasswordCodeMutation = useVerifyPasswordCode(() => {
+    toast.success("Code verified successfully");
+    setPasswordChangeStep("newPassword");
   });
 
-  const completePasswordChangeMutation = useMutation({
-    mutationFn: completePasswordChange,
-    onSuccess: () => {
-      toast.success("Password changed successfully");
-      setPasswordChangeStep("idle");
-      newPasswordForm.reset();
-      {/**  Reload Page*/}
-      window.location.reload();
-    },
-    onError: () => {
-      toast.error("Failed to change password", {
-        description: "Please try again later"
-      });
-    }
+  const completePasswordChangeMutation = useCompletePasswordChange(() => {
+    toast.success("Password changed successfully");
+    setPasswordChangeStep("idle");
+    newPasswordForm.reset();
+    window.location.reload();
   });
 
-  const requestEmailChangeMutation = useMutation({
-    mutationFn: requestEmailChange,
-    onSuccess: () => {
-      toast.success("Verification code sent to your new email");
-      setEmailChangeStep("verification");
-    },
-    onError: () => {
-      toast.error("Failed to request email change", {
-        description: "This email may already be in use or is invalid"
-      });
-    }
+  const requestEmailChangeMutation = useRequestEmailChange(() => {
+    toast.success("Verification code sent to your new email");
+    setEmailChangeStep("verification");
   });
 
-  const verifyEmailCodeMutation = useMutation({
-    mutationFn: verifyEmailChangeCode,
-    onSuccess: () => {
-      toast.success("Email changed successfully");
-      setEmailChangeStep("idle");
-      emailForm.reset();
-      verifyEmailForm.reset();
-      window.location.reload();
-    },
-    onError: () => {
-      toast.error("Invalid verification code", {
-        description: "Please check your code and try again"
-      });
-    }
+  const verifyEmailCodeMutation = useVerifyEmailCode(() => {
+    toast.success("Email changed successfully");
+    setEmailChangeStep("idle");
+    emailForm.reset();
+    verifyEmailForm.reset();
+    window.location.reload();
   });
 
   // Handle form submissions
@@ -521,7 +464,7 @@ function RouteComponent() {
                               <FormLabel className="font-pitch-sans-medium text-headline">New Email Address</FormLabel>
                               <FormControl>
                                 <Input 
-                                  placeholder="Enter your new email address"
+                                  placeholder="New Email Adress"
                                   type="email"
                                   {...field}
                                   className="font-pitch-sans-medium text-paragraph bg-background border-button/20 focus-within:border-button focus:bg-background/80 transition-all duration-300"

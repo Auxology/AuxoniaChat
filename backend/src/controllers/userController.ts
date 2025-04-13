@@ -19,7 +19,7 @@ import {
     deletePasswordChangeCode,
     deletePasswordChangeSession,
     deleteSessions,
-    lockoutUserById, storeEmailChangeCode,
+    lockoutUserById, removeLockout, storeEmailChangeCode,
     storePasswordChangeCode, verifyEmailChangeCode,
     verifyPasswordChangeCode
 } from "../libs/redis";
@@ -266,6 +266,7 @@ export const changePassword = async (req:Request, res:Response):Promise<void> =>
 
         await deleteSessions(sessionId);
         await removeSessionId(userId, sessionId)
+        await removeLockout(userData.email);
 
         res.status(200).json({message: 'Password updated'});
     }
@@ -389,6 +390,8 @@ export const verifyEmailChange = async (req:Request, res:Response):Promise<void>
         // Delete all sessions
         await deleteSessions(sessionId);
         await removeSessionId(userId, sessionId);
+
+        await removeLockout(email);
 
         res.status(200).json({message: 'Email updated'});
     }

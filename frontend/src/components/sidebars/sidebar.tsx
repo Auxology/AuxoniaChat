@@ -359,7 +359,7 @@ function ServerIcon({ server }: { server: Server }) {
   // Handle leaving server
   const handleLeaveServer = async () => {
     try {
-      leaveServer.mutateAsync(server.id);
+      await leaveServer.mutateAsync(server.id);
     } catch (error) {
       toast.error("Failed to leave server", {
         description: "Please try again"
@@ -410,7 +410,7 @@ function ServerIcon({ server }: { server: Server }) {
             </TooltipContent>
           </Tooltip>
         </ContextMenuTrigger>
-        <ContextMenuContent className="w-56 bg-card border">
+        <ContextMenuContent className="w-56 bg-card border z-[9999]">
           {isServerOwner ? (
               <Link to="/settings/server/$serverId" params={{ serverId: server.id }}>
               <ContextMenuItem className="cursor-pointer text-paragraph hover:text-headline flex items-center gap-2">
