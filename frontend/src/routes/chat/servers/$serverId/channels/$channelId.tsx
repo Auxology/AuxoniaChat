@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { toast } from "sonner";
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { MessageInput } from '@/components/messages/MessageInput';
-import { MessageItem } from '@/components/messages/MessageItem'; // Import MessageItem
+import { MessageItem } from '@/components/messages/MessageItem';
 import { useChannelDetails } from '@/queries/channelQueries';
-import { useGetMessagesForChannel } from '@/queries/messageQueries'; // Import the infinite messages hook
+import { useGetMessagesForChannel } from '@/queries/messageQueries';
 import { useAuthCheck } from "@/queries/useAuthQuery";
 import { requireAuth } from "@/utils/routeGuards";
+import InfiniteScrollContainer from "@/components/messages/InfiniteScrollComponent";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute('/chat/servers/$serverId/channels/$channelId')({
@@ -21,7 +21,7 @@ export const Route = createFileRoute('/chat/servers/$serverId/channels/$channelI
 function ChannelComponent() {
   const { channelId, serverId } = Route.useParams();
   const navigate = useNavigate();
-  const messagesEndRef = useRef<HTMLDivElement>(null); // Ref for potential auto-scrolling
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   const {
     isLoading: isLoadingChannel,
@@ -39,7 +39,6 @@ function ChannelComponent() {
     fetchNextPage,
     hasNextPage,
     isLoading: isLoadingMessages,
-    isFetchingNextPage,
     error: messagesError,
   } = useGetMessagesForChannel(channelId);
 
@@ -66,11 +65,9 @@ function ChannelComponent() {
       toast.error("Failed to load messages", {
         description: messagesError.message || "Could not fetch messages for this channel."
       });
-      // Decide if you want to navigate away or just show an error
     }
   }, [messagesError]);
 
-  // Combine loading states
   const isLoading = isLoadingChannel || isLoadingUserDetails || isLoadingMessages;
 
   if (isLoading && !messagesData) { // Show initial loader only if no messages are loaded yet
@@ -89,33 +86,42 @@ function ChannelComponent() {
         {/* Message List Area */}
         <div
           id="messageScrollableDiv"
-          className="flex-1 overflow-y-auto flex flex-col-reverse p-2" // flex-col-reverse to keep scroll at bottom
+          className="flex-1 overflow-y-auto flex flex-col-reverse p-2 bg-chat"
         >
-          {/* Infinite Scroll Component */}
-          <InfiniteScroll
-            dataLength={messages.length}
-            next={fetchNextPage}
-            style={{ display: 'flex', flexDirection: 'column-reverse' }} // To put new messages at the bottom initially
-            inverse={true} // Crucial for chat interfaces
-            hasMore={hasNextPage ?? false}
-            loader={<div className="text-center p-2">
-              <Loader2 className="animate-spin" />
-            </div>}
-            scrollableTarget="messageScrollableDiv"
-            endMessage={
+          {/* Use your InfiniteScrollContainer */}
+          <InfiniteScrollContainer
+            onTopReached={() => {
+              if (hasNextPage && !isLoadingMessages) {
+                fetchNextPage();
+              }
+            }}
+            className="flex flex-col-reverse"
+          >
+            {/* Render Messages */}
+            {messages.map((message) => (
+              <MessageItem key={message.id} message={message} />
+            ))}
+
+            {/* Conditionally render End Message */}
+            {!hasNextPage && messages.length > 0 && (
               <p className="text-center text-sm text-gray-400 p-2">
                 <b>Yay! You have seen it all</b>
               </p>
-            }
-          >
-            {/* Render Messages */}
-            {messages.map(  (message) => (
-              // Ensure your MessageItem takes a unique key, usually message.id
-              <MessageItem key={message.id} message={message} />
-            ))}
-          </InfiniteScroll>
-           {/* Optional: Element to scroll to */}
-           <div ref={messagesEndRef} />
+            )}
+
+            {/* Conditionally render Loader at the top (visually) */}
+            {isLoadingMessages && hasNextPage && (
+               <div className="text-center p-2 flex justify-center">
+                 <Loader2 className="animate-spin h-5 w-5" />
+               </div>
+            )}
+          </InfiniteScrollContainer>
+
+          {/* Scroll to bottom when new messages are received */}
+          {bottomRef.current && (
+            <div ref={bottomRef} className="h-1" />
+          )}
+          
         </div>
 
         {/* Message Input Area */}
@@ -123,7 +129,6 @@ function ChannelComponent() {
           <MessageInput
               serverId={serverId}
               channelId={channelId}
-              // Consider adding props to disable input while loading/error
           />
         </div>
       </div>

@@ -3,13 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useSendMessageInChannel } from "@/actions/useMessageActions";
+import { on } from "events";
 
 interface MessageInputProps {
   serverId: string;
   channelId: string;
+  onMessageSent?: (message: string) => void;
 }
 
-export function MessageInput({ serverId, channelId }: MessageInputProps) {
+export function MessageInput({ serverId, channelId, onMessageSent }: MessageInputProps) {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const sendMessage = useSendMessageInChannel();
@@ -30,11 +32,12 @@ export function MessageInput({ serverId, channelId }: MessageInputProps) {
     } finally {
       setIsSending(false);
       setMessage("");
+      onMessageSent?.(message);
     }
 }
     
   return (
-    <div className="p-4 border-t">
+    <div className="p-4">
       <form onSubmit={handleSendMessage} className="relative">
         <Input
           value={message}
