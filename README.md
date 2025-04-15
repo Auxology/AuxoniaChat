@@ -34,7 +34,6 @@ A modern real-time chat application focused on security, performance, and user e
 - 🔄 Redis
 - 🔌 Socket.io for real-time communication
 - ☁️ Cloudinary for media storage
-- 📧 Resend for emails
 
 ### Development Tools
 - 📦 pnpm
@@ -43,18 +42,6 @@ A modern real-time chat application focused on security, performance, and user e
 - 🧪 TypeScript
 - 🔍 ESLint
 
-## 🎯 Planned Features
-- Real-time messaging with WebSocket
-- File sharing and media support
-- User presence indicators
-- Message reactions and threads
-- End-to-end encryption
-- Group chat functionality
-- Rich text messaging
-- Message search
-
-## ⚡ Getting Started
-Coming soon...
-
 ## 📝 Status
-⚠️ **Note**: This project has reached final stage of development.
+⚠️ **Note**: I lost interest in this project so it is on hold for now.
+I can proudly say that I learned a lot from this and will just move on.

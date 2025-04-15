@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Search, MessageSquare, Plus, User, Settings, LogOut, Shield } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/axios.ts";
-import { Link } from "@tanstack/react-router";
+import {Link, useRouter} from "@tanstack/react-router";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -47,6 +47,7 @@ export function Sidebar() {
   const [createServerOpen, setCreateServerOpen] = useState(false);
   const [joinServerOpen, setJoinServerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const router = useRouter();
   
   // Fetch user profile
   const { 
@@ -116,12 +117,14 @@ export function Sidebar() {
         <TooltipProvider>
           <Tooltip delayDuration={300}>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full bg-button text-headline hover:bg-button/80">
+              <Button variant="ghost" size="icon" className="rounded-full bg-button text-headline hover:bg-button/80" onClick={() => {
+                router.navigate({ to: '/chat' });
+              }}>
                 <MessageSquare className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="right">
-              <p>Direct Messages</p>
+            <TooltipContent className="z-[9999]" side="right">
+              <p>Chat</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
